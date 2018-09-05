@@ -39,11 +39,10 @@
       <FileName>Managers\MusicLoader.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="LilypondViewModel" />
       <Property Name="MainViewModel" />
+      <Property Name="LilypondViewModel" />
       <Property Name="MidiPlayerViewModel" />
       <Property Name="StaffsViewModel" />
-      <Property Name="MidiSequence" />
     </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Property Name="WPFStaffs" />
@@ -90,10 +89,10 @@
       <FileName>ViewModels\ViewModelLocator.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
-      <Property Name="LilypondViewModel" />
       <Property Name="MainViewModel" />
-      <Property Name="MidiPlayerViewModel" />
+      <Property Name="LilypondViewModel" />
       <Property Name="StaffsViewModel" />
+      <Property Name="MidiPlayerViewModel" />
     </ShowAsAssociation>
   </Class>
   <Class Name="PSAMControlLibrary.MusicalSymbol" Collapsed="true">
