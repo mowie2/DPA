@@ -6,9 +6,14 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public class TimeSignature
+    public class TimeSignature : Symbol
     {
         private int NumberOfBeats;
         private int TimeOfBeats;
+
+        public override void GetSymbol()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

@@ -2,12 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public class Alternative
+    public abstract class Symbol : MusicSymbol
     {
-        private List<Note> notes;
     }
 }

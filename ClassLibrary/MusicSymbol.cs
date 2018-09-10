@@ -8,6 +8,7 @@ namespace ClassLibrary
 {
     public abstract class MusicSymbol
     {
-        public abstract void ShowSymbol();
+
+        public abstract void GetSymbol();
     }
 }

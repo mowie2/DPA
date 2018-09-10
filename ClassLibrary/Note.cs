@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public class Note
+    public class Note : Symbol
     {
         enum SEMITONE { MAJOR, NORMAL, MINOR };
         private char Pitch;
@@ -15,5 +15,9 @@ namespace ClassLibrary
         private int Octaaf;
         private int Dotted;
 
+        public override void GetSymbol()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

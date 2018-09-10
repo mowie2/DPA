@@ -2,12 +2,17 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    class Clef : Symbol
+    public class Composite : MusicSymbol
     {
+        private List<MusicSymbol> musicSymbols;
+
+        Composite()
+        {
+            musicSymbols = new List<MusicSymbol>();
+        }
         public override void GetSymbol()
         {
             throw new NotImplementedException();
