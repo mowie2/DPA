@@ -10,13 +10,19 @@ namespace DPA_Musicsheets.Builders
     class NoteBuilder : AbstractNoteBuilder
     {
 
-        public NoteBuilder()
-        {
-            note = new Note();
-        }
         protected override Note BuildNote()
         {
-            
+            note = new Note();
+            note.Clef = this.Clef;
+            note.TimeSignature = this.TimeSignature;
+            note.Pitch = this.Pitch;
+            this.Pitch = "";
+            note.Semitone = this.Semitone;
+            this.Semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
+            note.Duration = this.Duration;
+            this.Duration = 0;
+            note.Dotted = this.Dotted;
+            this.Dotted = 0;
             return note;
         }
 
@@ -27,27 +33,27 @@ namespace DPA_Musicsheets.Builders
 
         protected override void SetTimeSignature(TimeSignature timeSignature)
         {
-            note.TimeSignature = timeSignature;
+            this.TimeSignature = timeSignature;
         }
 
         protected override void SetDotted(int dotted)
         {
-            note.Dotted = dotted;
+            this.Dotted = dotted;
         }
 
         protected override void SetDuriation(float duration)
         {
-            note.Duration = duration;
+            this.Duration = duration;
         }
 
         protected override void SetPitch(char Pitch)
         {
-            note.Pitch = Pitch;
+            this.Pitch = Pitch;
         }
 
         protected override void SetSemitone(Semitone.SEMITONE semitone)
         {
-            note.Semitone = semitone;
+            this.Semitone = semitone;
         }
     }
 }

@@ -13,6 +13,12 @@ namespace DPA_Musicsheets.Builders
         protected Clef Clef;
         protected TimeSignature TimeSignature;
 
+        protected string Pitch;
+        protected Semitone.SEMITONE Semitone;
+        protected float Duration;
+        protected int Dotted;
+
+
         protected abstract void SetClef(Clef clef);
         protected abstract void SetTimeSignature(TimeSignature timeSignature);
         protected abstract void SetPitch(char Pitch);
