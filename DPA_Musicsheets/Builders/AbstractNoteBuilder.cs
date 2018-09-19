@@ -7,18 +7,15 @@ using System.Threading.Tasks;
 
 namespace CLassLibrary
 {
-    public abstract class AbstractBuilder
+    public abstract class AbstractNoteBuilder
     {
         protected Note PreviousNote;
+        protected Note NewNote = new Note();
         protected Clef Clef;
         protected TimeSignature TimeSignature;
-        protected char Pitch;
-        protected Semitone.SEMITONE Semitone;
-        protected float Duration;
-        protected int Dotted;
 
         protected abstract void SetClef(Clef clef);
-        protected abstract void SetClef(TimeSignature timeSignature);
+        protected abstract void SetTimeSignature(TimeSignature timeSignature);
         protected abstract void SetPitch(char Pitch);
         protected abstract void SetSemitone(Semitone.SEMITONE semitone);
         protected abstract void SetDuriation(float duration);

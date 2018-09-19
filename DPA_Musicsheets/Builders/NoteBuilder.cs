@@ -8,45 +8,44 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Builders
 {
-    class Builder : AbstractBuilder
+    class NoteBuilder : AbstractNoteBuilder
     {
         protected override Note BuildNote()
         {
-            PreviousNote = new Note();
-            PreviousNote.Clef = Clef;
-            PreviousNote;
-
+            PreviousNote.NextNote = NewNote;
+            PreviousNote = NewNote;
+            NewNote = new Note();
             return PreviousNote;
         }
 
         protected override void SetClef(Clef clef)
         {
-            throw new NotImplementedException();
+            NewNote.Clef = clef;
         }
 
-        protected override void SetClef(TimeSignature timeSignature)
+        protected override void SetTimeSignature(TimeSignature timeSignature)
         {
-            throw new NotImplementedException();
+            NewNote.TimeSignature = timeSignature;
         }
 
-        protected override void SetDotted(int Dotted)
+        protected override void SetDotted(int dotted)
         {
-            throw new NotImplementedException();
+            NewNote.Dotted = dotted;
         }
 
         protected override void SetDuriation(float duration)
         {
-            throw new NotImplementedException();
+            NewNote.Duration = duration;
         }
 
         protected override void SetPitch(char Pitch)
         {
-            throw new NotImplementedException();
+            NewNote.Pitch = Pitch;
         }
 
         protected override void SetSemitone(Semitone.SEMITONE semitone)
         {
-            throw new NotImplementedException();
+            NewNote.Semitone = semitone;
         }
     }
 }
