@@ -21,7 +21,6 @@ namespace DPA_Musicsheet
                     return openFileDialog.FileName;
                 } else
                 {
-                    MessageBox.Show("Dialogbox is not showing");
                     return null;
                 }
             } catch (Exception e)
