@@ -9,10 +9,10 @@ namespace ClassLibrary
     public class Note
     {
         private char Pitch;
-        private float Duration;
-        private Semitone.SEMITONE Semitone;
-        private Clef clef;
-        private int Dotted;
-
+        public Clef Clef { get; set; }
+        public char Pitch { get; set; }
+        public Semitone.SEMITONE Semitone { get; set; }
+        public float Duration { get; set; }
+        public int Dotted { get; set; }
     }
 }

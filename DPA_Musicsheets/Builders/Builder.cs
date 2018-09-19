@@ -1,24 +1,52 @@
 ﻿using ClassLibrary;
+using CLassLibrary;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CLassLibrary
+namespace DPA_Musicsheets.Builders
 {
-    public abstract class Builder
+    class Builder : AbstractBuilder
     {
-        protected Clef clef;
-        protected TimeSignature timeSignature;
+        protected override Note BuildNote()
+        {
+            PreviousNote = new Note();
+            PreviousNote.Clef = Clef;
+            PreviousNote;
 
-        protected abstract void SetDuriation(float duration);
-        protected abstract void SetPitch(char pitch);
-        protected abstract void SetSemitone(Semitone.SEMITONE semitone);
-        protected abstract void SetClef(Clef clef);
-        protected abstract void SetClef(TimeSignature timeSignature);
-        protected abstract Note BuildNote();
+            return PreviousNote;
+        }
 
+        protected override void SetClef(Clef clef)
+        {
+            throw new NotImplementedException();
+        }
 
+        protected override void SetClef(TimeSignature timeSignature)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void SetDotted(int Dotted)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void SetDuriation(float duration)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void SetPitch(char Pitch)
+        {
+            throw new NotImplementedException();
+        }
+
+        protected override void SetSemitone(Semitone.SEMITONE semitone)
+        {
+            throw new NotImplementedException();
+        }
     }
 }
