@@ -21,7 +21,7 @@ namespace DPA_Musicsheets.Builders
 
         protected abstract void SetClef(Clef clef);
         protected abstract void SetTimeSignature(TimeSignature timeSignature);
-        protected abstract void SetPitch(char Pitch);
+        protected abstract void SetPitch(String Pitch);
         protected abstract void SetSemitone(Semitone.SEMITONE semitone);
         protected abstract void SetDuriation(float duration);
         protected abstract void SetDotted(int Dotted);
