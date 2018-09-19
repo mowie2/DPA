@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public class Clef
+    public class Semitone
     {
-        public enum Key { G, F, C};
-        public Key key;
+        public enum SEMITONE { MAJOR, NORMAL, MINOR };
     }
 }

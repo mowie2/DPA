@@ -46,6 +46,7 @@
     <Compile Include="MusicSymbol.cs" />
     <Compile Include="Note.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Semitone.cs" />
     <Compile Include="TimeSignature.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

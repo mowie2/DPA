@@ -8,11 +8,10 @@ namespace ClassLibrary
 {
     public class Note
     {
-        enum SEMITONE { MAJOR, NORMAL, MINOR };
         private char Pitch;
         private float Duration;
-        private SEMITONE Semitone;
-        private int Octaaf;
+        private Semitone.SEMITONE Semitone;
+        private Clef clef;
         private int Dotted;
 
     }
