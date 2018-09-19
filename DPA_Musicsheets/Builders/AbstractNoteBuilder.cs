@@ -5,12 +5,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace CLassLibrary
+namespace DPA_Musicsheets.Builders
 {
     public abstract class AbstractNoteBuilder
     {
-        protected Note PreviousNote;
-        protected Note NewNote = new Note();
+        protected Note note;
         protected Clef Clef;
         protected TimeSignature TimeSignature;
 
