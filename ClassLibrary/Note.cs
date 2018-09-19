@@ -8,7 +8,6 @@ namespace ClassLibrary
 {
     public class Note
     {
-        private char Pitch;
         public Clef Clef { get; set; }
         public char Pitch { get; set; }
         public Semitone.SEMITONE Semitone { get; set; }
