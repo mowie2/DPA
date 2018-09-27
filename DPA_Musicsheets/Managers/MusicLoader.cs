@@ -50,6 +50,10 @@ namespace DPA_Musicsheets.Managers
         {
             if (Path.GetExtension(fileName).EndsWith(".mid"))
             {
+                MidiReader reader = new MidiReader();
+                reader.readFile(fileName);
+                
+
                 MidiSequence = new Sequence();
                 MidiSequence.Load(fileName);
 
@@ -118,7 +122,6 @@ namespace DPA_Musicsheets.Managers
             for (int i = 0; i < sequence.Count(); i++)
             {
                 Track track = sequence[i];
-
                 foreach (var midiEvent in track.Iterator())
                 {
                     IMidiMessage midiMessage = midiEvent.MidiMessage;
@@ -159,7 +162,8 @@ namespace DPA_Musicsheets.Managers
                                         }
                                     }
                                     break;
-                                default: break;
+                                default:
+                                    break;
                             }
                             break;
                         case MessageType.Channel:
@@ -195,6 +199,9 @@ namespace DPA_Musicsheets.Managers
                                     lilypondContent.Append("r");
                                 }
                             }
+                            break;
+                        default:
+
                             break;
                     }
                 }
