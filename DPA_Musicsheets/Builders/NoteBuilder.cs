@@ -1,57 +1,67 @@
 ﻿using ClassLibrary;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Builders
 {
-    class NoteBuilder : AbstractNoteBuilder
+    public class NoteBuilder
     {
+        private Note note;
+        private Clef Clef;
+        private TimeSignature TimeSignature;
 
-        protected override Note BuildNote()
+        private  string Pitch;
+        private  Semitone.SEMITONE Semitone;
+        private  float Duration;
+        private  int Dotted;
+
+        public Note BuildNote()
         {
-            note = new Note();
-            note.Clef = this.Clef;
-            note.TimeSignature = this.TimeSignature;
-            note.Pitch = this.Pitch;
-            this.Pitch = "";
-            note.Semitone = this.Semitone;
-            this.Semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
-            note.Duration = this.Duration;
-            this.Duration = 0;
-            note.Dotted = this.Dotted;
-            this.Dotted = 0;
+            note = new Note
+            {
+                Clef = this.Clef,
+                TimeSignature = this.TimeSignature,
+                Pitch = this.Pitch,
+                Semitone = this.Semitone,
+                Duration = this.Duration,
+                Dotted = this.Dotted
+            };
+
+            Clear();
             return note;
         }
 
-        protected override void SetClef(Clef clef)
+        private void Clear()
+        {
+            this.Dotted = 0;
+            this.Duration = 0;
+            this.Semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
+            this.Pitch = "";
+        }
+        public void SetClef(Clef clef)
         {
             this.Clef = clef;
         }
 
-        protected override void SetTimeSignature(TimeSignature timeSignature)
+        public void SetTimeSignature(TimeSignature timeSignature)
         {
             this.TimeSignature = timeSignature;
         }
 
-        protected override void SetDotted(int dotted)
+        public void SetDotted(int dotted)
         {
             this.Dotted = dotted;
         }
 
-        protected override void SetDuriation(float duration)
+        public void SetDuriation(float duration)
         {
             this.Duration = duration;
         }
 
-        protected override void SetPitch(char Pitch)
+        public void SetPitch(string Pitch)
         {
             this.Pitch = Pitch;
         }
 
-        protected override void SetSemitone(Semitone.SEMITONE semitone)
+        public void SetSemitone(Semitone.SEMITONE semitone)
         {
             this.Semitone = semitone;
         }
