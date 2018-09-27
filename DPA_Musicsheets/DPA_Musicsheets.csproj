@@ -103,8 +103,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="FileReader.cs" />
-    <Compile Include="Builders\NoteBuilder.cs" />
+    <Compile Include="Readers\FileReader.cs" />
+    <Compile Include="Readers\LillyPondReader.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Managers\MusicLoader.cs" />
     <Compile Include="Models\LilypondToken.cs" />
@@ -229,7 +229,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClassLibrary\ClassLibrary.csproj">
-      <Project>{3C3C2126-ABC1-4FC0-BC86-C3E359BD2724}</Project>
+      <Project>{3c3c2126-abc1-4fc0-bc86-c3e359bd2724}</Project>
       <Name>ClassLibrary</Name>
     </ProjectReference>
   </ItemGroup>
