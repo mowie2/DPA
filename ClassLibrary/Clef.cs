@@ -6,8 +6,11 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    class Clef : Symbol
+    public class Clef : Symbol
     {
+        public enum Key { G, F, C};
+        public Key key;
+
         public override void GetSymbol()
         {
             throw new NotImplementedException();
