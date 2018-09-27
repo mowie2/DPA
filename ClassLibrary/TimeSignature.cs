@@ -8,8 +8,8 @@ namespace ClassLibrary
 {
     public class TimeSignature : Symbol
     {
-        private int NumberOfBeats;
-        private int TimeOfBeats;
+        public int NumberOfBeats { get; set; }
+        public int TimeOfBeats { get; set; }
 
         public override void GetSymbol()
         {
