@@ -1,4 +1,5 @@
-﻿using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheet;
+using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using Microsoft.Win32;
@@ -52,11 +53,8 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand OpenFileCommand => new RelayCommand(() =>
         {
-            OpenFileDialog openFileDialog = new OpenFileDialog() { Filter = "Midi or LilyPond files (*.mid *.ly)|*.mid;*.ly" };
-            if (openFileDialog.ShowDialog() == true)
-            {
-                FileName = openFileDialog.FileName;
-            }
+            FileReader fr = new FileReader();
+            FileName = fr.OpenFile();
         });
 
         public ICommand LoadCommand => new RelayCommand(() =>

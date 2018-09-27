@@ -1,4 +1,5 @@
 ﻿
+using DPA_Musicsheet;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.ViewModels;
 using PSAMControlLibrary;
@@ -64,7 +65,7 @@ namespace DPA_Musicsheets.Managers
                 {
                     sb.AppendLine(line);
                 }
-                
+
                 this.LilypondText = sb.ToString();
                 this.LilypondViewModel.LilypondTextLoaded(this.LilypondText);
             }
@@ -128,74 +129,74 @@ namespace DPA_Musicsheets.Managers
                     switch (midiMessage.MessageType)
                     {
                         case MessageType.Meta:
-                            var metaMessage = midiMessage as MetaMessage;
-                            switch (metaMessage.MetaType)
+                        var metaMessage = midiMessage as MetaMessage;
+                        switch (metaMessage.MetaType)
+                        {
+                            case MetaType.TimeSignature:
+                            byte[] timeSignatureBytes = metaMessage.GetBytes();
+                            _beatNote = timeSignatureBytes[0];
+                            _beatsPerBar = (int)(1 / Math.Pow(timeSignatureBytes[1], -2));
+                            lilypondContent.AppendLine($"\\time {_beatNote}/{_beatsPerBar}");
+                            break;
+                            case MetaType.Tempo:
+                            byte[] tempoBytes = metaMessage.GetBytes();
+                            int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
+                            _bpm = 60000000 / tempo;
+                            lilypondContent.AppendLine($"\\tempo 4={_bpm}");
+                            break;
+                            case MetaType.EndOfTrack:
+                            if (previousNoteAbsoluteTicks > 0)
                             {
-                                case MetaType.TimeSignature:
-                                    byte[] timeSignatureBytes = metaMessage.GetBytes();
-                                    _beatNote = timeSignatureBytes[0];
-                                    _beatsPerBar = (int)(1 / Math.Pow(timeSignatureBytes[1], -2));
-                                    lilypondContent.AppendLine($"\\time {_beatNote}/{_beatsPerBar}");
-                                    break;
-                                case MetaType.Tempo:
-                                    byte[] tempoBytes = metaMessage.GetBytes();
-                                    int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
-                                    _bpm = 60000000 / tempo;
-                                    lilypondContent.AppendLine($"\\tempo 4={_bpm}");
-                                    break;
-                                case MetaType.EndOfTrack:
-                                    if (previousNoteAbsoluteTicks > 0)
-                                    {
-                                        // Finish the last notelength.
-                                        double percentageOfBar;
-                                        lilypondContent.Append(MidiToLilyHelper.GetLilypondNoteLength(previousNoteAbsoluteTicks, midiEvent.AbsoluteTicks, division, _beatNote, _beatsPerBar, out percentageOfBar));
-                                        lilypondContent.Append(" ");
+                                // Finish the last notelength.
+                                double percentageOfBar;
+                                lilypondContent.Append(MidiToLilyHelper.GetLilypondNoteLength(previousNoteAbsoluteTicks, midiEvent.AbsoluteTicks, division, _beatNote, _beatsPerBar, out percentageOfBar));
+                                lilypondContent.Append(" ");
 
-                                        percentageOfBarReached += percentageOfBar;
-                                        if (percentageOfBarReached >= 1)
-                                        {
-                                            lilypondContent.AppendLine("|");
-                                            percentageOfBar = percentageOfBar - 1;
-                                        }
-                                    }
-                                    break;
-                                default: break;
+                                percentageOfBarReached += percentageOfBar;
+                                if (percentageOfBarReached >= 1)
+                                {
+                                    lilypondContent.AppendLine("|");
+                                    percentageOfBar = percentageOfBar - 1;
+                                }
                             }
                             break;
+                            default: break;
+                        }
+                        break;
                         case MessageType.Channel:
-                            var channelMessage = midiEvent.MidiMessage as ChannelMessage;
-                            if (channelMessage.Command == ChannelCommand.NoteOn)
+                        var channelMessage = midiEvent.MidiMessage as ChannelMessage;
+                        if (channelMessage.Command == ChannelCommand.NoteOn)
+                        {
+                            if (channelMessage.Data2 > 0) // Data2 = loudness
                             {
-                                if(channelMessage.Data2 > 0) // Data2 = loudness
-                                {
-                                    // Append the new note.
-                                    lilypondContent.Append(MidiToLilyHelper.GetLilyNoteName(previousMidiKey, channelMessage.Data1));
-                                    
-                                    previousMidiKey = channelMessage.Data1;
-                                    startedNoteIsClosed = false;
-                                }
-                                else if (!startedNoteIsClosed)
-                                {
-                                    // Finish the previous note with the length.
-                                    double percentageOfBar;
-                                    lilypondContent.Append(MidiToLilyHelper.GetLilypondNoteLength(previousNoteAbsoluteTicks, midiEvent.AbsoluteTicks, division, _beatNote, _beatsPerBar, out percentageOfBar));
-                                    previousNoteAbsoluteTicks = midiEvent.AbsoluteTicks;
-                                    lilypondContent.Append(" ");
+                                // Append the new note.
+                                lilypondContent.Append(MidiToLilyHelper.GetLilyNoteName(previousMidiKey, channelMessage.Data1));
 
-                                    percentageOfBarReached += percentageOfBar;
-                                    if (percentageOfBarReached >= 1)
-                                    {
-                                        lilypondContent.AppendLine("|");
-                                        percentageOfBarReached -= 1;
-                                    }
-                                    startedNoteIsClosed = true;
-                                }
-                                else
-                                {
-                                    lilypondContent.Append("r");
-                                }
+                                previousMidiKey = channelMessage.Data1;
+                                startedNoteIsClosed = false;
                             }
-                            break;
+                            else if (!startedNoteIsClosed)
+                            {
+                                // Finish the previous note with the length.
+                                double percentageOfBar;
+                                lilypondContent.Append(MidiToLilyHelper.GetLilypondNoteLength(previousNoteAbsoluteTicks, midiEvent.AbsoluteTicks, division, _beatNote, _beatsPerBar, out percentageOfBar));
+                                previousNoteAbsoluteTicks = midiEvent.AbsoluteTicks;
+                                lilypondContent.Append(" ");
+
+                                percentageOfBarReached += percentageOfBar;
+                                if (percentageOfBarReached >= 1)
+                                {
+                                    lilypondContent.AppendLine("|");
+                                    percentageOfBarReached -= 1;
+                                }
+                                startedNoteIsClosed = true;
+                            }
+                            else
+                            {
+                                lilypondContent.Append("r");
+                            }
+                        }
+                        break;
                     }
                 }
             }
@@ -229,131 +230,130 @@ namespace DPA_Musicsheets.Managers
                 switch (currentToken.TokenKind)
                 {
                     case LilypondTokenKind.Unknown:
-                        break;
+                    break;
                     case LilypondTokenKind.Repeat:
-                        inRepeat = true;
-                        symbols.Add(new Barline() { RepeatSign = RepeatSignType.Forward });
-                        break;
+                    inRepeat = true;
+                    symbols.Add(new Barline() { RepeatSign = RepeatSignType.Forward });
+                    break;
                     case LilypondTokenKind.SectionEnd:
-                        if (inRepeat && currentToken.NextToken?.TokenKind != LilypondTokenKind.Alternative)
-                        {
-                            inRepeat = false;
-                            symbols.Add(new Barline() { RepeatSign = RepeatSignType.Backward, AlternateRepeatGroup = alternativeRepeatNumber });
-                        }
-                        else if (inAlternative && alternativeRepeatNumber == 1)
-                        {
-                            alternativeRepeatNumber++;
-                            symbols.Add(new Barline() { RepeatSign = RepeatSignType.Backward, AlternateRepeatGroup = alternativeRepeatNumber });
-                        }
-                        else if (inAlternative && currentToken.NextToken.TokenKind == LilypondTokenKind.SectionEnd)
-                        {
-                            inAlternative = false;
-                            alternativeRepeatNumber = 0;
-                        }
-                        break;
-                    case LilypondTokenKind.SectionStart:
-                        if (inAlternative && currentToken.PreviousToken.TokenKind != LilypondTokenKind.SectionEnd)
-                        {
-                            alternativeRepeatNumber++;
-                            symbols.Add(new Barline() { AlternateRepeatGroup = alternativeRepeatNumber });
-                        }
-                        break;
-                    case LilypondTokenKind.Alternative:
-                        inAlternative = true;
+                    if (inRepeat && currentToken.NextToken?.TokenKind != LilypondTokenKind.Alternative)
+                    {
                         inRepeat = false;
-                        currentToken = currentToken.NextToken; // Skip the first bracket open.
-                        break;
-                    case LilypondTokenKind.Note:
-                        // Tied
-                        // TODO: A tie, like a dot and cross or mole are decorations on notes. Is the DECORATOR pattern of use here?
-                        NoteTieType tie = NoteTieType.None;
-                        if (currentToken.Value.StartsWith("~"))
-                        {
-                            tie = NoteTieType.Stop;
-                            var lastNote = symbols.Last(s => s is Note) as Note;
-                            if (lastNote != null) lastNote.TieType = NoteTieType.Start;
-                            currentToken.Value = currentToken.Value.Substring(1);
-                        }
-                        // Length
-                        int noteLength = Int32.Parse(Regex.Match(currentToken.Value, @"\d+").Value);
-                        // Crosses and Moles
-                        int alter = 0;
-                        alter += Regex.Matches(currentToken.Value, "is").Count;
-                        alter -= Regex.Matches(currentToken.Value, "es|as").Count;
-                        // Octaves
-                        int distanceWithPreviousNote = notesorder.IndexOf(currentToken.Value[0]) - notesorder.IndexOf(previousNote);
-                        if (distanceWithPreviousNote > 3) // Shorter path possible the other way around
-                        {
-                            distanceWithPreviousNote -= 7; // The number of notes in an octave
-                        }
-                        else if (distanceWithPreviousNote < -3)
-                        {
-                            distanceWithPreviousNote += 7; // The number of notes in an octave
-                        }
-
-                        if (distanceWithPreviousNote + notesorder.IndexOf(previousNote) >= 7)
-                        {
-                            previousOctave++;
-                        }
-                        else if (distanceWithPreviousNote + notesorder.IndexOf(previousNote) < 0)
-                        {
-                            previousOctave--;
-                        }
-
-                        // Force up or down.
-                        previousOctave += currentToken.Value.Count(c => c == '\'');
-                        previousOctave -= currentToken.Value.Count(c => c == ',');
-
-                        previousNote = currentToken.Value[0];
-
-                        var note = new Note(currentToken.Value[0].ToString().ToUpper(), alter, previousOctave, (MusicalSymbolDuration)noteLength, NoteStemDirection.Up, tie, new List<NoteBeamType>() { NoteBeamType.Single });
-                        note.NumberOfDots += currentToken.Value.Count(c => c.Equals('.'));
-                        
-                        symbols.Add(note);
-                        break;
-                    case LilypondTokenKind.Rest:
-                        var restLength = Int32.Parse(currentToken.Value[1].ToString());
-                        symbols.Add(new Rest((MusicalSymbolDuration)restLength));
-                        break;
-                    case LilypondTokenKind.Bar:
+                        symbols.Add(new Barline() { RepeatSign = RepeatSignType.Backward, AlternateRepeatGroup = alternativeRepeatNumber });
+                    }
+                    else if (inAlternative && alternativeRepeatNumber == 1)
+                    {
+                        alternativeRepeatNumber++;
+                        symbols.Add(new Barline() { RepeatSign = RepeatSignType.Backward, AlternateRepeatGroup = alternativeRepeatNumber });
+                    }
+                    else if (inAlternative && currentToken.NextToken.TokenKind == LilypondTokenKind.SectionEnd)
+                    {
+                        inAlternative = false;
+                        alternativeRepeatNumber = 0;
+                    }
+                    break;
+                    case LilypondTokenKind.SectionStart:
+                    if (inAlternative && currentToken.PreviousToken.TokenKind != LilypondTokenKind.SectionEnd)
+                    {
+                        alternativeRepeatNumber++;
                         symbols.Add(new Barline() { AlternateRepeatGroup = alternativeRepeatNumber });
-                        break;
-                    case LilypondTokenKind.Clef:
-                        currentToken = currentToken.NextToken;
-                        if (currentToken.Value == "treble")
-                            currentClef = new Clef(ClefType.GClef, 2);
-                        else if (currentToken.Value == "bass")
-                            currentClef = new Clef(ClefType.FClef, 4);
-                        else
-                            throw new NotSupportedException($"Clef {currentToken.Value} is not supported.");
+                    }
+                    break;
+                    case LilypondTokenKind.Alternative:
+                    inAlternative = true;
+                    inRepeat = false;
+                    currentToken = currentToken.NextToken; // Skip the first bracket open.
+                    break;
+                    case LilypondTokenKind.Note:
+                    // Tied
+                    // TODO: A tie, like a dot and cross or mole are decorations on notes. Is the DECORATOR pattern of use here?
+                    NoteTieType tie = NoteTieType.None;
+                    if (currentToken.Value.StartsWith("~"))
+                    {
+                        tie = NoteTieType.Stop;
+                        var lastNote = symbols.Last(s => s is Note) as Note;
+                        if (lastNote != null) lastNote.TieType = NoteTieType.Start;
+                        currentToken.Value = currentToken.Value.Substring(1);
+                    }
+                    // Length
+                    int noteLength = Int32.Parse(Regex.Match(currentToken.Value, @"\d+").Value);
+                    // Crosses and Moles
+                    int alter = 0;
+                    alter += Regex.Matches(currentToken.Value, "is").Count;
+                    alter -= Regex.Matches(currentToken.Value, "es|as").Count;
+                    // Octaves
+                    int distanceWithPreviousNote = notesorder.IndexOf(currentToken.Value[0]) - notesorder.IndexOf(previousNote);
+                    if (distanceWithPreviousNote > 3) // Shorter path possible the other way around
+                    {
+                        distanceWithPreviousNote -= 7; // The number of notes in an octave
+                    }
+                    else if (distanceWithPreviousNote < -3)
+                    {
+                        distanceWithPreviousNote += 7; // The number of notes in an octave
+                    }
 
-                        symbols.Add(currentClef);
-                        break;
+                    if (distanceWithPreviousNote + notesorder.IndexOf(previousNote) >= 7)
+                    {
+                        previousOctave++;
+                    }
+                    else if (distanceWithPreviousNote + notesorder.IndexOf(previousNote) < 0)
+                    {
+                        previousOctave--;
+                    }
+
+                    // Force up or down.
+                    previousOctave += currentToken.Value.Count(c => c == '\'');
+                    previousOctave -= currentToken.Value.Count(c => c == ',');
+
+                    previousNote = currentToken.Value[0];
+
+                    var note = new Note(currentToken.Value[0].ToString().ToUpper(), alter, previousOctave, (MusicalSymbolDuration)noteLength, NoteStemDirection.Up, tie, new List<NoteBeamType>() { NoteBeamType.Single });
+                    note.NumberOfDots += currentToken.Value.Count(c => c.Equals('.'));
+
+                    symbols.Add(note);
+                    break;
+                    case LilypondTokenKind.Rest:
+                    var restLength = Int32.Parse(currentToken.Value[1].ToString());
+                    symbols.Add(new Rest((MusicalSymbolDuration)restLength));
+                    break;
+                    case LilypondTokenKind.Bar:
+                    symbols.Add(new Barline() { AlternateRepeatGroup = alternativeRepeatNumber });
+                    break;
+                    case LilypondTokenKind.Clef:
+                    currentToken = currentToken.NextToken;
+                    if (currentToken.Value == "treble")
+                        currentClef = new Clef(ClefType.GClef, 2);
+                    else if (currentToken.Value == "bass")
+                        currentClef = new Clef(ClefType.FClef, 4);
+                    else
+                        throw new NotSupportedException($"Clef {currentToken.Value} is not supported.");
+
+                    symbols.Add(currentClef);
+                    break;
                     case LilypondTokenKind.Time:
-                        currentToken = currentToken.NextToken;
-                        var times = currentToken.Value.Split('/');
-                        symbols.Add(new TimeSignature(TimeSignatureType.Numbers, UInt32.Parse(times[0]), UInt32.Parse(times[1])));
-                        break;
+                    currentToken = currentToken.NextToken;
+                    var times = currentToken.Value.Split('/');
+                    symbols.Add(new TimeSignature(TimeSignatureType.Numbers, UInt32.Parse(times[0]), UInt32.Parse(times[1])));
+                    break;
                     case LilypondTokenKind.Tempo:
-                        // Tempo not supported
-                        break;
+                    // Tempo not supported
+                    break;
                     default:
-                        break;
+                    break;
                 }
                 currentToken = currentToken.NextToken;
             }
 
             return symbols;
         }
-        
+
         private static LinkedList<LilypondToken> GetTokensFromLilypond(string content)
         {
             var tokens = new LinkedList<LilypondToken>();
 
             foreach (string s in content.Split(' ').Where(item => item.Length > 0))
             {
-                LilypondToken token = new LilypondToken()
-                {
+                LilypondToken token = new LilypondToken() {
                     Value = s
                 };
 
@@ -400,7 +400,7 @@ namespace DPA_Musicsheets.Managers
 
             sequence.Save(fileName);
         }
-        
+
         /// <summary>
         /// We create MIDI from WPF staffs, 2 different dependencies, not a good practice.
         /// TODO: Create MIDI from our own domain classes.
@@ -434,33 +434,33 @@ namespace DPA_Musicsheets.Managers
                 switch (musicalSymbol.Type)
                 {
                     case MusicalSymbolType.Note:
-                        Note note = musicalSymbol as Note;
+                    Note note = musicalSymbol as Note;
 
-                        // Calculate duration
-                        double absoluteLength = 1.0 / (double)note.Duration;
-                        absoluteLength += (absoluteLength / 2.0) * note.NumberOfDots;
+                    // Calculate duration
+                    double absoluteLength = 1.0 / (double)note.Duration;
+                    absoluteLength += (absoluteLength / 2.0) * note.NumberOfDots;
 
-                        double relationToQuartNote = _beatNote / 4.0;
-                        double percentageOfBeatNote = (1.0 / _beatNote) / absoluteLength;
-                        double deltaTicks = (sequence.Division / relationToQuartNote) / percentageOfBeatNote;
+                    double relationToQuartNote = _beatNote / 4.0;
+                    double percentageOfBeatNote = (1.0 / _beatNote) / absoluteLength;
+                    double deltaTicks = (sequence.Division / relationToQuartNote) / percentageOfBeatNote;
 
-                        // Calculate height
-                        int noteHeight = notesOrderWithCrosses.IndexOf(note.Step.ToLower()) + ((note.Octave + 1) * 12);
-                        noteHeight += note.Alter;
-                        notesTrack.Insert(absoluteTicks, new ChannelMessage(ChannelCommand.NoteOn, 1, noteHeight, 90)); // Data2 = volume
+                    // Calculate height
+                    int noteHeight = notesOrderWithCrosses.IndexOf(note.Step.ToLower()) + ((note.Octave + 1) * 12);
+                    noteHeight += note.Alter;
+                    notesTrack.Insert(absoluteTicks, new ChannelMessage(ChannelCommand.NoteOn, 1, noteHeight, 90)); // Data2 = volume
 
-                        absoluteTicks += (int)deltaTicks;
-                        notesTrack.Insert(absoluteTicks, new ChannelMessage(ChannelCommand.NoteOn, 1, noteHeight, 0)); // Data2 = volume
+                    absoluteTicks += (int)deltaTicks;
+                    notesTrack.Insert(absoluteTicks, new ChannelMessage(ChannelCommand.NoteOn, 1, noteHeight, 0)); // Data2 = volume
 
-                        break;
+                    break;
                     case MusicalSymbolType.TimeSignature:
-                        byte[] timeSignature = new byte[4];
-                        timeSignature[0] = (byte)_beatsPerBar;
-                        timeSignature[1] = (byte)(Math.Log(_beatNote) / Math.Log(2));
-                        metaTrack.Insert(absoluteTicks, new MetaMessage(MetaType.TimeSignature, timeSignature));
-                        break;
+                    byte[] timeSignature = new byte[4];
+                    timeSignature[0] = (byte)_beatsPerBar;
+                    timeSignature[1] = (byte)(Math.Log(_beatNote) / Math.Log(2));
+                    metaTrack.Insert(absoluteTicks, new MetaMessage(MetaType.TimeSignature, timeSignature));
+                    break;
                     default:
-                        break;
+                    break;
                 }
             }
 
@@ -481,8 +481,7 @@ namespace DPA_Musicsheets.Managers
             string targetFolder = Path.GetDirectoryName(fileName);
             string targetFileName = Path.GetFileNameWithoutExtension(fileName);
 
-            var process = new Process
-            {
+            var process = new Process {
                 StartInfo =
                 {
                     WorkingDirectory = sourceFolder,
@@ -493,9 +492,10 @@ namespace DPA_Musicsheets.Managers
             };
 
             process.Start();
-            while (!process.HasExited) { /* Wait for exit */
-                }
-                if (sourceFolder != targetFolder || sourceFileName != targetFileName)
+            while (!process.HasExited)
+            { /* Wait for exit */
+            }
+            if (sourceFolder != targetFolder || sourceFileName != targetFileName)
             {
                 File.Move(sourceFolder + "\\" + sourceFileName + ".pdf", targetFolder + "\\" + targetFileName + ".pdf");
                 File.Delete(tmpFileName);
