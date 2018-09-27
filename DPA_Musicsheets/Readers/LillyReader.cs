@@ -4,10 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ClassLibrary
+namespace DPA_Musicsheets.Readers
 {
-    public abstract class MusicSymbol
+    class LillyReader
     {
-        public abstract void GetSymbol();
     }
 }

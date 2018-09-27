@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public abstract class MusicSymbol
+    public class Semitone
     {
-        public abstract void GetSymbol();
+        public enum SEMITONE { MAJOR, NORMAL, MINOR };
     }
 }
