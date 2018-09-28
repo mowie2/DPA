@@ -54,7 +54,7 @@ namespace DPA_Musicsheets.Managers
                 MidiSequence = new Sequence();
                 MidiSequence.Load(fileName);
 
-                MidiPlayerViewModel.MidiSequence = MidiSequence;
+                MidiPlayerViewModel.slb.MidiSequence = MidiSequence;
                 this.LilypondText = LoadMidiIntoLilypond(MidiSequence);
                 this.LilypondViewModel.LilypondTextLoaded(this.LilypondText);
             }
@@ -94,7 +94,7 @@ namespace DPA_Musicsheets.Managers
             this.StaffsViewModel.SetStaffs(this.WPFStaffs);
 
             MidiSequence = GetSequenceFromWPFStaffs();
-            MidiPlayerViewModel.MidiSequence = MidiSequence;
+            MidiPlayerViewModel.slb.MidiSequence = MidiSequence;
         }
 
         #region Midi loading (loads midi to lilypond)
