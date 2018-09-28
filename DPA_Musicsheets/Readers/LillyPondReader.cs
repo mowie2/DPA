@@ -13,8 +13,6 @@ namespace DPA_Musicsheets.Readers
         private string[] pitches = new string[] { "c", "d", "e", "f", "g", "a", "b" };
         private string[] keyWords = new string[] { "relative", "clef", "time", "repeat", "alternitive" };
         private string[] breakers = new string[] { "{", "}"," " };
-        //private string[] uselessWords = new string[] { "clef" };
-        //keywords??????
 
         private Builders.NoteBuilder noteBuilder = new Builders.NoteBuilder();
 
