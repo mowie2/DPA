@@ -45,10 +45,5 @@ namespace DPA_Musicsheets.Facade
 
             }
         }
-
-        public void SetSequence(Sequence sequence)
-        {
-            this._sequencer.Sequence = sequence;
-        }
     }
 }
