@@ -1,28 +1,51 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using ClassLibrary;
+﻿using ClassLibrary;
 using DPA_Musicsheets.Builders;
 using Sanford.Multimedia.Midi;
+using System;
+using System.Collections.Generic;
 
 namespace DPA_Musicsheets.Managers
 {
     public class MidiReader
     {
-        List<MidiEvent> openNotes;
-        NoteBuilder noteBuilder;
+        private List<MidiEvent> openNotes;
+        private readonly NoteBuilder noteBuilder;
+        private int division;
+        private TimeSignature currentTimeSignature;
+        private readonly Note previousNote;
+        private readonly int previousMidiKey;
 
-        int division;
-        TimeSignature currentTimeSignature;
-        Note previousNote;
-        int previousMidiKey;
+        private readonly Dictionary<int, string> pitches;
+        List<int> SemitonValues;
+
 
         public MidiReader()
         {
             noteBuilder = new NoteBuilder();
             openNotes = new List<MidiEvent>();
+            pitches = new Dictionary<int, string>()
+            {
+                { 0, "c" },
+                { 1, "c" },
+                { 2, "d" },
+                { 3, "d" },
+                { 4, "e" },
+                { 5, "f" },
+                { 6, "f" },
+                { 7, "g" },
+                { 8, "g" },
+                { 9, "a" },
+                { 9, "a" },
+                { 9, "b" }
+            };
+            SemitonValues = new List<int>()
+            {
+                1,
+                3,
+                6,
+                8,
+                10,
+            };
         }
 
         public void readFile(string fileName)
@@ -35,12 +58,12 @@ namespace DPA_Musicsheets.Managers
         public void processFile(Sequence midiSequence)
         {
             division = midiSequence.Division;
-            List<MidiEvent> allEvents = new List<MidiEvent>();;
+            List<MidiEvent> allEvents = new List<MidiEvent>(); ;
 
             //add all events to list
             foreach (var track in midiSequence)
             {
-                foreach(var midiEvent in track.Iterator())
+                foreach (var midiEvent in track.Iterator())
                 {
                     IMidiMessage midiMessage = midiEvent.MidiMessage;
                     if (midiMessage.GetType() == typeof(MetaMessage))
@@ -90,11 +113,11 @@ namespace DPA_Musicsheets.Managers
             int middle = (leftIndex / 2) + (rightIndex / 2);
 
             mergeSortMidiEvents(list, leftIndex, middle);
-            mergeSortMidiEvents(list, middle+1, rightIndex);
+            mergeSortMidiEvents(list, middle + 1, rightIndex);
             Merge(list, leftIndex, middle, rightIndex);
         }
 
-        private void Merge(MidiEvent[] list, int low, int middle,int high)
+        private void Merge(MidiEvent[] list, int low, int middle, int high)
         {
             int left = low;
             int right = middle + 1;
@@ -107,7 +130,8 @@ namespace DPA_Musicsheets.Managers
                 {
                     secList[tempIndex] = list[left];
                     left++;
-                } else
+                }
+                else
                 {
                     //todo:write so metamessages come befor channelMessages
                     secList[tempIndex] = list[right];
@@ -126,7 +150,7 @@ namespace DPA_Musicsheets.Managers
                 }
             }
 
-            if(right <= high)
+            if (right <= high)
             {
                 while (right <= high)
                 {
@@ -170,16 +194,17 @@ namespace DPA_Musicsheets.Managers
             var channelMessage = midiEvent.MidiMessage as ChannelMessage;
             if (channelMessage.Command == ChannelCommand.NoteOn)
             {
-                if(channelMessage.Data2 > 0)
+                if (channelMessage.Data2 > 0)
                 {
                     openNotes.Add(midiEvent);
-                } else if (channelMessage.Data2 == 0)
+                }
+                else if (channelMessage.Data2 == 0)
                 {
                     //Find channelMessage with same height
                     for (int i = 0; i < openNotes.Count; i++)
                     {
                         ChannelMessage previousChannelMessage = openNotes[i].MidiMessage as ChannelMessage;
-                        if(previousChannelMessage.Data1 == channelMessage.Data1)
+                        if (previousChannelMessage.Data1 == channelMessage.Data1)
                         {
                             handleNote(openNotes[i], midiEvent);
                         }
@@ -200,54 +225,72 @@ namespace DPA_Musicsheets.Managers
             openNotes.Remove(previousMidiEvent);
         }
 
+       
+        private void NoteBuilderSetSemitone(int x)
+        {
+            if (SemitonValues.Contains(x))
+            {
+                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
+            }
+        }
+
         private void setNotePitch(int previousMidiKey, int midiKey)
         {
             int octave = (midiKey / 12) - 1;
-            switch (midiKey % 12)
-            {
-                case 0:
-                    noteBuilder.SetPitch("c");
-                    break;
-                case 1:
-                    noteBuilder.SetPitch("c");
-                    noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                    break;
-                case 2:
-                    noteBuilder.SetPitch("d");
-                    break;
-                case 3:
-                    noteBuilder.SetPitch("d");
-                    noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                    break;
-                case 4:
-                    noteBuilder.SetPitch("e");
-                    break;
-                case 5:
-                    noteBuilder.SetPitch("f");
-                    break;
-                case 6:
-                    noteBuilder.SetPitch("f");
-                    noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                    break;
-                case 7:
-                    noteBuilder.SetPitch("g");
-                    break;
-                case 8:
-                    noteBuilder.SetPitch("g");
-                    noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                    break;
-                case 9:
-                    noteBuilder.SetPitch("a");
-                    break;
-                case 10:
-                    noteBuilder.SetPitch("a");
-                    noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                    break;
-                case 11:
-                    noteBuilder.SetPitch("b");
-                    break;
-            }
 
+            var x = pitches[midiKey % 12];
+            var y = midiKey % 12;
+            noteBuilder.SetPitch(pitches[y]);
+            NoteBuilderSetSemitone(y);
+
+            #region old code
+            /*
+                        switch (y)
+                        {
+                            case 0:
+
+                                break;
+                            case 1:
+                                noteBuilder.SetPitch(pitches[y]);
+                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
+                                break;
+                            case 2:
+                                noteBuilder.SetPitch(pitches[y]);
+                                break;
+                            case 3:
+                                noteBuilder.SetPitch(pitches[y]);
+                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
+                                break;
+                            case 4:
+                                noteBuilder.SetPitch(pitches[y]);
+                                break;
+                            case 5:
+                                noteBuilder.SetPitch(pitches[y]);
+                                break;
+                            case 6:
+                                noteBuilder.SetPitch(pitches[y]);
+                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
+                                break;
+                            case 7:
+                                noteBuilder.SetPitch(pitches[y]);
+                                break;
+                            case 8:
+                                noteBuilder.SetPitch(pitches[y]);
+                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
+                                break;
+                            case 9:
+                                noteBuilder.SetPitch(pitches[y]);
+                                break;
+                            case 10:
+                                noteBuilder.SetPitch(pitches[y]);
+                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
+                                break;
+                            case 11:
+                                noteBuilder.SetPitch(pitches[y]);
+                                break;
+                        }
+            */
+            #endregion
             int distance = midiKey - previousMidiKey;
             while (distance < -6)
             {
@@ -262,13 +305,17 @@ namespace DPA_Musicsheets.Managers
             }
         }
 
+
+        // absoluut ticks: start tijd
+        // nextNoteAbosulutetick: eind tijd
+        // division: 
         private void setNoteDuration(int absoluteTicks, int nextNoteAbsoluteTicks, int division, int beatNote, int beatsPerBar)
         {
             int duration = 0;
             int dots = 0;
             double deltaTicks = nextNoteAbsoluteTicks - absoluteTicks;
             double percentageOfBar = 0;
-            
+
 
             double percentageOfBeatNote = deltaTicks / division;
             percentageOfBar = (1.0 / beatsPerBar) * percentageOfBeatNote;
@@ -280,44 +327,76 @@ namespace DPA_Musicsheets.Managers
                 if (percentageOfBar <= absoluteNoteLength)
                 {
                     if (noteLength < 2)
+                    {
                         noteLength = 2;
+                    }
+
 
                     int subtractDuration;
 
                     if (noteLength == 32)
+                    {
                         subtractDuration = 32;
+                    }
                     else if (noteLength >= 16)
+                    {
                         subtractDuration = 16;
+                    }
                     else if (noteLength >= 8)
+                    {
                         subtractDuration = 8;
+                    }
                     else if (noteLength >= 4)
+                    {
                         subtractDuration = 4;
+                    }
                     else
+                    {
                         subtractDuration = 2;
+                    }
+
 
                     if (noteLength >= 17)
+                    {
                         duration = 32;
+                    }
                     else if (noteLength >= 9)
+                    {
                         duration = 16;
+                    }
                     else if (noteLength >= 5)
+                    {
                         duration = 8;
+                    }
                     else if (noteLength >= 3)
+                    {
                         duration = 4;
+                    }
                     else
+                    {
                         duration = 2;
+                    }
+
 
                     double currentTime = 0;
 
                     while (currentTime < (noteLength - subtractDuration))
                     {
                         var addtime = 1 / ((subtractDuration / beatNote) * Math.Pow(2, dots));
-                        if (addtime <= 0) break;
+                        if (addtime <= 0)
+                        {
+                            break;
+                        }
+
                         currentTime += addtime;
                         if (currentTime <= (noteLength - subtractDuration))
                         {
                             dots++;
                         }
-                        if (dots >= 4) break;
+                        if (dots >= 4)
+                        {
+                            break;
+                        }
                     }
 
                     break;
