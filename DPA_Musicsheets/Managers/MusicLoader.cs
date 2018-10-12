@@ -50,8 +50,8 @@ namespace DPA_Musicsheets.Managers
         {
             if (Path.GetExtension(fileName).EndsWith(".mid"))
             {
-                //MidiReader reader = new MidiReader();
-                //reader.readFile(fileName);
+                MidiReader reader = new MidiReader();
+                reader.readFile(fileName);
                 
 
                 MidiSequence = new Sequence();

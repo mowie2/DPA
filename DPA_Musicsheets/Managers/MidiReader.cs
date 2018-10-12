@@ -35,6 +35,35 @@ namespace DPA_Musicsheets.Managers
         public void processFile(Sequence midiSequence)
         {
             division = midiSequence.Division;
+            List<MidiEvent> allEvents = new List<MidiEvent>();;
+
+            //add all events to list
+            foreach (var track in midiSequence)
+            {
+                foreach(var midiEvent in track.Iterator())
+                {
+                    IMidiMessage midiMessage = midiEvent.MidiMessage;
+                    if (midiMessage.GetType() == typeof(MetaMessage))
+                        addMetaMessage(midiEvent, allEvents);
+                    if (midiMessage.GetType() == typeof(ChannelMessage))
+                        addChannelMessage(midiEvent, allEvents);
+                }
+            }
+
+            foreach (var item in allEvents)
+            {
+                //System.Diagnostics.Debug.Write(item.AbsoluteTicks + ",  ");
+            }
+
+            //sort allNodes
+            MidiEvent[] allEventsArray = allEvents.ToArray();
+            sortAllEvents(allEventsArray);
+
+            for (int i = 0; i < allEventsArray.Length; i++)
+            {
+                System.Diagnostics.Debug.Write(allEventsArray[i].AbsoluteTicks + ",  ");
+            }
+
             //builder code: set clef G
             foreach (var track in midiSequence)
             {
@@ -46,6 +75,93 @@ namespace DPA_Musicsheets.Managers
                     if (midiMessage.GetType() == typeof(ChannelMessage))
                         handleChannelMessage(midiEvent);
                 }
+            }
+        }
+
+        private void sortAllEvents(MidiEvent[] allEvents)
+        {
+            mergeSortMidiEvents(allEvents, 0, allEvents.Length - 1);
+        }
+
+        private void mergeSortMidiEvents(MidiEvent[] list, int leftIndex, int rightIndex)
+        {
+            if (leftIndex < rightIndex)
+                return;
+            int middle = (leftIndex / 2) + (rightIndex / 2);
+
+            mergeSortMidiEvents(list, leftIndex, middle);
+            mergeSortMidiEvents(list, middle+1, rightIndex);
+            Merge(list, leftIndex, middle, rightIndex);
+        }
+
+        private void Merge(MidiEvent[] list, int low, int middle,int high)
+        {
+            int left = low;
+            int right = middle + 1;
+            MidiEvent[] secList = new MidiEvent[(high - low) + 1];
+            int tempIndex = 0;
+
+            while (left < middle && right <= high)
+            {
+                if (list[left].AbsoluteTicks < list[right].AbsoluteTicks)
+                {
+                    secList[tempIndex] = list[left];
+                    left++;
+                } else
+                {
+                    //todo:write so metamessages come befor channelMessages
+                    secList[tempIndex] = list[right];
+                    right++;
+                }
+                tempIndex++;
+            }
+
+            if (left <= middle)
+            {
+                while (left <= middle)
+                {
+                    secList[tempIndex] = list[left];
+                    left++;
+                    tempIndex++;
+                }
+            }
+
+            if(right <= high)
+            {
+                while (right <= high)
+                {
+                    secList[tempIndex] = list[right];
+                    right++;
+                    tempIndex++;
+                }
+            }
+
+            for (int i = 0; i < secList.Length; i++)
+            {
+                list[low + i] = secList[i];
+            }
+
+        }
+
+        private void addChannelMessage(MidiEvent midiEvent, List<MidiEvent> allEvents)
+        {
+            var channelMessage = midiEvent.MidiMessage as ChannelMessage;
+            if (channelMessage.Command == ChannelCommand.NoteOn)
+            {
+                allEvents.Add(midiEvent);
+            }
+        }
+
+        private void addMetaMessage(MidiEvent midiEvent, List<MidiEvent> allEvents)
+        {
+            var metaMessage = midiEvent.MidiMessage as MetaMessage;
+            if (metaMessage.MetaType == MetaType.TimeSignature)
+            {
+                allEvents.Add(midiEvent);
+            }
+            else if (metaMessage.MetaType == MetaType.Tempo)
+            {
+                allEvents.Add(midiEvent);
             }
         }
 
