@@ -40,15 +40,11 @@ namespace DPA_Musicsheets.ViewModels
             //_sequencer = new Sequencer();
 
             slb = new SanfordLib(PlayCommand, UpdateButtons);
-            slb._sequencer.ChannelMessagePlayed += slb.ChannelMessagePlayed;
+            slb.SequencerChannelMessagedPlayed(slb.ChannelMessagePlayed);
 
             // Wanneer de sequence klaar is moeten we alles closen en stoppen.
-            slb._sequencer.PlayingCompleted += (playingSender, playingEvent) =>
-            {
-                slb._sequencer.Stop();
-                _running = false;
-            };
-
+            slb.SquencePlayCompleted(_running);
+            
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
             musicLoader.MidiPlayerViewModel = this;
         }
@@ -72,23 +68,23 @@ namespace DPA_Musicsheets.ViewModels
             if (!_running)
             {
                 _running = true;
-                slb._sequencer.Continue();
+                slb.ContinueSequence();
                 UpdateButtons();
             }
-        }, () => !_running && slb._sequencer.Sequence != null);
+        }, () => !_running && slb.CheckSequence() == true);
 
         public RelayCommand StopCommand => new RelayCommand(() =>
         {
             _running = false;
-            slb._sequencer.Stop();
-            slb._sequencer.Position = 0;
+            slb.SequencerStop();
+            slb.SetSequncerPosition(0);
             UpdateButtons();
         }, () => _running);
 
         public RelayCommand PauseCommand => new RelayCommand(() =>
         {
             _running = false;
-            slb._sequencer.Stop();
+            slb.SequencerStop();
             UpdateButtons();
         }, () => _running);
 
@@ -99,11 +95,8 @@ namespace DPA_Musicsheets.ViewModels
         /// </summary>
         public override void Cleanup()
         {
+            slb.Cleanup();
             base.Cleanup();
-
-            slb._sequencer.Stop();
-            slb._sequencer.Dispose();
-            slb._outputDevice.Dispose();
         }
     }
 }

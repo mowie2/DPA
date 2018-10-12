@@ -15,6 +15,7 @@ namespace ClassLibrary
         public Semitone.SEMITONE Semitone { get; set; }
         public float Duration { get; set; }
         public int Dotted { get; set; }
+
         public override void GetSymbol()
         {
             throw new NotImplementedException();

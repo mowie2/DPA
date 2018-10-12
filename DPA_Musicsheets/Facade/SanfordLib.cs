@@ -7,7 +7,7 @@ namespace DPA_Musicsheets.Facade
     public class SanfordLib
     {
         public OutputDevice _outputDevice { get; set; }
-        public Sequencer _sequencer;
+        private Sequencer _sequencer;
         public Sequence MidiSequence
         {
             get { return _sequencer.Sequence; }
@@ -19,8 +19,25 @@ namespace DPA_Musicsheets.Facade
             }
         }
 
+        public bool CheckSequence()
+        {
+            return _sequencer.Sequence != null;
+        }
+        public void SetSequncerPosition(int position)
+        {
+            _sequencer.Position = position;
+        }
+        public void SequencerStop()
+        {
+            _sequencer.Stop();
+        }
+        public void ContinueSequence()
+        {
+            _sequencer.Continue();
+        }
         private RelayCommand StopCommand;
-        private Action UpdateButtons;
+        private readonly Action UpdateButtons;
+
         public SanfordLib(RelayCommand stop, Action update)
         {
             this._sequencer = new Sequencer();
@@ -30,6 +47,25 @@ namespace DPA_Musicsheets.Facade
             this.UpdateButtons = update;
         }
 
+        public void Cleanup()
+        {
+            _sequencer.Stop();
+            _sequencer.Dispose();
+            _outputDevice.Dispose();
+        }
+        public void SquencePlayCompleted(bool running)
+        {
+            _sequencer.PlayingCompleted += (playingSender, playingEvent) =>
+            {
+                _sequencer.Stop();
+                running = false;
+            };
+        }
+
+        public void SequencerChannelMessagedPlayed(EventHandler<ChannelMessageEventArgs> e)
+        {
+            _sequencer.ChannelMessagePlayed += e;
+        }
         public void ChannelMessagePlayed(object sender, ChannelMessageEventArgs e)
         {
             try
@@ -44,6 +80,14 @@ namespace DPA_Musicsheets.Facade
                 // so this is the only safe way to prevent race conditions
 
             }
+        }
+
+        public void CreateSequence(string filename)
+        {
+            Sequence temp = new Sequence();
+            temp.Load(filename);
+
+            this.MidiSequence = temp;
         }
     }
 }
