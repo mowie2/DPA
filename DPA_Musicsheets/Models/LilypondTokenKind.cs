@@ -13,11 +13,14 @@ namespace DPA_Musicsheets.Models
     public enum LilypondTokenKind
     {
         Unknown,
+        Relative,
         Note,
         Rest,
         Bar,
         Clef,
+        ClefValue,
         Time,
+        TimeValue,
         Tempo,
         Staff,
         Repeat,

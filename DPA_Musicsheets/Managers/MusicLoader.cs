@@ -1,5 +1,6 @@
 ﻿
 using DPA_Musicsheets.Models;
+using DPA_Musicsheets.Readers;
 using DPA_Musicsheets.ViewModels;
 using PSAMControlLibrary;
 using PSAMWPFControlLibrary;
@@ -77,7 +78,10 @@ namespace DPA_Musicsheets.Managers
                 throw new NotSupportedException($"File extension {Path.GetExtension(fileName)} is not supported.");
             }
 
-            LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+            LillyPondReader tokenizer = new LillyPondReader();
+            tokenizer.ReadLily(LilypondText);
+
+            //LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
         }
 
         /// <summary>
