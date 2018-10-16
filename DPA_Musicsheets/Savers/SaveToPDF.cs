@@ -1,0 +1,57 @@
+﻿using DPA_Musicsheets.Interfaces;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace DPA_Musicsheets.Savers
+{
+    public class SaveToPDF : ISavable
+    {
+        public void Save(string fileName, object musicData)
+        {
+            string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
+            string tmpFileName = $"{fileName}-tmp.ly";
+            write(tmpFileName, musicData);
+
+            string lilypondLocation = @"C:\Program Files (x86)\LilyPond\usr\bin\lilypond.exe";
+            string sourceFolder = Path.GetDirectoryName(tmpFileName);
+            string sourceFileName = Path.GetFileNameWithoutExtension(tmpFileName);
+            string targetFolder = Path.GetDirectoryName(fileName);
+            string targetFileName = Path.GetFileNameWithoutExtension(fileName);
+
+            var process = new Process
+            {
+                StartInfo =
+                {
+                    WorkingDirectory = sourceFolder,
+                    WindowStyle = ProcessWindowStyle.Hidden,
+                    Arguments = String.Format("--pdf \"{0}\\{1}.ly\"", sourceFolder, sourceFileName),
+                    FileName = lilypondLocation
+                }
+            };
+
+            process.Start();
+            while (!process.HasExited)
+            { /* Wait for exit */
+            }
+            if (sourceFolder != targetFolder || sourceFileName != targetFileName)
+            {
+                File.Move(sourceFolder + "\\" + sourceFileName + ".pdf", targetFolder + "\\" + targetFileName + ".pdf");
+                File.Delete(tmpFileName);
+            }
+        }
+
+        private void write(string fileName, object musicData)
+        {
+            using (StreamWriter outputFile = new StreamWriter(fileName))
+            {
+                outputFile.Write((string)musicData);
+                outputFile.Close();
+            }
+        }
+    }
+}

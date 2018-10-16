@@ -1,4 +1,6 @@
-﻿using Microsoft.Win32;
+﻿using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Savers;
+using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,6 +13,14 @@ namespace DPA_Musicsheet
 {
     public class FileReader
     {
+        public Dictionary<string, ISavable> savables;
+        
+        public FileReader()
+        {
+            savables = new Dictionary<string, ISavable>();
+            savables.Add(".pdf", new SaveToPDF());
+        }
+        
         public string OpenFile()
         {
             try
@@ -29,6 +39,17 @@ namespace DPA_Musicsheet
                 return null;
                 
             }
+        }
+
+        public void SaveFile(string extension, string fileName, object musicData)
+        {
+            if (!savables.ContainsKey(extension))
+            {
+                MessageBox.Show($"Extension {extension} is not supported.");
+            }
+            ISavable saver = savables[extension];
+            saver.Save(fileName, musicData);
+            
         }
     }
 }

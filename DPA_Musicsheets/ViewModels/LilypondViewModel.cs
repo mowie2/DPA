@@ -1,4 +1,5 @@
-﻿using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheet;
+using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using Microsoft.Win32;
@@ -15,6 +16,7 @@ namespace DPA_Musicsheets.ViewModels
     {
         private MusicLoader _musicLoader;
         private MainViewModel _mainViewModel { get; set; }
+        private MusicController musicController;
 
         private string _text;
         private string _previousText;
@@ -48,6 +50,7 @@ namespace DPA_Musicsheets.ViewModels
 
         public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader)
         {
+            musicController = new MusicController();
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
             _mainViewModel = mainViewModel;
@@ -109,12 +112,16 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand SaveAsCommand => new RelayCommand(() =>
         {
-            // TODO: In the application a lot of classes know which filetypes are supported. Lots and lots of repeated code here...
-            // Can this be done better?
             SaveFileDialog saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
             if (saveFileDialog.ShowDialog() == true)
             {
                 string extension = Path.GetExtension(saveFileDialog.FileName);
+
+                // TODO: Save inplementeren
+                // dit stukje code vervangt alles wat er onder staat
+                // moet Geimplimenteerd worden zodra bestanden weggewcherven kunnen worden.
+                // musicController.Save(extension, saveFileDialog.FileName);
+
                 if (extension.EndsWith(".mid"))
                 {
                     _musicLoader.SaveToMidi(saveFileDialog.FileName);

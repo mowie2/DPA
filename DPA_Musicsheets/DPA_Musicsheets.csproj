@@ -103,13 +103,16 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Interfaces\ISavable.cs" />
     <Compile Include="Managers\MidiReader.cs" />
     <Compile Include="FileReader.cs" />
     <Compile Include="Builders\NoteBuilder.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
+    <Compile Include="Managers\MusicController.cs" />
     <Compile Include="Managers\MusicLoader.cs" />
     <Compile Include="Models\LilypondToken.cs" />
     <Compile Include="Models\LilypondTokenKind.cs" />
+    <Compile Include="Savers\SaveToPDF.cs" />
     <Compile Include="ViewModels\MidiPlayerViewModel.cs" />
     <Compile Include="ViewModels\StaffsViewModel.cs" />
     <Compile Include="Views\MidiPlayerCtrl.xaml.cs">
