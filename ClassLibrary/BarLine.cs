@@ -9,10 +9,10 @@ namespace ClassLibrary
     public class BarLine : Symbol
     {
 
-        enum TYPE { FINAL, REPEAT, NORMAL, START }
-        private BarLine Buddy;
+        public enum TYPE { FINAL, REPEAT, NORMAL, START }
+        public BarLine Buddy { get; set; }
         private bool HasBeenPlayed;
-        private TYPE Type;
+        public TYPE Type { get; set; }
         private List<Alternative> Alternatives;
 
         public override void GetSymbol()
