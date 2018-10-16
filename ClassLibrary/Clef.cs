@@ -11,6 +11,16 @@ namespace ClassLibrary
         public enum Key { G, F, C};
         public Key key;
 
+        public Clef()
+        {
+
+        }
+
+        public Clef(Key key)
+        {
+            this.key = key;
+        }
+
         public override void GetSymbol()
         {
             throw new NotImplementedException();

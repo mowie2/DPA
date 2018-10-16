@@ -29,6 +29,14 @@ namespace DPA_Musicsheets.Builders
             return note;
         }
 
+        public NoteBuilder()
+        {
+            Dotted = 0;
+            Duration = 0;
+            Semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
+            Pitch = "";
+        }
+
         private void Clear()
         {
             this.Dotted = 0;
