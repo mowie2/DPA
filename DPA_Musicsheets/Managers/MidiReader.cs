@@ -8,12 +8,12 @@ namespace DPA_Musicsheets.Managers
 {
     public class MidiReader
     {
-        private List<MidiEvent> openNotes;
+        private Dictionary<int, Tuple<MidiEvent,Note>> openNotes;
         private readonly NoteBuilder noteBuilder;
         private int division;
         private TimeSignature currentTimeSignature;
-        private readonly Note previousNote;
-        private readonly int previousMidiKey;
+        private Note firstNote;
+        private Note prevNote;
 
         private readonly Dictionary<int, string> pitches;
         List<int> SemitonValues;
@@ -22,7 +22,7 @@ namespace DPA_Musicsheets.Managers
         public MidiReader()
         {
             noteBuilder = new NoteBuilder();
-            openNotes = new List<MidiEvent>();
+            openNotes = new Dictionary<int, Tuple<MidiEvent, Note>>();
             pitches = new Dictionary<int, string>()
             {
                 { 0, "c" },
@@ -35,8 +35,8 @@ namespace DPA_Musicsheets.Managers
                 { 7, "g" },
                 { 8, "g" },
                 { 9, "a" },
-                { 9, "a" },
-                { 9, "b" }
+                { 10, "a" },
+                { 11, "b" }
             };
             SemitonValues = new List<int>()
             {
@@ -73,31 +73,18 @@ namespace DPA_Musicsheets.Managers
                 }
             }
 
-            foreach (var item in allEvents)
-            {
-                //System.Diagnostics.Debug.Write(item.AbsoluteTicks + ",  ");
-            }
-
             //sort allNodes
             MidiEvent[] allEventsArray = allEvents.ToArray();
-            sortAllEvents(allEventsArray);
+            //sortAllEvents(allEventsArray);
 
-            for (int i = 0; i < allEventsArray.Length; i++)
+            noteBuilder.SetClef(new Clef(Clef.Key.G));
+            foreach (var midiEvent in allEventsArray)
             {
-                System.Diagnostics.Debug.Write(allEventsArray[i].AbsoluteTicks + ",  ");
-            }
-
-            //builder code: set clef G
-            foreach (var track in midiSequence)
-            {
-                foreach (var midiEvent in track.Iterator())
-                {
-                    IMidiMessage midiMessage = midiEvent.MidiMessage;
-                    if (midiMessage.GetType() == typeof(MetaMessage))
-                        handleMetaMessage(midiMessage);
-                    if (midiMessage.GetType() == typeof(ChannelMessage))
-                        handleChannelMessage(midiEvent);
-                }
+                IMidiMessage midiMessage = midiEvent.MidiMessage;
+                if (midiMessage.GetType() == typeof(MetaMessage))
+                    handleMetaMessage(midiMessage);
+                if (midiMessage.GetType() == typeof(ChannelMessage))
+                    handleChannelMessage(midiEvent);
             }
         }
 
@@ -109,22 +96,30 @@ namespace DPA_Musicsheets.Managers
         private void mergeSortMidiEvents(MidiEvent[] list, int leftIndex, int rightIndex)
         {
             if (leftIndex < rightIndex)
-                return;
-            int middle = (leftIndex / 2) + (rightIndex / 2);
-
-            mergeSortMidiEvents(list, leftIndex, middle);
-            mergeSortMidiEvents(list, middle + 1, rightIndex);
-            Merge(list, leftIndex, middle, rightIndex);
+            {
+                int middle = (leftIndex / 2) + (rightIndex / 2);
+                
+                mergeSortMidiEvents(list, leftIndex, middle);
+                mergeSortMidiEvents(list, middle + 1, rightIndex);
+                Merge(list, leftIndex, middle, rightIndex);
+            }
         }
 
         private void Merge(MidiEvent[] list, int low, int middle, int high)
         {
             int left = low;
-            int right = middle + 1;
+            int right = middle;
             MidiEvent[] secList = new MidiEvent[(high - low) + 1];
             int tempIndex = 0;
 
-            while (left < middle && right <= high)
+            System.Diagnostics.Debug.WriteLine("left: " + left + "middle: " + middle + "high: " + high + "sec list length: " + secList.Length);
+
+            if (middle == 38623 && high == 38624)
+            {
+                return;
+            }
+
+            while (left <= middle && right <= high)
             {
                 if (list[left].AbsoluteTicks < list[right].AbsoluteTicks)
                 {
@@ -133,24 +128,14 @@ namespace DPA_Musicsheets.Managers
                 }
                 else
                 {
-                    //todo:write so metamessages come befor channelMessages
+                    //todo:write so metamessages come before channelMessages
                     secList[tempIndex] = list[right];
                     right++;
                 }
                 tempIndex++;
             }
 
-            if (left <= middle)
-            {
-                while (left <= middle)
-                {
-                    secList[tempIndex] = list[left];
-                    left++;
-                    tempIndex++;
-                }
-            }
-
-            if (right <= high)
+            if (left >= middle)
             {
                 while (right <= high)
                 {
@@ -160,6 +145,16 @@ namespace DPA_Musicsheets.Managers
                 }
             }
 
+            if (right <= high)
+            {
+                while (left <= middle)
+                {
+                    secList[tempIndex] = list[left];
+                    left++;
+                    tempIndex++;
+                }
+            }
+            
             for (int i = 0; i < secList.Length; i++)
             {
                 list[low + i] = secList[i];
@@ -196,34 +191,47 @@ namespace DPA_Musicsheets.Managers
             {
                 if (channelMessage.Data2 > 0)
                 {
-                    openNotes.Add(midiEvent);
+                    setNotePitch(channelMessage.Data1);
+                    Note note = noteBuilder.BuildNote();
+                    openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
+
+                    if (firstNote != null)
+                    {
+                        prevNote.nextSymbol = note;
+                        prevNote = null;
+                        prevNote = note;
+                    } else
+                    {
+                        firstNote = note;
+                        prevNote = note;
+                    }
                 }
                 else if (channelMessage.Data2 == 0)
                 {
                     //Find channelMessage with same height
-                    for (int i = 0; i < openNotes.Count; i++)
+                    var tuple = new Tuple<MidiEvent, Note>(null, null);
+                    if (!openNotes.TryGetValue(channelMessage.Data1, out tuple))
                     {
-                        ChannelMessage previousChannelMessage = openNotes[i].MidiMessage as ChannelMessage;
-                        if (previousChannelMessage.Data1 == channelMessage.Data1)
-                        {
-                            handleNote(openNotes[i], midiEvent);
-                        }
+                        throw new Exception("off midiKey without start");
                     }
+                    setNoteDuration((midiEvent.AbsoluteTicks - tuple.Item1.AbsoluteTicks) , division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, tuple.Item2);
+                    openNotes.Remove(channelMessage.Data1);
+
                 }
             }
         }
 
-        private void handleNote(MidiEvent previousMidiEvent, MidiEvent midiEvent)
-        {
-            setNoteDuration(previousMidiEvent.AbsoluteTicks, midiEvent.AbsoluteTicks, division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats);
-
-            ChannelMessage channelMessage = midiEvent.MidiMessage as ChannelMessage;
-            if (previousMidiKey == 0)
-                setNotePitch(60, channelMessage.Data1);
-            else
-                setNotePitch(previousMidiKey, channelMessage.Data1);
-            openNotes.Remove(previousMidiEvent);
-        }
+        //private void handleNote(MidiEvent previousMidiEvent, MidiEvent midiEvent)
+        //{
+        //    setNoteDuration(previousMidiEvent.AbsoluteTicks, midiEvent.AbsoluteTicks, division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats);
+        //
+        //    ChannelMessage channelMessage = midiEvent.MidiMessage as ChannelMessage;
+        //    if (previousMidiKey == 0)
+        //        setNotePitch(channelMessage.Data1);
+        //    else
+        //        setNotePitch(channelMessage.Data1);
+        //    openNotes.Remove(previousMidiEvent);
+        //}
 
        
         private void NoteBuilderSetSemitone(int x)
@@ -234,8 +242,9 @@ namespace DPA_Musicsheets.Managers
             }
         }
 
-        private void setNotePitch(int previousMidiKey, int midiKey)
+        private void setNotePitch(int midiKey)
         {
+            int previousMidikey = 60;
             int octave = (midiKey / 12) - 1;
 
             var x = pitches[midiKey % 12];
@@ -291,16 +300,17 @@ namespace DPA_Musicsheets.Managers
                         }
             */
             #endregion
-            int distance = midiKey - previousMidiKey;
+            noteBuilder.ClearOctave();
+            int distance = midiKey - previousMidikey;
             while (distance < -6)
             {
-                //verlaag octaaf
+                noteBuilder.ModifyOctave(-1);
                 distance += 8;
             }
 
             while (distance > 6)
             {
-                //verhoog octaaf
+                noteBuilder.ModifyOctave(1);
                 distance -= 8;
             }
         }
@@ -309,11 +319,10 @@ namespace DPA_Musicsheets.Managers
         // absoluut ticks: start tijd
         // nextNoteAbosulutetick: eind tijd
         // division: 
-        private void setNoteDuration(int absoluteTicks, int nextNoteAbsoluteTicks, int division, int beatNote, int beatsPerBar)
+        private void setNoteDuration(double deltaTicks, int division, int beatNote, int beatsPerBar, Note note)
         {
             int duration = 0;
             int dots = 0;
-            double deltaTicks = nextNoteAbsoluteTicks - absoluteTicks;
             double percentageOfBar = 0;
 
 
@@ -327,55 +336,33 @@ namespace DPA_Musicsheets.Managers
                 if (percentageOfBar <= absoluteNoteLength)
                 {
                     if (noteLength < 2)
-                    {
                         noteLength = 2;
-                    }
 
 
                     int subtractDuration;
 
                     if (noteLength == 32)
-                    {
                         subtractDuration = 32;
-                    }
                     else if (noteLength >= 16)
-                    {
                         subtractDuration = 16;
-                    }
                     else if (noteLength >= 8)
-                    {
                         subtractDuration = 8;
-                    }
                     else if (noteLength >= 4)
-                    {
                         subtractDuration = 4;
-                    }
                     else
-                    {
                         subtractDuration = 2;
-                    }
 
 
                     if (noteLength >= 17)
-                    {
                         duration = 32;
-                    }
                     else if (noteLength >= 9)
-                    {
                         duration = 16;
-                    }
                     else if (noteLength >= 5)
-                    {
                         duration = 8;
-                    }
                     else if (noteLength >= 3)
-                    {
                         duration = 4;
-                    }
                     else
-                    {
                         duration = 2;
-                    }
 
 
                     double currentTime = 0;
@@ -384,9 +371,7 @@ namespace DPA_Musicsheets.Managers
                     {
                         var addtime = 1 / ((subtractDuration / beatNote) * Math.Pow(2, dots));
                         if (addtime <= 0)
-                        {
                             break;
-                        }
 
                         currentTime += addtime;
                         if (currentTime <= (noteLength - subtractDuration))
@@ -394,15 +379,15 @@ namespace DPA_Musicsheets.Managers
                             dots++;
                         }
                         if (dots >= 4)
-                        {
                             break;
-                        }
                     }
 
                     break;
                 }
             }
 
+            note.Duration = duration;
+            note.Dotted = dots;
             noteBuilder.SetDuriation(duration);
             noteBuilder.SetDotted(dots);
         }
