@@ -12,6 +12,8 @@ namespace DPA_Musicsheets.Managers
         private readonly NoteBuilder noteBuilder;
         private int division;
         private TimeSignature currentTimeSignature;
+        private Note firstNote;
+        private Note prevNote;
 
         private readonly Dictionary<int, string> pitches;
         List<int> SemitonValues;
@@ -189,35 +191,47 @@ namespace DPA_Musicsheets.Managers
             {
                 if (channelMessage.Data2 > 0)
                 {
-                    
-                    openNotes.Add(channelMessage.Data2, new Tuple<MidiEvent, Note>(midiEvent, new Note()));
+                    setNotePitch(channelMessage.Data1);
+                    Note note = noteBuilder.BuildNote();
+                    openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
+
+                    if (firstNote != null)
+                    {
+                        prevNote.nextSymbol = note;
+                        prevNote = null;
+                        prevNote = note;
+                    } else
+                    {
+                        firstNote = note;
+                        prevNote = note;
+                    }
                 }
                 else if (channelMessage.Data2 == 0)
                 {
                     //Find channelMessage with same height
-                    for (int i = 0; i < openNotes.Count; i++)
+                    var tuple = new Tuple<MidiEvent, Note>(null, null);
+                    if (!openNotes.TryGetValue(channelMessage.Data1, out tuple))
                     {
-                        ChannelMessage previousChannelMessage = openNotes[i].MidiMessage as ChannelMessage;
-                        if (previousChannelMessage.Data1 == channelMessage.Data1)
-                        {
-                            handleNote(openNotes[i], midiEvent);
-                        }
+                        throw new Exception("off midiKey without start");
                     }
+                    setNoteDuration((midiEvent.AbsoluteTicks - tuple.Item1.AbsoluteTicks) , division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, tuple.Item2);
+                    openNotes.Remove(channelMessage.Data1);
+
                 }
             }
         }
 
-        private void handleNote(MidiEvent previousMidiEvent, MidiEvent midiEvent)
-        {
-            setNoteDuration(previousMidiEvent.AbsoluteTicks, midiEvent.AbsoluteTicks, division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats);
-
-            ChannelMessage channelMessage = midiEvent.MidiMessage as ChannelMessage;
-            if (previousMidiKey == 0)
-                setNotePitch(channelMessage.Data1);
-            else
-                setNotePitch(channelMessage.Data1);
-            openNotes.Remove(previousMidiEvent);
-        }
+        //private void handleNote(MidiEvent previousMidiEvent, MidiEvent midiEvent)
+        //{
+        //    setNoteDuration(previousMidiEvent.AbsoluteTicks, midiEvent.AbsoluteTicks, division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats);
+        //
+        //    ChannelMessage channelMessage = midiEvent.MidiMessage as ChannelMessage;
+        //    if (previousMidiKey == 0)
+        //        setNotePitch(channelMessage.Data1);
+        //    else
+        //        setNotePitch(channelMessage.Data1);
+        //    openNotes.Remove(previousMidiEvent);
+        //}
 
        
         private void NoteBuilderSetSemitone(int x)
@@ -286,16 +300,17 @@ namespace DPA_Musicsheets.Managers
                         }
             */
             #endregion
+            noteBuilder.ClearOctave();
             int distance = midiKey - previousMidikey;
             while (distance < -6)
             {
-                //verlaag octaaf
+                noteBuilder.ModifyOctave(-1);
                 distance += 8;
             }
 
             while (distance > 6)
             {
-                //verhoog octaaf
+                noteBuilder.ModifyOctave(1);
                 distance -= 8;
             }
         }
@@ -304,11 +319,10 @@ namespace DPA_Musicsheets.Managers
         // absoluut ticks: start tijd
         // nextNoteAbosulutetick: eind tijd
         // division: 
-        private void setNoteDuration(int absoluteTicks, int nextNoteAbsoluteTicks, int division, int beatNote, int beatsPerBar)
+        private void setNoteDuration(double deltaTicks, int division, int beatNote, int beatsPerBar, Note note)
         {
             int duration = 0;
             int dots = 0;
-            double deltaTicks = nextNoteAbsoluteTicks - absoluteTicks;
             double percentageOfBar = 0;
 
 
@@ -372,6 +386,8 @@ namespace DPA_Musicsheets.Managers
                 }
             }
 
+            note.Duration = duration;
+            note.Dotted = dots;
             noteBuilder.SetDuriation(duration);
             noteBuilder.SetDotted(dots);
         }

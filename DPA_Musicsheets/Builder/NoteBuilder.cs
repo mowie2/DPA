@@ -19,6 +19,7 @@ namespace DPA_Musicsheets.Builders
             this.dotted = 0;
             this.duration = 0;
             this.ocataveModifier = 0;
+            this.semitone = Semitone.SEMITONE.NORMAL;
         }
         public Note BuildNote()
         {
@@ -35,14 +36,6 @@ namespace DPA_Musicsheets.Builders
 
             Clear();
             return note;
-        }
-
-        public NoteBuilder()
-        {
-            Dotted = 0;
-            Duration = 0;
-            Semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
-            Pitch = "";
         }
 
         private void Clear()
@@ -85,6 +78,11 @@ namespace DPA_Musicsheets.Builders
         public void ModifyOctave(int octaveModifier)
         {
             this.ocataveModifier += octaveModifier;
+        }
+
+        public void ClearOctave()
+        {
+            this.ocataveModifier = 0;
         }
     }
 }
