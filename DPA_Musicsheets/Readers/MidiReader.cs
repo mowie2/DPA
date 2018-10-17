@@ -110,17 +110,12 @@ namespace DPA_Musicsheets.Managers
         private void Merge(MidiEvent[] list, int low, int middle, int high)
         {
             int left = low;
-            int right = middle;
+            int right = middle+1;
             MidiEvent[] secList = new MidiEvent[(high - low) + 1];
             int tempIndex = 0;
 
             System.Diagnostics.Debug.WriteLine("left: " + left + "middle: " + middle + "high: " + high + "sec list length: " + secList.Length);
-
-            if (middle == 38623 && high == 38624)
-            {
-                return;
-            }
-
+            
             while (left <= middle && right <= high)
             {
                 if (list[left].AbsoluteTicks < list[right].AbsoluteTicks)
@@ -130,29 +125,50 @@ namespace DPA_Musicsheets.Managers
                 }
                 else
                 {
+                    if (list[left].GetType() == list[right].GetType())
+                    {
+                        if (list[left].DeltaTicks < list[right].DeltaTicks)
+                        {
+                            secList[tempIndex] = list[right];
+                            right++;
+                        }
+                        else
+                        {
+                            secList[tempIndex] = list[left];
+                            left++;
+                        }
+                    }
+                    else if (list[left].GetType() == typeof(MetaMessage))
+                    {
+                        secList[tempIndex] = list[left];
+                        left++;
+                    }
+                    else
+                    {
+                        secList[tempIndex] = list[right];
+                        right++;
+                    }
                     //todo:write so metamessages come before channelMessages
-                    secList[tempIndex] = list[right];
-                    right++;
                 }
                 tempIndex++;
             }
 
-            if (left >= middle)
+            if (left <= middle)
             {
-                while (right <= high)
+                while (left <= middle)
                 {
-                    secList[tempIndex] = list[right];
-                    right++;
+                    secList[tempIndex] = list[left];
+                    left++;
                     tempIndex++;
                 }
             }
 
             if (right <= high)
             {
-                while (left <= middle)
+                while (right <= high)
                 {
-                    secList[tempIndex] = list[left];
-                    left++;
+                    secList[tempIndex] = list[right];
+                    right++;
                     tempIndex++;
                 }
             }
