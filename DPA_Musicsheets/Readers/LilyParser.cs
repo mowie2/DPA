@@ -12,8 +12,12 @@ namespace DPA_Musicsheets.Readers
     class LilyParser
     {
         private Builders.NoteBuilder noteBuilder = new Builders.NoteBuilder();
-        private Symbol rootSymbol;
-        private Symbol prefSymbol;
+        private Symbol[] symbols;
+
+        public LilyParser()
+        {
+            symbols = new Symbol[2];
+        }
 
         public void ReadLily(LilypondToken rootToken)
         {
@@ -28,38 +32,41 @@ namespace DPA_Musicsheets.Readers
                         currentToken = FindTimeSignature(currentToken);
                         break;
                     case LilypondTokenKind.Note:
-                        SetNote(currentToken.Value);
+                        Note newNote = FindNote(currentToken.Value);
+                        SetNextSymbol(symbols,newNote);
                         break;
                     case LilypondTokenKind.Clef:
-                        currentToken = currentToken.NextToken;
                         currentToken = FindCef(currentToken);
                         break;
                     case LilypondTokenKind.Repeat:
-                        currentToken = currentToken.NextToken;
-                        currentToken = FindRepeat(currentToken);
+                        currentToken = SetRepeat(currentToken);
                         break;
                     case LilypondTokenKind.Alternative:
-                        currentToken = currentToken.NextToken;
-                        currentToken = FindRepeat(currentToken);
+                        currentToken = SetAlternitive(currentToken);
                         break;
                 }
                 currentToken = currentToken.NextToken;
             }
         }
 
-        private void SetNextSymbol(Symbol nextSymbol)
+        private Symbol[] SetNextSymbol(Symbol[] symbols,Symbol nextSymbol)
         {
-            if(rootSymbol == null)
+            Symbol rootSymbol = symbols[0];
+            if (rootSymbol == null)
             {
-                rootSymbol = nextSymbol;
+                symbols[0] = nextSymbol;
             }
-            prefSymbol.nextSymbol = nextSymbol;
-            prefSymbol = nextSymbol;
+            else
+            {
+                symbols[1].nextSymbol = nextSymbol;
+            }
+            symbols[1] = nextSymbol;
+            return symbols;
         }
 
-        public void SetNote(string text)
+        public Note FindNote(string text)
         {
-            Regex re = new Regex(@"([a-g])([eis]*)([,']+*)([0-14]+)([.]+*)");
+            Regex re = new Regex(@"([a-g])([eis]*)([,']*)([0-9]+)([.]*)");
             if (re.IsMatch(text))
             {
                 Match result = re.Match(text);
@@ -86,8 +93,9 @@ namespace DPA_Musicsheets.Readers
                 }
                 noteBuilder.SetDuriation(int.Parse(result.Groups[4].Value));
                 noteBuilder.SetDotted(result.Groups[5].Value.Length);
-                SetNextSymbol(noteBuilder.BuildNote());
+                return noteBuilder.BuildNote();
             }
+            return null;
         }
 
         private LilypondToken FindCef(LilypondToken startToken)
@@ -122,33 +130,45 @@ namespace DPA_Musicsheets.Readers
 
         private LilypondToken FindSection(LilypondToken startToken)
         {
+            int countSectionStarts = 0;
             LilypondToken currentToken = startToken;
             if (currentToken.TokenKind == LilypondTokenKind.SectionStart)
             {
-                currentToken = currentToken.NextToken;
-                while (currentToken.NextToken.TokenKind != LilypondTokenKind.SectionEnd)
+                countSectionStarts++;
+                while (currentToken.NextToken != null && countSectionStarts!=0)
                 {
-                    if (currentToken.NextToken == null)
+                    currentToken = currentToken.NextToken;
+                    if (currentToken.TokenKind == LilypondTokenKind.SectionStart)
                     {
-                        return null;
+                        countSectionStarts++;
                     }
-                    else
+                    else if(currentToken.TokenKind == LilypondTokenKind.SectionEnd)
                     {
-                        currentToken = currentToken.NextToken;
-                        if (currentToken.TokenKind != LilypondTokenKind.Note)
-                        {
-                            currentToken = currentToken.NextToken;
-                            continue;
-                        }
-                        SetNote(currentToken.Value);
-                    }
+                        countSectionStarts--;
+                    }          
                 }
             }
             return currentToken;
         }
 
+        public Note[] FindNoteSection(LilypondToken startToken,LilypondToken endToken)
+        {
+            LilypondToken currentToken = startToken;
 
-        private LilypondToken FindRepeat(LilypondToken startToken)
+            Note[] newSymbols = new Note[2];
+
+            while ((currentToken != endToken && currentToken.NextToken != endToken) && currentToken.NextToken != null) 
+            {
+                currentToken = currentToken.NextToken;
+                if (currentToken.TokenKind == LilypondTokenKind.Note)
+                {
+                    newSymbols = (Note[])SetNextSymbol(newSymbols, FindNote(currentToken.Value));
+                }
+            }
+            return newSymbols;
+        }
+
+        private LilypondToken SetRepeat(LilypondToken startToken)
         {
             LilypondToken currentToken = startToken.NextToken.NextToken.NextToken;
             BarLine firstBarline = new BarLine { Type = BarLine.TYPE.REPEAT };
@@ -158,49 +178,34 @@ namespace DPA_Musicsheets.Readers
                 Buddy = firstBarline
             };
             LilypondToken lastToken = FindSection(currentToken);
-            if (lastToken != null)
-            {
-                while (currentToken != lastToken)
-                {
-                    currentToken = currentToken.NextToken;
-                    if(currentToken.TokenKind == LilypondTokenKind.Note)
-                    {
-                        SetNote(currentToken.Value);
-                    }
-                }
-            }
-            return currentToken;
+            SetNextSymbol(symbols,firstBarline);
+            Symbol[] newSymbols = FindNoteSection(currentToken, lastToken);
+            SetNextSymbol(symbols,newSymbols[0]);
+            symbols[1] = newSymbols[1];
+            SetNextSymbol(symbols,lastBarline);
+            return lastToken;
         }
 
-        private LilypondToken FindAlternitive(LilypondToken startToken)
+        private LilypondToken SetAlternitive(LilypondToken startToken)
         {
-            LilypondToken currentToken = startToken.NextToken.NextToken.NextToken;
-            BarLine firstBarline = new BarLine { Type = BarLine.TYPE.REPEAT };
-            BarLine lastBarline = new BarLine
+            LilypondToken currentToken = startToken.NextToken;
+            LilypondToken lastToken = FindSection(currentToken);
+            Symbol prevSymbol = symbols[1];
+
+            if (prevSymbol.GetType() == typeof(BarLine))
             {
-                Type = BarLine.TYPE.REPEAT,
-                Buddy = firstBarline
-            };
-            SetNextSymbol(firstBarline);
-            if (currentToken.TokenKind == LilypondTokenKind.SectionStart)
-            {
-                currentToken = currentToken.NextToken;
-                while (currentToken.NextToken.TokenKind != LilypondTokenKind.SectionEnd
-                    && currentToken.NextToken != null)
+                BarLine barline = prevSymbol as BarLine;
+                while (currentToken != lastToken && currentToken.NextToken != lastToken)
                 {
                     currentToken = currentToken.NextToken;
-                    if (currentToken.TokenKind != LilypondTokenKind.Note)
-                    {
-                        currentToken = currentToken.NextToken;
-                        continue;
-                    }
-                    SetNote(currentToken.Value);
+                    LilypondToken templastToken = FindSection(currentToken);
+                    Note tempRoot = FindNoteSection(currentToken, templastToken)[0];
+                    currentToken = templastToken;
+                    barline.Alternatives.Add(tempRoot);
                 }
-                SetNextSymbol(lastBarline);
             }
             return currentToken;
         }
-
 
         public LilypondToken FindTimeSignature(LilypondToken startToken)
         {
@@ -215,24 +220,21 @@ namespace DPA_Musicsheets.Readers
 
         public void SetTimeSignature(string text)
         {
-            TimeSignature t = new TimeSignature();
             Regex re = new Regex(@"(\d+)/(\d+)");
-            int NumberOfBeats;
-            int TimeOfBeats;
             if (re.IsMatch(text))
             {
                 var result = re.Match(text);
-                NumberOfBeats = int.Parse(result.Groups[1].Value);
-                TimeOfBeats = int.Parse(result.Groups[2].Value);
-                noteBuilder.SetTimeSignature(t);
+                noteBuilder.SetTimeSignature(new TimeSignature
+                {
+                    NumberOfBeats = int.Parse(result.Groups[1].Value),
+                    TimeOfBeats = int.Parse(result.Groups[2].Value)
+                });
             };
         }
 
-
-
         public Symbol GetRootSymbol()
         {
-            return rootSymbol;
+            return symbols[0];
         }
     }
 }

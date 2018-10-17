@@ -18,7 +18,7 @@ namespace DPA_Musicsheets.Models
             lookupTable = new Dictionary<string, LilypondTokenKind>
             {
                 [@"\\relative"] = LilypondTokenKind.Relative ,
-                [@"([a-g])([eis]*)([,']*)([0-14]+)([.]*)"] = LilypondTokenKind.Note,
+                [@"([a-g])([eis]*)([,']*)([0-9])([.]*)"] = LilypondTokenKind.Note,
                 [@"(r)(\d+)"] = LilypondTokenKind.Rest,
                 //Bar,
                 [@"\\clef"] = LilypondTokenKind.Clef,
@@ -29,22 +29,18 @@ namespace DPA_Musicsheets.Models
                 [@"(\d+)/(\d+)"] = LilypondTokenKind.TimeValue,
                 [@"\\tempo"] = LilypondTokenKind.Tempo,
                 [@"\\repeat"] = LilypondTokenKind.Repeat,
-                [@"\\alternitive"] = LilypondTokenKind.Alternative,
+                [@"\\alternative"] = LilypondTokenKind.Alternative,
                 [@"{"] = LilypondTokenKind.SectionStart,
                 [@"}"] = LilypondTokenKind.SectionEnd 
             };
         }
         public void ReadLily(string text)
         {
-            
-            string copyText = text.Replace("\r\n","");
             string currentWord = "";
             int position = 0;
-
             
             while (position < text.Length)
             {
-
                 LilypondTokenKind[] resultToken = lookupTable.Where(pv => Regex.IsMatch(currentWord, pv.Key)).Select(pv => pv.Value).ToArray();
                 char currentChar = text[position];
                 if (currentChar.Equals(' ') || resultToken.Length > 0)
@@ -81,8 +77,6 @@ namespace DPA_Musicsheets.Models
             }
             prefToken = nextToken;
         }
-
-
 
         public LilypondToken GetRootToken()
         {

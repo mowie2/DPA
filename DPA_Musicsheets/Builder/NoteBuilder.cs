@@ -16,6 +16,7 @@ namespace DPA_Musicsheets.Builders
 
         public NoteBuilder()
         {
+            this.semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
             this.dotted = 0;
             this.duration = 0;
             this.ocataveModifier = 0;
