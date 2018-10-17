@@ -193,47 +193,47 @@ namespace DPA_Musicsheets.Managers
             {
                 if (channelMessage.Data2 > 0)
                 {
-                    setNotePitch(channelMessage.Data1);
-                    Note note = noteBuilder.BuildNote();
-                    openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
-
-                    if (firstNote != null)
-                    {
-                        prevNote.nextSymbol = note;
-                        prevNote = null;
-                        prevNote = note;
-                    } else
-                    {
-                        firstNote = note;
-                        prevNote = note;
-                    }
+                    createNewNote(midiEvent);
                 }
                 else if (channelMessage.Data2 == 0)
                 {
-                    //Find channelMessage with same height
-                    var tuple = new Tuple<MidiEvent, Note>(null, null);
-                    if (!openNotes.TryGetValue(channelMessage.Data1, out tuple))
-                    {
-                        throw new Exception("off midiKey without start");
-                    }
-                    setNoteDuration((midiEvent.AbsoluteTicks - tuple.Item1.AbsoluteTicks) , division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, tuple.Item2);
-                    openNotes.Remove(channelMessage.Data1);
-
+                    finishOldNote(midiEvent);
                 }
             }
         }
 
-        //private void handleNote(MidiEvent previousMidiEvent, MidiEvent midiEvent)
-        //{
-        //    setNoteDuration(previousMidiEvent.AbsoluteTicks, midiEvent.AbsoluteTicks, division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats);
-        //
-        //    ChannelMessage channelMessage = midiEvent.MidiMessage as ChannelMessage;
-        //    if (previousMidiKey == 0)
-        //        setNotePitch(channelMessage.Data1);
-        //    else
-        //        setNotePitch(channelMessage.Data1);
-        //    openNotes.Remove(previousMidiEvent);
-        //}
+        private void createNewNote(MidiEvent midiEvent)
+        {
+            var channelMessage = midiEvent.MidiMessage as ChannelMessage;
+
+            setNotePitch(channelMessage.Data1);
+            Note note = noteBuilder.BuildNote();
+            openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
+
+            if (firstNote != null)
+            {
+                prevNote.nextSymbol = note;
+                prevNote = note;
+            }
+            else
+            {
+                firstNote = note;
+                prevNote = note;
+            }
+        }
+
+        private void finishOldNote(MidiEvent midiEvent)
+        {
+            var channelMessage = midiEvent.MidiMessage as ChannelMessage;
+
+            var tuple = new Tuple<MidiEvent, Note>(null, null);
+            if (!openNotes.TryGetValue(channelMessage.Data1, out tuple))
+            {
+                throw new Exception("off midiKey without start");
+            }
+            setNoteDuration((midiEvent.AbsoluteTicks - tuple.Item1.AbsoluteTicks), division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, tuple.Item2);
+            openNotes.Remove(channelMessage.Data1);
+        }
 
        
         private void NoteBuilderSetSemitone(int x)
