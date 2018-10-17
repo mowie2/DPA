@@ -105,11 +105,10 @@
     </ApplicationDefinition>
     <Compile Include="Builder\NoteBuilder.cs" />
     <Compile Include="Models\LilyTokenizer.cs" />
-    <Compile Include="Readers\FileReader.cs" />
+    <Compile Include="Readers\FileManager.cs" />
     <Compile Include="Readers\LillyPondReader.cs" />
     <Compile Include="Interfaces\ISavable.cs" />
     <Compile Include="Managers\MidiReader.cs" />
-    <Compile Include="FileReader.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Managers\MusicController.cs" />
     <Compile Include="Managers\MusicLoader.cs" />

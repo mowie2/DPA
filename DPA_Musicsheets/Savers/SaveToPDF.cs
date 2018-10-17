@@ -40,7 +40,9 @@ namespace DPA_Musicsheets.Savers
             }
             if (sourceFolder != targetFolder || sourceFileName != targetFileName)
             {
-                File.Move(sourceFolder + "\\" + sourceFileName + ".pdf", targetFolder + "\\" + targetFileName + ".pdf");
+                var source = sourceFolder + "\\" + sourceFileName + ".pdf";
+                var destination = targetFolder + "\\" + targetFileName + ".pdf";
+                File.Move(source, destination);
                 File.Delete(tmpFileName);
             }
         }

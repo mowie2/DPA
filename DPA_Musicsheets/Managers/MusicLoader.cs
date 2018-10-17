@@ -79,9 +79,9 @@ namespace DPA_Musicsheets.Managers
             }
 
             LillyPondReader tokenizer = new LillyPondReader();
-            tokenizer.ReadLily(LilypondText);
+            //tokenizer.ReadLily(LilypondText);
 
-            //LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+            LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
         }
 
         /// <summary>
