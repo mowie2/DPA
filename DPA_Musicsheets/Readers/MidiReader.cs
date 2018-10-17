@@ -1,12 +1,13 @@
 ﻿using ClassLibrary;
 using DPA_Musicsheets.Builders;
+using DPA_Musicsheets.Interfaces;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
 
 namespace DPA_Musicsheets.Managers
 {
-    public class MidiReader
+    public class MidiReader : IReader
     {
         private Dictionary<int, Tuple<MidiEvent,Note>> openNotes;
         private readonly NoteBuilder noteBuilder;
@@ -48,11 +49,12 @@ namespace DPA_Musicsheets.Managers
             };
         }
 
-        public void readFile(string fileName)
+        public Note readFile(string fileName)
         {
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);
             processFile(midiSequence);
+            return firstNote;
         }
 
         public void processFile(Sequence midiSequence)
