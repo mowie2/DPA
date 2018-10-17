@@ -7,5 +7,6 @@ namespace ClassLibrary
 {
     public abstract class Symbol : MusicSymbol
     {
+        public Symbol nextSymbol { get; set; }
     }
 }
