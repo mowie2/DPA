@@ -42,6 +42,7 @@ namespace DPA_Musicsheets.Readers
                 switch (currentToken.TokenKind)
                 {
                     case LilypondTokenKind.Relative:
+                        currentToken = FindRelative(currentToken);
                         break;
                     case LilypondTokenKind.Time:
                         currentToken = FindTimeSignature(currentToken);
@@ -73,7 +74,7 @@ namespace DPA_Musicsheets.Readers
             LilypondToken currentToken = startToken.NextToken;
             if(currentToken.TokenKind == LilypondTokenKind.RelativeValue)
             {
-                Regex re = new Regex(@"^c[,']*$");
+                Regex re = new Regex(@"^c([,'])*$");
                 var result = re.Match(currentToken.Value);
                 noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[1].Value));
             }
@@ -99,7 +100,7 @@ namespace DPA_Musicsheets.Readers
         public Note FindRest(LilypondToken currentToken)
         {
             string text = currentToken.Value;
-            Regex re = new Regex(@"^ r([0 - 9])([.] *)$");
+            Regex re = new Regex(@"^r(\d+)([.]*)$");
             Match result = re.Match(text);
             noteBuilder.SetDuriation(int.Parse(result.Groups[1].Value));
             noteBuilder.SetDotted(result.Groups[2].Value.Length);
@@ -126,7 +127,7 @@ namespace DPA_Musicsheets.Readers
         private Note FindNote(LilypondToken currentToken)
         {
             string text = currentToken.Value;
-            Regex re = new Regex(@"^([a-g])([eis]*)([,']*)([0-9])([.]*)$");
+            Regex re = new Regex(@"^([a-g])([eis]*)([,']*)(\d+)([.]*)$");
 
             Match result = re.Match(text);
             noteBuilder.SetPitch(result.Groups[1].Value);

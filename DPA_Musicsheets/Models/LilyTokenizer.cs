@@ -18,9 +18,9 @@ namespace DPA_Musicsheets.Models
             lookupTable = new Dictionary<string, LilypondTokenKind>
             {
                 [@"^\\relative$"] = LilypondTokenKind.Relative,
-                [@"^c[,']*$"] = LilypondTokenKind.RelativeValue,
-                [@"^([a-g])([eis]*)([,']*)([0-9])([.]*)$"] = LilypondTokenKind.Note,
-                [@"^ r([0 - 9])([.] *)$"] = LilypondTokenKind.Rest,
+                [@"^c([,'])*$"] = LilypondTokenKind.RelativeValue,
+                [@"^([a-g])([eis]*)([,']*)(\d+)([.]*)$"] = LilypondTokenKind.Note,
+                [@"^r(\d+)([.]*)$"] = LilypondTokenKind.Rest,
                 //Bar,
                 [@"^\\clef$"] = LilypondTokenKind.Clef,
                 [@"^treble$"] = LilypondTokenKind.ClefValue,
