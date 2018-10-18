@@ -153,7 +153,6 @@ namespace DPA_Musicsheets.Managers
                         secList[tempIndex] = list[right];
                         right++;
                     }
-                    //todo:write so metamessages come before channelMessages
                 }
                 tempIndex++;
             }
