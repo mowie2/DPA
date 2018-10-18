@@ -50,7 +50,7 @@ namespace DPA_Musicsheets.ViewModels
 
         public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader)
         {
-            musicController = new MusicController();
+            musicController = new MusicController(musicLoader);
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
             _mainViewModel = mainViewModel;
@@ -112,33 +112,33 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand SaveAsCommand => new RelayCommand(() =>
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
-            if (saveFileDialog.ShowDialog() == true)
-            {
-                string extension = Path.GetExtension(saveFileDialog.FileName);
+            // TODO: Save inplementeren
+            // dit stukje code vervangt alles wat er onder staat
+            // moet Geimplimenteerd worden zodra bestanden weggewcherven kunnen worden.
+            musicController.Save();
 
-                // TODO: Save inplementeren
-                // dit stukje code vervangt alles wat er onder staat
-                // moet Geimplimenteerd worden zodra bestanden weggewcherven kunnen worden.
-                // musicController.Save(extension, saveFileDialog.FileName);
+            //SaveFileDialog saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
+            //if (saveFileDialog.ShowDialog() == true)
+            //{
+            //    string extension = Path.GetExtension(saveFileDialog.FileName);
 
-                if (extension.EndsWith(".mid"))
-                {
-                    _musicLoader.SaveToMidi(saveFileDialog.FileName);
-                }
-                else if (extension.EndsWith(".ly"))
-                {
-                    _musicLoader.SaveToLilypond(saveFileDialog.FileName);
-                }
-                else if (extension.EndsWith(".pdf"))
-                {
-                    _musicLoader.SaveToPDF(saveFileDialog.FileName);
-                }
-                else
-                {
-                    MessageBox.Show($"Extension {extension} is not supported.");
-                }
-            }
+            //    if (extension.EndsWith(".mid"))
+            //    {
+            //        _musicLoader.SaveToMidi(saveFileDialog.FileName);
+            //    }
+            //    else if (extension.EndsWith(".ly"))
+            //    {
+            //        _musicLoader.SaveToLilypond(saveFileDialog.FileName);
+            //    }
+            //    else if (extension.EndsWith(".pdf"))
+            //    {
+            //        _musicLoader.SaveToPDF(saveFileDialog.FileName);
+            //    }
+            //    else
+            //    {
+            //        MessageBox.Show($"Extension {extension} is not supported.");
+            //    }
+            //}
         });
         #endregion Commands for buttons like Undo, Redo and SaveAs
     }

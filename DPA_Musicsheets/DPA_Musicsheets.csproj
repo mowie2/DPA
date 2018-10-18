@@ -103,10 +103,11 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Facade\SanfordLib.cs" />
     <Compile Include="Builder\NoteBuilder.cs" />
     <Compile Include="Interfaces\IReader.cs" />
     <Compile Include="Models\LilyTokenizer.cs" />
-    <Compile Include="Readers\FileReader.cs" />
+    <Compile Include="Readers\FileManager.cs" />
     <Compile Include="Readers\LillyPondReader.cs" />
     <Compile Include="Interfaces\ISavable.cs" />
     <Compile Include="Readers\MidiReader.cs" />
@@ -116,6 +117,8 @@
     <Compile Include="Models\LilypondToken.cs" />
     <Compile Include="Models\LilypondTokenKind.cs" />
     <Compile Include="Readers\LilyParser.cs" />
+    <Compile Include="Savers\SaveToLily.cs" />
+    <Compile Include="Savers\SaveToMidi.cs" />
     <Compile Include="Savers\SaveToPDF.cs" />
     <Compile Include="ViewModels\MidiPlayerViewModel.cs" />
     <Compile Include="ViewModels\StaffsViewModel.cs" />
@@ -241,6 +244,7 @@
       <Name>ClassLibrary</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

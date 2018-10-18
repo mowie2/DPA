@@ -53,7 +53,7 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand OpenFileCommand => new RelayCommand(() =>
         {
-            FileReader fr = new FileReader();
+            FileManager fr = new FileManager();
             FileName = fr.OpenFile();
         });
 

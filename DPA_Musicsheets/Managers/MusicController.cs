@@ -10,22 +10,22 @@ namespace DPA_Musicsheets.Managers
 {
     public class MusicController
     {
-        FileReader fileReader;
-        Dictionary<string, IReader> readers;
+        FileManager fileManager;
         object musicData;
 
-        public MusicController()
+        public MusicController(MusicLoader ml)
         {
-            fileReader = new FileReader();
-            readers = new Dictionary<string, IReader>()
-            {
-                {"mid", new MidiReader() }
-            };
-
+            musicData = ml.LilypondText;
+            fileManager = new FileManager();
         }
-        public void Save(string extension, string fileName)
+        public void Save()
         {
-            fileReader.SaveFile(extension, fileName, musicData);
+            fileManager.SaveFile(musicData);
+        }
+
+        public void OpenFile()
+        {
+            fileManager.OpenFile();
         }
     }
 }
