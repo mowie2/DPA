@@ -105,11 +105,12 @@
     </ApplicationDefinition>
     <Compile Include="Facade\SanfordLib.cs" />
     <Compile Include="Builder\NoteBuilder.cs" />
+    <Compile Include="Interfaces\IReader.cs" />
     <Compile Include="Models\LilyTokenizer.cs" />
     <Compile Include="Readers\FileManager.cs" />
     <Compile Include="Readers\LillyPondReader.cs" />
     <Compile Include="Interfaces\ISavable.cs" />
-    <Compile Include="Managers\MidiReader.cs" />
+    <Compile Include="Readers\MidiReader.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Managers\MusicController.cs" />
     <Compile Include="Managers\MusicLoader.cs" />
