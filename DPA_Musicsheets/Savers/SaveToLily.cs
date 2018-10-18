@@ -10,7 +10,7 @@ namespace DPA_Musicsheets.Savers
 {
     public class SaveToLily : ISavable
     {
-        public void Save(string fileName, MusicSymbol note)
+        public void Save(string fileName, Note note)
         {
             throw new NotImplementedException();
         }

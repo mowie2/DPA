@@ -12,11 +12,11 @@ namespace DPA_Musicsheets.Savers
 {
     public class SaveToPDF : ISavable
     {
-        public void Save(string fileName, MusicSymbol note)
+        public void Save(string fileName, Note note)
         {
             string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string tmpFileName = $"{fileName}-tmp.ly";
-            //write(tmpFileName, note);
+            write(tmpFileName, note);
 
             string lilypondLocation = @"C:\Program Files (x86)\LilyPond\usr\bin\lilypond.exe";
             string sourceFolder = Path.GetDirectoryName(tmpFileName);
