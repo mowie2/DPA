@@ -73,7 +73,7 @@ namespace DPA_Musicsheets.Managers
                 throw new NotSupportedException($"File extension {Path.GetExtension(fileName)} is not supported.");
             }
 
-            LillyPondReader tokenizer = new LillyPondReader();
+            //LillyPondReader tokenizer = new LillyPondReader();
             //tokenizer.ReadLily(LilypondText);
 
             LoadLilypondIntoWpfStaffsAndMidi(LilypondText);

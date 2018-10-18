@@ -1,4 +1,6 @@
-﻿using DPA_Musicsheets.Interfaces;
+﻿using ClassLibrary;
+using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Managers;
 using DPA_Musicsheets.Savers;
 using Microsoft.Win32;
 using System;
@@ -10,7 +12,11 @@ namespace DPA_Musicsheet
 {
     public class FileManager
     {
-        public Dictionary<string, ISavable> savables;
+        private Dictionary<string, ISavable> savables;
+        private readonly Dictionary<string, IReader> readers;
+        private OpenFileDialog openFileDialog;
+        private SaveFileDialog saveFileDialog;
+
 
         public FileManager()
         {
@@ -20,13 +26,28 @@ namespace DPA_Musicsheet
                 { ".ly", new SaveToLily() },
                 { ".mid", new SaveToMidi() }
             };
+
+            readers = new Dictionary<string, IReader>()
+            {
+                {"mid", new MidiReader() }
+            };
+
+            openFileDialog = new OpenFileDialog() { Filter = "Midi or LilyPond files (*.mid *.ly)|*.mid;*.ly" };
+            saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
+        }
+
+        internal Note LoadFile(string path)
+        {
+            string extension = Path.GetExtension(openFileDialog.FileName);
+            IReader reader = readers[extension];
+            return reader.readFile(openFileDialog.FileName);
         }
 
         public string OpenFile()
         {
+
             try
             {
-                OpenFileDialog openFileDialog = new OpenFileDialog() { Filter = "Midi or LilyPond files (*.mid *.ly)|*.mid;*.ly" };
                 if (openFileDialog.ShowDialog() == true)
                 {
                     return openFileDialog.FileName;
@@ -44,27 +65,22 @@ namespace DPA_Musicsheet
             }
         }
 
-        public void SaveFile(object musicData)
+        public void SaveFile(Note musicData)
         {
-            SaveFileDialog saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
 
             if (saveFileDialog.ShowDialog() == true)
             {
                 string extension = Path.GetExtension(saveFileDialog.FileName);
-                if (savables.ContainsKey(extension))
-                {
-                    ISavable saver = savables[extension];
-                    saver.Save(saveFileDialog.FileName, musicData);
-                }
-                else
+                if (!savables.ContainsKey(extension))
                 {
                     MessageBox.Show($"Extension {extension} is not supported.");
+                    return;
                 }
 
+                ISavable saver = savables[extension];
+                saver.Save(saveFileDialog.FileName, musicData);
 
             }
-
-
 
         }
     }
