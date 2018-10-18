@@ -77,7 +77,7 @@ namespace DPA_Musicsheets.Managers
 
             //sort allNodes
             MidiEvent[] allEventsArray = allEvents.ToArray();
-            //sortAllEvents(allEventsArray);
+            sortAllEvents(allEventsArray);
 
             noteBuilder.SetClef(new Clef(Clef.Key.G));
             foreach (var midiEvent in allEventsArray)
@@ -114,14 +114,17 @@ namespace DPA_Musicsheets.Managers
             MidiEvent[] secList = new MidiEvent[(high - low) + 1];
             int tempIndex = 0;
 
-            System.Diagnostics.Debug.WriteLine("left: " + left + "middle: " + middle + "high: " + high + "sec list length: " + secList.Length);
-            
             while (left <= middle && right <= high)
             {
                 if (list[left].AbsoluteTicks < list[right].AbsoluteTicks)
                 {
                     secList[tempIndex] = list[left];
                     left++;
+                }
+                else if (list[left].AbsoluteTicks > list[right].AbsoluteTicks)
+                {
+                    secList[tempIndex] = list[right];
+                    right++;
                 }
                 else
                 {
@@ -172,9 +175,15 @@ namespace DPA_Musicsheets.Managers
                     tempIndex++;
                 }
             }
-            
+
+            double prev = 0;
             for (int i = 0; i < secList.Length; i++)
             {
+                if (prev > secList[i].AbsoluteTicks)
+                {
+
+                }
+                prev = secList[i].AbsoluteTicks;
                 list[low + i] = secList[i];
             }
 
@@ -224,7 +233,13 @@ namespace DPA_Musicsheets.Managers
 
             setNotePitch(channelMessage.Data1);
             Note note = noteBuilder.BuildNote();
-            openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
+            if (!openNotes.ContainsKey(channelMessage.Data1))
+            {
+                openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
+            } else
+            {
+                return;
+            }
 
             if (firstNote != null)
             {
@@ -245,8 +260,8 @@ namespace DPA_Musicsheets.Managers
             var tuple = new Tuple<MidiEvent, Note>(null, null);
             if (!openNotes.TryGetValue(channelMessage.Data1, out tuple))
             {
-                throw new Exception("off midiKey without start");
-            }
+                return;
+            };
             setNoteDuration((midiEvent.AbsoluteTicks - tuple.Item1.AbsoluteTicks), division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, tuple.Item2);
             openNotes.Remove(channelMessage.Data1);
         }
