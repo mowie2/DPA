@@ -10,6 +10,7 @@ namespace ClassLibrary
     {
         public Clef Clef { get; set; }
         public TimeSignature TimeSignature { get; set; }
+        public Tempo Tempo { get; set; }
         public string Pitch { get; set; }
         public Semitone.SEMITONE Semitone { get; set; }
         public float Duration { get; set; }
