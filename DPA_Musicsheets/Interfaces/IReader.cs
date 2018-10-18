@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Interfaces
 {
-    public interface ISavable
+    interface IReader
     {
-        void Save(string fileName, Note file);
+        Note readFile(string filename);
     }
 }

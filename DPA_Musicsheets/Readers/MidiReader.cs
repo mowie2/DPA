@@ -1,12 +1,13 @@
 ﻿using ClassLibrary;
 using DPA_Musicsheets.Builders;
+using DPA_Musicsheets.Interfaces;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
 
 namespace DPA_Musicsheets.Managers
 {
-    public class MidiReader
+    public class MidiReader : IReader
     {
         private Dictionary<int, Tuple<MidiEvent,Note>> openNotes;
         private readonly NoteBuilder noteBuilder;
@@ -48,11 +49,12 @@ namespace DPA_Musicsheets.Managers
             };
         }
 
-        public void readFile(string fileName)
+        public Note readFile(string fileName)
         {
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);
             processFile(midiSequence);
+            return firstNote;
         }
 
         public void processFile(Sequence midiSequence)
@@ -108,17 +110,12 @@ namespace DPA_Musicsheets.Managers
         private void Merge(MidiEvent[] list, int low, int middle, int high)
         {
             int left = low;
-            int right = middle;
+            int right = middle+1;
             MidiEvent[] secList = new MidiEvent[(high - low) + 1];
             int tempIndex = 0;
 
             System.Diagnostics.Debug.WriteLine("left: " + left + "middle: " + middle + "high: " + high + "sec list length: " + secList.Length);
-
-            if (middle == 38623 && high == 38624)
-            {
-                return;
-            }
-
+            
             while (left <= middle && right <= high)
             {
                 if (list[left].AbsoluteTicks < list[right].AbsoluteTicks)
@@ -128,29 +125,50 @@ namespace DPA_Musicsheets.Managers
                 }
                 else
                 {
+                    if (list[left].GetType() == list[right].GetType())
+                    {
+                        if (list[left].DeltaTicks < list[right].DeltaTicks)
+                        {
+                            secList[tempIndex] = list[right];
+                            right++;
+                        }
+                        else
+                        {
+                            secList[tempIndex] = list[left];
+                            left++;
+                        }
+                    }
+                    else if (list[left].GetType() == typeof(MetaMessage))
+                    {
+                        secList[tempIndex] = list[left];
+                        left++;
+                    }
+                    else
+                    {
+                        secList[tempIndex] = list[right];
+                        right++;
+                    }
                     //todo:write so metamessages come before channelMessages
-                    secList[tempIndex] = list[right];
-                    right++;
                 }
                 tempIndex++;
             }
 
-            if (left >= middle)
+            if (left <= middle)
             {
-                while (right <= high)
+                while (left <= middle)
                 {
-                    secList[tempIndex] = list[right];
-                    right++;
+                    secList[tempIndex] = list[left];
+                    left++;
                     tempIndex++;
                 }
             }
 
             if (right <= high)
             {
-                while (left <= middle)
+                while (right <= high)
                 {
-                    secList[tempIndex] = list[left];
-                    left++;
+                    secList[tempIndex] = list[right];
+                    right++;
                     tempIndex++;
                 }
             }
@@ -191,47 +209,47 @@ namespace DPA_Musicsheets.Managers
             {
                 if (channelMessage.Data2 > 0)
                 {
-                    setNotePitch(channelMessage.Data1);
-                    Note note = noteBuilder.BuildNote();
-                    openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
-
-                    if (firstNote != null)
-                    {
-                        prevNote.nextSymbol = note;
-                        prevNote = null;
-                        prevNote = note;
-                    } else
-                    {
-                        firstNote = note;
-                        prevNote = note;
-                    }
+                    createNewNote(midiEvent);
                 }
                 else if (channelMessage.Data2 == 0)
                 {
-                    //Find channelMessage with same height
-                    var tuple = new Tuple<MidiEvent, Note>(null, null);
-                    if (!openNotes.TryGetValue(channelMessage.Data1, out tuple))
-                    {
-                        throw new Exception("off midiKey without start");
-                    }
-                    setNoteDuration((midiEvent.AbsoluteTicks - tuple.Item1.AbsoluteTicks) , division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, tuple.Item2);
-                    openNotes.Remove(channelMessage.Data1);
-
+                    finishOldNote(midiEvent);
                 }
             }
         }
 
-        //private void handleNote(MidiEvent previousMidiEvent, MidiEvent midiEvent)
-        //{
-        //    setNoteDuration(previousMidiEvent.AbsoluteTicks, midiEvent.AbsoluteTicks, division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats);
-        //
-        //    ChannelMessage channelMessage = midiEvent.MidiMessage as ChannelMessage;
-        //    if (previousMidiKey == 0)
-        //        setNotePitch(channelMessage.Data1);
-        //    else
-        //        setNotePitch(channelMessage.Data1);
-        //    openNotes.Remove(previousMidiEvent);
-        //}
+        private void createNewNote(MidiEvent midiEvent)
+        {
+            var channelMessage = midiEvent.MidiMessage as ChannelMessage;
+
+            setNotePitch(channelMessage.Data1);
+            Note note = noteBuilder.BuildNote();
+            openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
+
+            if (firstNote != null)
+            {
+                prevNote.nextSymbol = note;
+                prevNote = note;
+            }
+            else
+            {
+                firstNote = note;
+                prevNote = note;
+            }
+        }
+
+        private void finishOldNote(MidiEvent midiEvent)
+        {
+            var channelMessage = midiEvent.MidiMessage as ChannelMessage;
+
+            var tuple = new Tuple<MidiEvent, Note>(null, null);
+            if (!openNotes.TryGetValue(channelMessage.Data1, out tuple))
+            {
+                throw new Exception("off midiKey without start");
+            }
+            setNoteDuration((midiEvent.AbsoluteTicks - tuple.Item1.AbsoluteTicks), division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, tuple.Item2);
+            openNotes.Remove(channelMessage.Data1);
+        }
 
        
         private void NoteBuilderSetSemitone(int x)

@@ -1,4 +1,6 @@
-﻿using DPA_Musicsheet;
+﻿using ClassLibrary;
+using DPA_Musicsheet;
+using DPA_Musicsheets.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,11 +12,13 @@ namespace DPA_Musicsheets.Managers
     public class MusicController
     {
         FileManager fileManager;
-        object musicData;
+        string path;
+        Dictionary<string, IReader> readers;
+        Note musicData;
 
         public MusicController(MusicLoader ml)
         {
-            musicData = ml.LilypondText;
+            //musicData = ml.LilypondText;
             fileManager = new FileManager();
         }
         public void Save()
@@ -24,7 +28,12 @@ namespace DPA_Musicsheets.Managers
 
         public void OpenFile()
         {
-            fileManager.OpenFile();
+            path = fileManager.OpenFile();
+        }
+
+        public void LoadFile()
+        {
+            musicData = fileManager.LoadFile(path);
         }
     }
 }
