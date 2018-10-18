@@ -12,7 +12,12 @@ namespace DPA_Musicsheets.Savers
     {
         public void Save(string fileName, Note note)
         {
-            throw new NotImplementedException();
+            Note currentNote = note;
+            while (currentNote != null)
+            {
+                setPitch(note.Pitch, note.Octave, note.Clef, note.Semitone);
+                setDuration(note.Duration, note.Dotted, note.TimeSignature);
+            }
         }
     }
 }
