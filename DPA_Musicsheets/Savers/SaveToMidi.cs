@@ -10,7 +10,7 @@ namespace DPA_Musicsheets.Savers
 {
     public class SaveToMidi : ISavable
     {
-        public void Save(string fileName, Note note)
+        public void Save(string fileName, MusicSymbol firstMusicSymbol)
         {
             throw new NotImplementedException();
         }
