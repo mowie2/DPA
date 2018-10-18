@@ -23,7 +23,7 @@ namespace DPA_Musicsheets.Readers
 
         public void ReadLily(string text)
         {
-            string content = text.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ");
+            string content = text.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ")+" ";
             tokenizer.ReadLily(content);
             parser.ReadLily(tokenizer.GetRootToken());
             root = parser.GetRootSymbol();

@@ -14,6 +14,7 @@ namespace DPA_Musicsheets.Models
     {
         Unknown,
         Relative,
+        RelativeValue,
         Note,
         Rest,
         Bar,

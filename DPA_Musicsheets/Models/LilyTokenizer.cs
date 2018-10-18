@@ -17,23 +17,25 @@ namespace DPA_Musicsheets.Models
         {
             lookupTable = new Dictionary<string, LilypondTokenKind>
             {
-                [@"\\relative"] = LilypondTokenKind.Relative ,
-                [@"([a-g])([eis]*)([,']*)([0-9])([.]*)"] = LilypondTokenKind.Note,
-                [@"(r)(\d+)"] = LilypondTokenKind.Rest,
+                [@"^\\relative$"] = LilypondTokenKind.Relative,
+                [@"^c[,']*$"] = LilypondTokenKind.RelativeValue,
+                [@"^([a-g])([eis]*)([,']*)([0-9])([.]*)$"] = LilypondTokenKind.Note,
+                [@"^ r([0 - 9])([.] *)$"] = LilypondTokenKind.Rest,
                 //Bar,
-                [@"\\clef"] = LilypondTokenKind.Clef,
-                [@"treble"] = LilypondTokenKind.ClefValue,
-                [@"bass"] = LilypondTokenKind.ClefValue,
-                [@"alto"] = LilypondTokenKind.ClefValue,
-                [@"\\time"] = LilypondTokenKind.Time,
-                [@"(\d+)/(\d+)"] = LilypondTokenKind.TimeValue,
-                [@"\\tempo"] = LilypondTokenKind.Tempo,
-                [@"\\repeat"] = LilypondTokenKind.Repeat,
-                [@"\\alternative"] = LilypondTokenKind.Alternative,
-                [@"{"] = LilypondTokenKind.SectionStart,
-                [@"}"] = LilypondTokenKind.SectionEnd 
+                [@"^\\clef$"] = LilypondTokenKind.Clef,
+                [@"^treble$"] = LilypondTokenKind.ClefValue,
+                [@"^bass$"] = LilypondTokenKind.ClefValue,
+                [@"^alto$"] = LilypondTokenKind.ClefValue,
+                [@"^\\time$"] = LilypondTokenKind.Time,
+                [@"^(\d+)/(\d+)$"] = LilypondTokenKind.TimeValue,
+                [@"^\\tempo$"] = LilypondTokenKind.Tempo,
+                [@"^\\repeat$"] = LilypondTokenKind.Repeat,
+                [@"^\\alternative$"] = LilypondTokenKind.Alternative,
+                [@"^{$"] = LilypondTokenKind.SectionStart,
+                [@"^}$"] = LilypondTokenKind.SectionEnd 
             };
         }
+
         public void ReadLily(string text)
         {
             string currentWord = "";
@@ -43,7 +45,7 @@ namespace DPA_Musicsheets.Models
             {
                 LilypondTokenKind[] resultToken = lookupTable.Where(pv => Regex.IsMatch(currentWord, pv.Key)).Select(pv => pv.Value).ToArray();
                 char currentChar = text[position];
-                if (currentChar.Equals(' ') || resultToken.Length > 0)
+                if (currentChar.Equals(' '))
                 {
                     LilypondToken tempToken = new LilypondToken { TokenKind = LilypondTokenKind.Unknown };
                     if (resultToken.Length > 0)
