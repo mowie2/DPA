@@ -10,7 +10,7 @@ namespace ClassLibrary
     {
         public int NumberOfBeats { get; set; }
         public int TimeOfBeats { get; set; }
-
+        
         public override void GetSymbol()
         {
             throw new NotImplementedException();

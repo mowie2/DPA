@@ -1,5 +1,4 @@
 ﻿using DPA_Musicsheets.Managers;
-using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 
@@ -14,17 +13,20 @@ namespace DPA_Musicsheets.ViewModels
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
-            SimpleIoc.Default.Register<MusicLoader>();
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<LilypondViewModel>();
             SimpleIoc.Default.Register<StaffsViewModel>();
             SimpleIoc.Default.Register<MidiPlayerViewModel>();
+
+            SimpleIoc.Default.Register<MusicLoader>();
+            SimpleIoc.Default.Register<MusicController>();
         }
 
-        public MainViewModel MainViewModel => ServiceLocator.Current.GetInstance<MainViewModel>();
+
         public LilypondViewModel LilypondViewModel => ServiceLocator.Current.GetInstance<LilypondViewModel>();
         public StaffsViewModel StaffsViewModel => ServiceLocator.Current.GetInstance<StaffsViewModel>();
         public MidiPlayerViewModel MidiPlayerViewModel => ServiceLocator.Current.GetInstance<MidiPlayerViewModel>();
+        public MainViewModel MainViewModel => ServiceLocator.Current.GetInstance<MainViewModel>();
 
         public static void Cleanup()
         {

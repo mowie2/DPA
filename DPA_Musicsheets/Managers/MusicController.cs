@@ -1,6 +1,8 @@
 ﻿using ClassLibrary;
 using DPA_Musicsheet;
+using DPA_Musicsheets.Facade;
 using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,12 +16,101 @@ namespace DPA_Musicsheets.Managers
         FileManager fileManager;
         string path;
         Dictionary<string, IReader> readers;
-        Note musicData;
+        Symbol musicData;
+        private PsamContolLib psamContolLib;
+        private MusicLoader musicLoader;
 
         public MusicController(MusicLoader ml)
         {
             //musicData = ml.LilypondText;
             fileManager = new FileManager();
+            psamContolLib = new PsamContolLib();
+            musicLoader = ml;
+
+            Test();
+        }
+
+        void Test()
+        {
+            musicData = new Note()
+            {
+                Pitch = "B",
+                Duration = 8,
+                TimeSignature = new TimeSignature()
+                {
+                    NumberOfBeats = 4,
+                    TimeOfBeats = 4
+                },
+
+                Clef = new Clef(Clef.Key.G)
+
+            };
+            musicData.nextSymbol = new Note()
+            {
+                Pitch = "B",
+                Duration = 8,
+                TimeSignature = new TimeSignature()
+                {
+                    NumberOfBeats = 4,
+                    TimeOfBeats = 4
+                },
+                Clef = new Clef(Clef.Key.G)
+            };
+            musicData.nextSymbol.nextSymbol = new Note()
+            {
+                Pitch = "B",
+                Duration = 4,
+                TimeSignature = new TimeSignature()
+                {
+                    NumberOfBeats = 4,
+                    TimeOfBeats = 4
+                },
+                Clef = new Clef(Clef.Key.G)
+            };
+            musicData.nextSymbol.nextSymbol.nextSymbol = new Note()
+            {
+                Pitch = "B",
+                Duration = 4,
+                TimeSignature = new TimeSignature()
+                {
+                    NumberOfBeats = 4,
+                    TimeOfBeats = 4
+                },
+                Clef = new Clef(Clef.Key.G)
+            };
+            musicData.nextSymbol.nextSymbol.nextSymbol.nextSymbol = new Note()
+            {
+                Pitch = "B",
+                Duration = 4,
+                TimeSignature = new TimeSignature()
+                {
+                    NumberOfBeats = 4,
+                    TimeOfBeats = 4
+                },
+                Clef = new Clef(Clef.Key.G)
+            };
+            musicData.nextSymbol.nextSymbol.nextSymbol.nextSymbol.nextSymbol = new Note()
+            {
+                Pitch = "B",
+                Duration = 4,
+                TimeSignature = new TimeSignature()
+                {
+                    NumberOfBeats = 4,
+                    TimeOfBeats = 4
+                },
+                Clef = new Clef(Clef.Key.G)
+            };
+            musicData.nextSymbol.nextSymbol.nextSymbol.nextSymbol.nextSymbol.nextSymbol = new Note()
+            {
+                Pitch = "B",
+                Duration = 4,
+                TimeSignature = new TimeSignature()
+                {
+                    NumberOfBeats = 4,
+                    TimeOfBeats = 4
+                },
+                Clef = new Clef(Clef.Key.G)
+            };
         }
         public void Save()
         {
@@ -34,6 +125,11 @@ namespace DPA_Musicsheets.Managers
         public void LoadFile()
         {
             musicData = fileManager.LoadFile(path);
+        }
+
+        public void SetStaffs()
+        {
+            musicLoader.StaffsViewModel.SetStaffs(psamContolLib.GetStaffsFromTokens(musicData));
         }
     }
 }

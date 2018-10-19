@@ -65,7 +65,7 @@ namespace DPA_Musicsheet
             }
         }
 
-        public void SaveFile(Note musicData)
+        public void SaveFile(Symbol musicData)
         {
 
             if (saveFileDialog.ShowDialog() == true)
