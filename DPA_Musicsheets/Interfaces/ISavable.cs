@@ -9,6 +9,6 @@ namespace DPA_Musicsheets.Interfaces
 {
     public interface ISavable
     {
-        void Save(string fileName, Note file);
+        void Save(string fileName, Symbol symbol);
     }
 }
