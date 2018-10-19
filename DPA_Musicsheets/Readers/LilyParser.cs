@@ -38,6 +38,7 @@ namespace DPA_Musicsheets.Readers
             {
                 [LilypondTokenKind.Relative] = new Func<LilypondToken, LilypondToken>(FindRelative),
                 [LilypondTokenKind.Time] = new Func<LilypondToken, LilypondToken>(FindTimeSignature),
+                [LilypondTokenKind.Tempo] = new Func<LilypondToken,LilypondToken>(FindTempo),
                 [LilypondTokenKind.Note] = new Func<LilypondToken, LilypondToken>(SetNextNote),
                 [LilypondTokenKind.Rest] = new Func<LilypondToken, LilypondToken>(SetNextRest),
                 [LilypondTokenKind.Clef] = new Func<LilypondToken, LilypondToken>(FindClef),
@@ -121,6 +122,25 @@ namespace DPA_Musicsheets.Readers
                 key = cleffs[text]
             };
             noteBuilder.SetClef(tempClef);
+        }
+
+        private LilypondToken FindTempo(LilypondToken startToken)
+        {
+            LilypondToken currentToken = startToken.NextToken;
+            if(currentToken.TokenKind == LilypondTokenKind.TempoValue)
+            {
+                SetTempo(currentToken.Value);    
+            }
+            return currentToken;
+        }
+
+        private void SetTempo(string text)
+        {
+            Tempo newTempo = new Tempo();
+            var result = Regex.Match(text, @"^(\d+)=(\d+)$");
+            newTempo.noteDuration = int.Parse(result.Groups[1].Value);
+            newTempo.bpm = int.Parse(result.Groups[2].Value);
+            noteBuilder.SetTempo(newTempo);
         }
 
         private LilypondToken FindTimeSignature(LilypondToken startToken)

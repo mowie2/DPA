@@ -53,7 +53,7 @@ namespace DPA_Musicsheets.Builders
             this.clef = clef;
         }
 
-        public void setTempo(Tempo tempo)
+        public void SetTempo(Tempo tempo)
         {
             this.tempo = tempo;
         }

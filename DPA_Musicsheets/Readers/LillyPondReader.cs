@@ -1,5 +1,6 @@
 ﻿using ClassLibrary;
 using DPA_Musicsheets.Models;
+using DPA_Musicsheets.Savers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -27,6 +28,8 @@ namespace DPA_Musicsheets.Readers
             tokenizer.ReadLily(content);
             parser.ReadLily(tokenizer.GetRootToken());
             root = parser.GetRootSymbol();
+            SaveToLily s = new SaveToLily();
+            s.Save("jifljlf",root);
         }
     }
 }
