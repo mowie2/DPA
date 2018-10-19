@@ -7,6 +7,7 @@ namespace DPA_Musicsheets.Builders
         private Note note;
         private Clef clef;
         private TimeSignature timeSignature;
+        private Tempo tempo;
 
         private string pitch;
         private Semitone.SEMITONE semitone;
@@ -20,6 +21,7 @@ namespace DPA_Musicsheets.Builders
             this.dotted = 0;
             this.duration = 0;
             this.ocataveModifier = 0;
+            this.semitone = Semitone.SEMITONE.NORMAL;
         }
         public Note BuildNote()
         {
@@ -27,6 +29,7 @@ namespace DPA_Musicsheets.Builders
             {
                 Clef = this.clef,
                 TimeSignature = this.timeSignature,
+                Tempo = this.tempo,
                 Pitch = this.pitch,
                 Semitone = this.semitone,
                 Octave = this.ocataveModifier,
@@ -48,6 +51,11 @@ namespace DPA_Musicsheets.Builders
         public void SetClef(Clef clef)
         {
             this.clef = clef;
+        }
+
+        public void setTempo(Tempo tempo)
+        {
+            this.tempo = tempo;
         }
 
         public void SetTimeSignature(TimeSignature timeSignature)
@@ -78,6 +86,11 @@ namespace DPA_Musicsheets.Builders
         public void ModifyOctave(int octaveModifier)
         {
             this.ocataveModifier += octaveModifier;
+        }
+
+        public void ClearOctave()
+        {
+            this.ocataveModifier = 0;
         }
     }
 }

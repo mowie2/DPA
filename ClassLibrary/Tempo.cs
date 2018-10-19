@@ -6,20 +6,9 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public class Clef : Symbol
+    public class Tempo : Symbol
     {
-        public enum Key { G, F, C};
-        public Key key;
-
-        public Clef()
-        {
-
-        }
-
-        public Clef(Key key)
-        {
-            this.key = key;
-        }
+        public int bpm { get; set; }
 
         public override void GetSymbol()
         {

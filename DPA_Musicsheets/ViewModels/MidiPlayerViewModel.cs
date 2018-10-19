@@ -1,8 +1,7 @@
-﻿using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Facade;
+using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using Sanford.Multimedia.Midi;
-using System;
 
 namespace DPA_Musicsheets.ViewModels
 {
@@ -12,41 +11,40 @@ namespace DPA_Musicsheets.ViewModels
     /// </summary>
     public class MidiPlayerViewModel : ViewModelBase
     {
-        private OutputDevice _outputDevice;
+        public SanfordLib slb;
+        //private OutputDevice _outputDevice;
         private bool _running;
+
 
         // This sequencer creates a possibility to play a sequence.
         // It has a timer and raises events on the right moments.
-        private Sequencer _sequencer;
+        //private Sequencer _sequencer;
 
-        public Sequence MidiSequence
-        {
-            get { return _sequencer.Sequence; }
-            set
-            {
-                StopCommand.Execute(null);
-                _sequencer.Sequence = value;
-                UpdateButtons();
-            }
-        }
+        //public Sequence MidiSequence
+        //{
+        //    get { return slb._sequencer.Sequence; }
+        //    set
+        //    {
+        //        StopCommand.Execute(null);
+        //        slb._sequencer.Sequence = value;
+        //        UpdateButtons();
+        //    }
+        //}
 
         public MidiPlayerViewModel(MusicLoader musicLoader)
         {
             // The OutputDevice is a midi device on the midi channel of your computer.
             // The audio will be streamed towards this output.
             // DeviceID 0 is your computer's audio channel.
-            _outputDevice = new OutputDevice(0);
-            _sequencer = new Sequencer();
+            //_outputDevice = new OutputDevice(0);
+            //_sequencer = new Sequencer();
 
-            _sequencer.ChannelMessagePlayed += ChannelMessagePlayed;
+            slb = new SanfordLib(PlayCommand, UpdateButtons);
+            slb.SequencerChannelMessagedPlayed(slb.ChannelMessagePlayed);
 
             // Wanneer de sequence klaar is moeten we alles closen en stoppen.
-            _sequencer.PlayingCompleted += (playingSender, playingEvent) =>
-            {
-                _sequencer.Stop();
-                _running = false;
-            };
-
+            slb.SquencePlayCompleted(_running);
+            
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
             musicLoader.MidiPlayerViewModel = this;
         }
@@ -62,20 +60,7 @@ namespace DPA_Musicsheets.ViewModels
         // Channelmessages zijn tonen met commands als NoteOn en NoteOff
         // In midi wordt elke noot gespeeld totdat NoteOff is benoemd. Wanneer dus nooit een NoteOff komt nadat die een NoteOn heeft gehad
         // zal deze note dus oneindig lang blijven spelen.
-        private void ChannelMessagePlayed(object sender, ChannelMessageEventArgs e)
-        {
-            try
-            {
-                _outputDevice.Send(e.Message);
-            }
-            catch (Exception ex) when (ex is ObjectDisposedException || ex is OutputDeviceException)
-            {
-                // Don't crash when we can't play
-                // We have to do it this way because IsDisposed on
-                // _outDevice may be false when it is being disposed
-                // so this is the only safe way to prevent race conditions
-            }
-        }
+
 
         #region buttons for play, stop, pause
         public RelayCommand PlayCommand => new RelayCommand(() =>
@@ -83,23 +68,23 @@ namespace DPA_Musicsheets.ViewModels
             if (!_running)
             {
                 _running = true;
-                _sequencer.Continue();
+                slb.ContinueSequence();
                 UpdateButtons();
             }
-        }, () => !_running && _sequencer.Sequence != null);
+        }, () => !_running && slb.CheckSequence() == true);
 
         public RelayCommand StopCommand => new RelayCommand(() =>
         {
             _running = false;
-            _sequencer.Stop();
-            _sequencer.Position = 0;
+            slb.SequencerStop();
+            slb.SetSequncerPosition(0);
             UpdateButtons();
         }, () => _running);
 
         public RelayCommand PauseCommand => new RelayCommand(() =>
         {
             _running = false;
-            _sequencer.Stop();
+            slb.SequencerStop();
             UpdateButtons();
         }, () => _running);
 
@@ -110,11 +95,8 @@ namespace DPA_Musicsheets.ViewModels
         /// </summary>
         public override void Cleanup()
         {
+            slb.Cleanup();
             base.Cleanup();
-
-            _sequencer.Stop();
-            _sequencer.Dispose();
-            _outputDevice.Dispose();
         }
     }
 }
