@@ -29,6 +29,7 @@ namespace DPA_Musicsheets.Models
                 [@"^\\time$"] = LilypondTokenKind.Time,
                 [@"^(\d+)/(\d+)$"] = LilypondTokenKind.TimeValue,
                 [@"^\\tempo$"] = LilypondTokenKind.Tempo,
+                [@"^(\d+)=(\d+)$"] = LilypondTokenKind.TempoValue,
                 [@"^\\repeat$"] = LilypondTokenKind.Repeat,
                 [@"^\\alternative$"] = LilypondTokenKind.Alternative,
                 [@"^{$"] = LilypondTokenKind.SectionStart,

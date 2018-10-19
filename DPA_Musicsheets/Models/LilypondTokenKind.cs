@@ -23,6 +23,7 @@ namespace DPA_Musicsheets.Models
         Time,
         TimeValue,
         Tempo,
+        TempoValue,
         Staff,
         Repeat,
         Alternative,
