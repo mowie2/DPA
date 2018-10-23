@@ -1,6 +1,7 @@
 ﻿using ClassLibrary;
 using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Models;
+using DPA_Musicsheets.Savers;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -23,11 +24,12 @@ namespace DPA_Musicsheets.Readers
 
         public Symbol readFile(string filename)
         {
-            tokenizer.ReadLily(filename);
+            string content = text.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ")+" ";
+            tokenizer.ReadLily(content);
             parser.ReadLily(tokenizer.GetRootToken());
             root = parser.GetRootSymbol();
-
-            return root;
+            SaveToLily s = new SaveToLily();
+            s.Save("jifljlf",root);
         }
 
     }

@@ -23,7 +23,7 @@ namespace DPA_Musicsheet
         {
             savables = new Dictionary<string, ISavable>
             {
-                { ".pdf", new SaveToPDF() },
+                //{ ".pdf", new SaveToPDF() },
                 { ".ly", new SaveToLily() },
                 { ".mid", new SaveToMidi() }
             };

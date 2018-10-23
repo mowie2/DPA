@@ -17,6 +17,7 @@ namespace DPA_Musicsheets.Builders
 
         public NoteBuilder()
         {
+            this.semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
             this.dotted = 0;
             this.duration = 0;
             this.ocataveModifier = 0;
@@ -52,7 +53,7 @@ namespace DPA_Musicsheets.Builders
             this.clef = clef;
         }
 
-        public void setTempo(Tempo tempo)
+        public void SetTempo(Tempo tempo)
         {
             this.tempo = tempo;
         }

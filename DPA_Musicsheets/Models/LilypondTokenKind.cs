@@ -14,6 +14,7 @@ namespace DPA_Musicsheets.Models
     {
         Unknown,
         Relative,
+        RelativeValue,
         Note,
         Rest,
         Bar,
@@ -22,6 +23,7 @@ namespace DPA_Musicsheets.Models
         Time,
         TimeValue,
         Tempo,
+        TempoValue,
         Staff,
         Repeat,
         Alternative,

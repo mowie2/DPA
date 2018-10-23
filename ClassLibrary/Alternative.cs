@@ -8,6 +8,10 @@ namespace ClassLibrary
 {
     public class Alternative
     {
-        private List<Note> notes;
+        public List<Note> Notes { get; set; }
+        public Alternative()
+        {
+            Notes = new List<Note>();
+        }
     }
 }
