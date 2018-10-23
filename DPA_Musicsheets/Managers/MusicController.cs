@@ -15,7 +15,6 @@ namespace DPA_Musicsheets.Managers
     {
         FileManager fileManager;
         string path;
-        Dictionary<string, IReader> readers;
         Symbol musicData;
         private PsamContolLib psamContolLib;
         private MusicLoader musicLoader;
@@ -26,8 +25,9 @@ namespace DPA_Musicsheets.Managers
             fileManager = new FileManager();
             psamContolLib = new PsamContolLib();
             musicLoader = ml;
-
-            Test();
+            path = "C:\\Users\\mo\\Desktop\\School\\DPA\\DPA_Musicsheets\\Files\\Herhaling_metAlternatief.ly";
+            //musicData = fileManager.LoadFile(path);
+            //Test();
         }
 
         void Test()
@@ -129,6 +129,7 @@ namespace DPA_Musicsheets.Managers
 
         public void SetStaffs()
         {
+            LoadFile();
             musicLoader.StaffsViewModel.SetStaffs(psamContolLib.GetStaffsFromTokens(musicData));
         }
     }

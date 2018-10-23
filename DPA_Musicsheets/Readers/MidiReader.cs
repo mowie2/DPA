@@ -50,7 +50,7 @@ namespace DPA_Musicsheets.Managers
             };
         }
 
-        public Note readFile(string fileName)
+        public Symbol readFile(string fileName)
         {
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);

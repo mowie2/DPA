@@ -1,6 +1,7 @@
 ﻿using ClassLibrary;
 using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Managers;
+using DPA_Musicsheets.Readers;
 using DPA_Musicsheets.Savers;
 using Microsoft.Win32;
 using System;
@@ -29,18 +30,23 @@ namespace DPA_Musicsheet
 
             readers = new Dictionary<string, IReader>()
             {
-                {"mid", new MidiReader() }
+                {"mid", new MidiReader() },
+                {".ly", new LillyPondReader() }
             };
 
             openFileDialog = new OpenFileDialog() { Filter = "Midi or LilyPond files (*.mid *.ly)|*.mid;*.ly" };
             saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
         }
 
-        internal Note LoadFile(string path)
+        internal Symbol LoadFile(string path)
         {
             string extension = Path.GetExtension(openFileDialog.FileName);
-            IReader reader = readers[extension];
-            return reader.readFile(openFileDialog.FileName);
+            if (readers.ContainsKey(extension))
+            {
+                IReader reader = readers[extension];
+                return reader.readFile(openFileDialog.FileName);
+            }
+            return null;
         }
 
         public string OpenFile()

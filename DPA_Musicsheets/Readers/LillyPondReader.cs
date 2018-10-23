@@ -1,4 +1,5 @@
 ﻿using ClassLibrary;
+using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Models;
 using System;
 using System.Collections.Generic;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Readers
 {
-    class LillyPondReader
+    public class LillyPondReader : IReader
     {
         private LilyParser parser;
         private LilyTokenizer tokenizer; 
@@ -20,12 +21,14 @@ namespace DPA_Musicsheets.Readers
             tokenizer = new LilyTokenizer();
         }
 
-
-        public void ReadLily(string text)
+        public Symbol readFile(string filename)
         {
-            tokenizer.ReadLily(text);
+            tokenizer.ReadLily(filename);
             parser.ReadLily(tokenizer.GetRootToken());
             root = parser.GetRootSymbol();
+
+            return root;
         }
+
     }
 }
