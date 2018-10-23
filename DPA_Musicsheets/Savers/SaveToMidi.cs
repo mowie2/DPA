@@ -11,6 +11,7 @@ namespace DPA_Musicsheets.Savers
         private TimeSignature currentTimeSignature;
         private Tempo currentTempo;
         private int currentTick;
+        private int PPQN;
         private ChannelMessageBuilder builder;
         private List<Track> tracks;
 
@@ -21,6 +22,7 @@ namespace DPA_Musicsheets.Savers
             tracks.Add(new Track());
             tracks.Add(new Track());
             currentTick = 0;
+            PPQN = 384;
         }
         public void Save(string fileName, Symbol symbol)
         {
@@ -42,20 +44,29 @@ namespace DPA_Musicsheets.Savers
 
         public void addNote(Note note)
         {
+            addTimeSignature(note.TimeSignature);
+            addTempo(note.Tempo);
+
             builder.MidiChannel = 0;
-            builder.Data1 = calculatePitch(note.Pitch, note.Octave, note.Clef, note.Semitone);
+            int midiPitch = calculatePitch(note.Pitch, note.Octave, note.Clef, note.Semitone);
+            builder.Data1 = midiPitch;
             builder.Data2 = 90;
             builder.Build();
             tracks[1].Insert(currentTick, builder.Result);
 
-            addTimeSignature(note.TimeSignature);
-            addTempo(note.Tempo);
-            setEndOfNote(note.Duration, note.Dotted);
+            setEndOfNote(note.Duration, note.Dotted, midiPitch);
         }
 
-        private void setEndOfNote(float duration, int dotted)
+        private void setEndOfNote(float duration, int dotted, int midiPitch)
         {
-            
+            //Pulse Length = 60/(BPM * PPQN)
+            builder.MidiChannel = 0;
+            builder.Data1 = midiPitch;
+            builder.Data2 = 0;
+            builder.Build();
+
+
+
         }
 
         private void addTempo(Tempo tempo)
