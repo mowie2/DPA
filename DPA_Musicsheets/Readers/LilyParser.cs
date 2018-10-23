@@ -14,6 +14,7 @@ namespace DPA_Musicsheets.Readers
     {
         private Builders.NoteBuilder noteBuilder;
         private readonly Dictionary<string, Clef.Key> cleffs;
+        private readonly Dictionary<char, int> octaveModifier;
         private readonly Symbol[] symbols;
         private readonly Dictionary<string, Semitone.SEMITONE> pitchModifiers;
         Dictionary<LilypondTokenKind, Delegate> parserFunctions;
@@ -29,9 +30,15 @@ namespace DPA_Musicsheets.Readers
             };
             pitchModifiers = new Dictionary<string, Semitone.SEMITONE>
             {
+                ["s"] = Semitone.SEMITONE.MAJOR,
                 ["es"] = Semitone.SEMITONE.MAJOR,
                 ["is"] = Semitone.SEMITONE.MINOR,
                 [""] = Semitone.SEMITONE.NORMAL
+            };
+            octaveModifier = new Dictionary<char, int>
+            {
+                ['\''] = 1,
+                [','] = -1
             };
             symbols = new Symbol[2];
             parserFunctions = new Dictionary<LilypondTokenKind, Delegate>
@@ -81,14 +88,7 @@ namespace DPA_Musicsheets.Readers
             int count = 0;
             foreach (char i in text)
             {
-                if (i.Equals('\''))
-                {
-                    count += 1;
-                }
-                else if (i.Equals(','))
-                {
-                    count -= 1;
-                }
+                count += octaveModifier[i];
             }
             return count;
         }
