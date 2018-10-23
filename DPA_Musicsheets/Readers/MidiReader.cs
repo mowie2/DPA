@@ -15,6 +15,7 @@ namespace DPA_Musicsheets.Managers
         private TimeSignature currentTimeSignature;
         private Note firstNote;
         private Note prevNote;
+        private int lastAbsoluteTicks;
 
         private readonly Dictionary<int, string> pitches;
         List<int> SemitonValues;
@@ -77,9 +78,10 @@ namespace DPA_Musicsheets.Managers
 
             //sort allNodes
             MidiEvent[] allEventsArray = allEvents.ToArray();
-            //sortAllEvents(allEventsArray);
+            sortAllEvents(allEventsArray);
 
             noteBuilder.SetClef(new Clef(Clef.Key.G));
+            lastAbsoluteTicks = 0;
             foreach (var midiEvent in allEventsArray)
             {
                 IMidiMessage midiMessage = midiEvent.MidiMessage;
@@ -114,14 +116,17 @@ namespace DPA_Musicsheets.Managers
             MidiEvent[] secList = new MidiEvent[(high - low) + 1];
             int tempIndex = 0;
 
-            System.Diagnostics.Debug.WriteLine("left: " + left + "middle: " + middle + "high: " + high + "sec list length: " + secList.Length);
-            
             while (left <= middle && right <= high)
             {
                 if (list[left].AbsoluteTicks < list[right].AbsoluteTicks)
                 {
                     secList[tempIndex] = list[left];
                     left++;
+                }
+                else if (list[left].AbsoluteTicks > list[right].AbsoluteTicks)
+                {
+                    secList[tempIndex] = list[right];
+                    right++;
                 }
                 else
                 {
@@ -148,7 +153,6 @@ namespace DPA_Musicsheets.Managers
                         secList[tempIndex] = list[right];
                         right++;
                     }
-                    //todo:write so metamessages come before channelMessages
                 }
                 tempIndex++;
             }
@@ -172,9 +176,15 @@ namespace DPA_Musicsheets.Managers
                     tempIndex++;
                 }
             }
-            
+
+            double prev = 0;
             for (int i = 0; i < secList.Length; i++)
             {
+                if (prev > secList[i].AbsoluteTicks)
+                {
+
+                }
+                prev = secList[i].AbsoluteTicks;
                 list[low + i] = secList[i];
             }
 
@@ -208,13 +218,9 @@ namespace DPA_Musicsheets.Managers
             if (channelMessage.Command == ChannelCommand.NoteOn)
             {
                 if (channelMessage.Data2 > 0)
-                {
                     createNewNote(midiEvent);
-                }
                 else if (channelMessage.Data2 == 0)
-                {
                     finishOldNote(midiEvent);
-                }
             }
         }
 
@@ -224,8 +230,38 @@ namespace DPA_Musicsheets.Managers
 
             setNotePitch(channelMessage.Data1);
             Note note = noteBuilder.BuildNote();
-            openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
 
+            checkRest(midiEvent);
+
+            if (!openNotes.ContainsKey(channelMessage.Data1))
+                openNotes.Add(channelMessage.Data1, new Tuple<MidiEvent, Note>(midiEvent, note));
+            else
+                return;
+
+            connectToLastNote(note);
+        }
+
+        private void checkRest(MidiEvent midiEvent)
+        {
+            if (openNotes.Count == 0)
+            {
+                if (lastAbsoluteTicks < midiEvent.AbsoluteTicks)
+                {
+                    addRest(midiEvent.AbsoluteTicks);
+                }
+            }
+        }
+
+        private void addRest(double absoluteTicks)
+        {
+            Note note = noteBuilder.BuildNote();
+            setNoteDuration((absoluteTicks - lastAbsoluteTicks), division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, note);
+
+            connectToLastNote(note);
+        }
+
+        private void connectToLastNote(Note note)
+        {
             if (firstNote != null)
             {
                 prevNote.nextSymbol = note;
@@ -245,9 +281,10 @@ namespace DPA_Musicsheets.Managers
             var tuple = new Tuple<MidiEvent, Note>(null, null);
             if (!openNotes.TryGetValue(channelMessage.Data1, out tuple))
             {
-                throw new Exception("off midiKey without start");
-            }
+                return;
+            };
             setNoteDuration((midiEvent.AbsoluteTicks - tuple.Item1.AbsoluteTicks), division, currentTimeSignature.NumberOfBeats, currentTimeSignature.TimeOfBeats, tuple.Item2);
+            lastAbsoluteTicks = midiEvent.AbsoluteTicks;
             openNotes.Remove(channelMessage.Data1);
         }
 
