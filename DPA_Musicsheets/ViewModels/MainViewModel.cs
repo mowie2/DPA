@@ -43,23 +43,28 @@ namespace DPA_Musicsheets.ViewModels
         }
 
         private MusicLoader _musicLoader;
+        private MusicController musicController;
 
-        public MainViewModel(MusicLoader musicLoader)
+        public MainViewModel(MusicLoader musicLoader, MusicController ms)
         {
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
             _musicLoader = musicLoader;
+            musicController = ms;
             FileName = @"Files/Alle-eendjes-zwemmen-in-het-water.mid";
         }
 
         public ICommand OpenFileCommand => new RelayCommand(() =>
         {
-            FileManager fr = new FileManager();
-            FileName = fr.OpenFile();
+            //FileManager fr = new FileManager();
+            //FileName = fr.OpenFile();
+
+            musicController.OpenFile();
         });
 
         public ICommand LoadCommand => new RelayCommand(() =>
         {
-            _musicLoader.OpenFile(FileName);
+            //_musicLoader.OpenFile(FileName);
+            musicController.SetStaffs();
         });
 
         #region Focus and key commands, these can be used for implementing hotkeys

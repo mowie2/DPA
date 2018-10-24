@@ -12,7 +12,7 @@ namespace DPA_Musicsheets.Savers
 {
     public class SaveToPDF// : ISavable
     {
-        public void Save(string fileName, object musicData)
+        public void Save(string fileName, Symbol note)
         {
             string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string tmpFileName = $"{fileName}-tmp.ly";
@@ -53,7 +53,7 @@ namespace DPA_Musicsheets.Savers
             /*
             using (StreamWriter outputFile = new StreamWriter(fileName))
             {
-                outputFile.Write((string)musicData);
+               // outputFile.Write((string)musicData);
                 outputFile.Close();
             }
             */

@@ -1,4 +1,5 @@
 ﻿using ClassLibrary;
+using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.Savers;
 using System;
@@ -10,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Readers
 {
-    class LillyPondReader
+    public class LillyPondReader : IReader
     {
         private LilyParser parser;
         private LilyTokenizer tokenizer; 
@@ -21,15 +22,21 @@ namespace DPA_Musicsheets.Readers
             tokenizer = new LilyTokenizer();
         }
 
-
-        public void ReadLily(string text)
+        public Symbol readFile(string filename)
         {
-            string content = text.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ")+" ";
+            string file = ReadFile(filename);
+            string content = file.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ")+" ";
             tokenizer.ReadLily(content);
             parser.ReadLily(tokenizer.GetRootToken());
             root = parser.GetRootSymbol();
             SaveToLily s = new SaveToLily();
             s.Save("jifljlf.ly",root);
+        }
+
+
+        private string ReadFile(string filePath)
+        {
+            return System.IO.File.ReadAllText(filePath);
         }
     }
 }

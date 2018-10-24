@@ -251,7 +251,7 @@ namespace DPA_Musicsheets.Readers
         private LilypondToken SetRepeat(LilypondToken startToken)
         {
             LilypondToken currentToken = startToken.NextToken.NextToken.NextToken;
-            BarLine firstBarline = new BarLine { Type = BarLine.TYPE.REPEAT };
+            BarLine firstBarline = new BarLine { Type = BarLine.TYPE.START };
             BarLine lastBarline = new BarLine
             {
                 Type = BarLine.TYPE.REPEAT,
