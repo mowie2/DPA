@@ -2,6 +2,7 @@
 using DPA_Musicsheets.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -47,6 +48,15 @@ namespace DPA_Musicsheets.Savers
             };
         }
 
+        internal void SaveToLilypond(string fileName)
+        {
+            using (StreamWriter outputFile = new StreamWriter(fileName))
+            {
+                outputFile.Write(lilyString);
+                outputFile.Close();
+            }
+        }
+
         public void Save(string fileName, Symbol rootSymbol)
         {
             Symbol currentSymbol = rootSymbol;
@@ -55,6 +65,7 @@ namespace DPA_Musicsheets.Savers
                 currentSymbol = (Symbol)writeLilyLookupTable[currentSymbol.GetType()].DynamicInvoke(currentSymbol);
             }
             lilyString += "}";
+            SaveToLilypond(fileName);
         }
 
         public string WriteRelative(int octaveModifier)
@@ -62,7 +73,7 @@ namespace DPA_Musicsheets.Savers
             if (!setOctave)
             {
                 setOctave = true;
-                return "\\relative c" + WriteOctaveModifier(octaveModifier) + "{\n";
+                return "\\relative c" + WriteOctaveModifier(octaveModifier) + "{\r\r\n";
             }
             return "";
         }
@@ -93,7 +104,7 @@ namespace DPA_Musicsheets.Savers
             if (clef != currentClef)
             {
                 currentClef = clef;
-                returnString = "\\clef " + clef.key.ToString() + "\n";
+                returnString = "\\clef " + clef.key.ToString() + "\r\n";
             } 
             return returnString;
         }
@@ -106,7 +117,7 @@ namespace DPA_Musicsheets.Savers
                 currentTimeSignature = timeSignature;
                 currentDuration = 0;
                 CurrentBarTime = (float)timeSignature.NumberOfBeats/ timeSignature.TimeOfBeats;
-                returnString = "\\time " + timeSignature.NumberOfBeats + "/" + timeSignature.TimeOfBeats + "\n";
+                returnString = "\\time " + timeSignature.NumberOfBeats + "/" + timeSignature.TimeOfBeats + "\r\n";
             }
             return returnString;
         }
@@ -117,7 +128,7 @@ namespace DPA_Musicsheets.Savers
             if (tempo != currentTempo)
             {
                 currentTempo = tempo;
-                returnString = "\\tempo " + tempo.noteDuration + "=" + tempo.bpm + "\n";
+                returnString = "\\tempo " + tempo.noteDuration + "=" + tempo.bpm + "\r\n";
             }
             return returnString;
         }
@@ -139,9 +150,9 @@ namespace DPA_Musicsheets.Savers
         {
             currentDuration = 0;
             Symbol currentSymbol = startSymbol.nextSymbol;
-            lilyString += "\\repeat volta 2 {\n";
+            lilyString += "\\repeat volta 2 {\r\n";
             currentSymbol = WriteSection(currentSymbol);
-            lilyString += "}\n";
+            lilyString += "}\r\n";
             WriteAlternative((BarLine)currentSymbol);
             currentSymbol = currentSymbol.nextSymbol;
             return currentSymbol;
@@ -149,7 +160,7 @@ namespace DPA_Musicsheets.Savers
 
         public void WriteAlternative(BarLine barline)
         {
-            lilyString += "\\Alternative {\n";
+            lilyString += "\\Alternative {\r\n";
             if (barline.Alternatives.Count > 0)
             {
                 foreach(Note note in barline.Alternatives)
@@ -157,10 +168,10 @@ namespace DPA_Musicsheets.Savers
                     currentDuration = 0;
                     lilyString += "{";
                     WriteSection(note);
-                    lilyString += "}\n";
+                    lilyString += "}\r\n";
                 }
             }
-            lilyString += "}\n";
+            lilyString += "}\r\n";
         }
 
         public string WriteBarlines(int duration,int dotted)
@@ -172,7 +183,7 @@ namespace DPA_Musicsheets.Savers
             if (currentDuration+newDuration == CurrentBarTime)
             {
                 currentDuration = 0;
-                return "|\n";
+                return "|\r\n";
             } else if(currentDuration + newDuration > CurrentBarTime)
             {
                 currentDuration = 0;

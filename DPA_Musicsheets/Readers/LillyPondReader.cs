@@ -29,7 +29,7 @@ namespace DPA_Musicsheets.Readers
             parser.ReadLily(tokenizer.GetRootToken());
             root = parser.GetRootSymbol();
             SaveToLily s = new SaveToLily();
-            s.Save("jifljlf",root);
+            s.Save("jifljlf.ly",root);
         }
     }
 }
