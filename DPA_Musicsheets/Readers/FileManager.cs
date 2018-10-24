@@ -30,7 +30,7 @@ namespace DPA_Musicsheet
 
             readers = new Dictionary<string, IReader>()
             {
-                {"mid", new MidiReader() },
+                {".mid", new MidiReader() },
                 {".ly", new LillyPondReader() }
             };
 
@@ -44,7 +44,8 @@ namespace DPA_Musicsheet
             if (readers.ContainsKey(extension))
             {
                 IReader reader = readers[extension];
-                return reader.readFile(openFileDialog.FileName);
+                string fileName = openFileDialog.FileName;
+                return reader.readFile(fileName);
             }
             return null;
         }

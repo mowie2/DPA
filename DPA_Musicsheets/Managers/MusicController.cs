@@ -25,7 +25,7 @@ namespace DPA_Musicsheets.Managers
             fileManager = new FileManager();
             psamContolLib = new PsamContolLib();
             musicLoader = ml;
-            path = "C:\\Users\\mo\\Desktop\\School\\DPA\\DPA_Musicsheets\\Files\\Herhaling_metAlternatief.ly";
+            //path = "C:\\Users\\mo\\Desktop\\School\\DPA\\DPA_Musicsheets\\Files\\Herhaling_metAlternatief.ly";
             //musicData = fileManager.LoadFile(path);
             //Test();
         }

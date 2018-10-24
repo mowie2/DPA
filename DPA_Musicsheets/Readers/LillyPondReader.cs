@@ -24,13 +24,19 @@ namespace DPA_Musicsheets.Readers
 
         public Symbol readFile(string filename)
         {
-            string content = text.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ")+" ";
+            string file = ReadFile(filename);
+            string content = file.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ")+" ";
             tokenizer.ReadLily(content);
             parser.ReadLily(tokenizer.GetRootToken());
             root = parser.GetRootSymbol();
-            SaveToLily s = new SaveToLily();
-            s.Save("jifljlf",root);
+
+            return root;
         }
 
+
+        private string ReadFile(string filePath)
+        {
+            return System.IO.File.ReadAllText(filePath);
+        }
     }
 }
