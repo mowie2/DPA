@@ -13,7 +13,7 @@ namespace ClassLibrary
         public BarLine Buddy { get; set; }
         private bool HasBeenPlayed;
         public TYPE Type { get; set; }
-        private List<Alternative> Alternatives;
+        public List<Note> Alternatives { get; set; }
 
         public override void GetSymbol()
         {

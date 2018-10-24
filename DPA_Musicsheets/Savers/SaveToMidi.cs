@@ -14,6 +14,8 @@ namespace DPA_Musicsheets.Savers
         private int PPQN;
         private ChannelMessageBuilder builder;
         private List<Track> tracks;
+        private BarLine activeBarline;
+        private int alternativeCount;
 
 
         public SaveToMidi()
@@ -22,9 +24,14 @@ namespace DPA_Musicsheets.Savers
             tracks.Add(new Track());
             tracks.Add(new Track());
             currentTick = 0;
-            PPQN = 384;
+            PPQN = 192;
         }
         public void Save(string fileName, Symbol symbol)
+        {
+            readSymbolTillNull(symbol);
+        }
+
+        private void readSymbolTillNull(Symbol symbol)
         {
             Symbol currentSymbol = symbol;
             while (currentSymbol != null)
@@ -39,7 +46,16 @@ namespace DPA_Musicsheets.Savers
 
         public void handleBarline(BarLine barLine)
         {
-            throw new NotImplementedException();
+            if (activeBarline != barLine)
+            {
+                activeBarline = barLine;
+                alternativeCount = 0;
+            } else
+                alternativeCount++;
+            if (alternativeCount > barLine.Alternatives.Count)
+                return;
+
+            readSymbolTillNull(barLine.Alternatives[alternativeCount]);
         }
 
         public void addNote(Note note)
@@ -59,14 +75,19 @@ namespace DPA_Musicsheets.Savers
 
         private void setEndOfNote(float duration, int dotted, int midiPitch)
         {
-            //Pulse Length = 60/(BPM * PPQN)
+            //Pulse Length = (BPM * PPQN) / 60 = 120 *192 / 60
             builder.MidiChannel = 0;
             builder.Data1 = midiPitch;
             builder.Data2 = 0;
             builder.Build();
+            
+            double endSequence = 1 / duration * 4;
+            endSequence = endSequence * ((Math.Pow(2, dotted) - 1) / (Math.Pow(2, dotted) + endSequence));
 
+            int pulseLength =(int) (PPQN * endSequence) * 120 / 60;
+            currentTick += pulseLength;
 
-
+            tracks[1].Insert(currentTick, builder.Result);
         }
 
         private void addTempo(Tempo tempo)
