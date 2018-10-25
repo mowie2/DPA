@@ -2,6 +2,7 @@
 using DPA_Musicsheets.Interfaces;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -20,6 +21,7 @@ namespace DPA_Musicsheets.Savers
         private float CurrentBarTime;
         private Tempo currentTempo;
         private int currentOctave;
+        private bool setOctave;
 
         public SaveToLily()
         {
@@ -30,6 +32,7 @@ namespace DPA_Musicsheets.Savers
             CurrentBarTime = 0;
             currentTempo = null;
             currentOctave = 0;
+            setOctave = false;
 
             writeLilyLookupTable = new Dictionary<Type, Delegate>
             {
@@ -45,21 +48,44 @@ namespace DPA_Musicsheets.Savers
             };
         }
 
-        public void Save(string fileName, Symbol rootSymbol)
+        internal void SaveToLilypond(string fileName)
         {
-            Symbol currentSymbol = rootSymbol;
-            
-            currentSymbol = currentSymbol.nextSymbol;
-            while (currentSymbol != null)
+            using (StreamWriter outputFile = new StreamWriter(fileName))
             {
-                currentSymbol = (Symbol)writeLilyLookupTable[currentSymbol.GetType()].DynamicInvoke(currentSymbol);
+                outputFile.Write(lilyString);
+                outputFile.Close();
             }
         }
 
-        public string WriteOctaveModifier(int octaveModifier)
+        public void Save(string fileName, Symbol root)
+        {
+            if (root != null)
+            {
+                Symbol currentSymbol = root;
+                while (currentSymbol != null)
+                {
+                    currentSymbol = (Symbol)writeLilyLookupTable[currentSymbol.GetType()].DynamicInvoke(currentSymbol);
+                }
+                lilyString += "}";
+                SaveToLilypond(fileName);
+            }
+        }
+
+        private string WriteRelative(int octaveModifier)
+        {
+            if (!setOctave)
+            {
+                setOctave = true;
+                return "\\relative c" + WriteOctaveModifier(octaveModifier) + "{\r\r\n";
+            }
+            return "";
+        }
+
+        private string WriteOctaveModifier(int octaveModifier)
         {
             string returnString = "";
-            for (int i = 0; i < Math.Abs(octaveModifier - currentOctave); i++)
+            int currentOctaveCopy = currentOctave;
+            for (int i = 0; i < Math.Abs(octaveModifier - currentOctaveCopy); i++)
             {
                 if (currentOctave < octaveModifier)
                 {
@@ -75,18 +101,18 @@ namespace DPA_Musicsheets.Savers
             return returnString;
         }
 
-        public string WriteClef(Clef clef)
+        private string WriteClef(Clef clef)
         {
             string returnString = "";
             if (clef != currentClef)
             {
                 currentClef = clef;
-                returnString = "\\clef " + clef.key.ToString() + "\n";
-            }
+                returnString = "\\clef " + clef.key.ToString() + "\r\n";
+            } 
             return returnString;
         }
 
-        public string WriteTimeSignature(TimeSignature timeSignature)
+        private string WriteTimeSignature(TimeSignature timeSignature)
         {
             string returnString = "";
             if (timeSignature != currentTimeSignature)
@@ -94,71 +120,88 @@ namespace DPA_Musicsheets.Savers
                 currentTimeSignature = timeSignature;
                 currentDuration = 0;
                 CurrentBarTime = (float)timeSignature.NumberOfBeats/ timeSignature.TimeOfBeats;
-                returnString = "\\time " + timeSignature.NumberOfBeats + "/" + timeSignature.TimeOfBeats + "\n";
+                returnString = "\\time " + timeSignature.NumberOfBeats + "/" + timeSignature.TimeOfBeats + "\r\n";
             }
             return returnString;
         }
 
-        public string WriteTempo(Tempo tempo)
+        private string WriteTempo(Tempo tempo)
         {
             string returnString = "";
             if (tempo != currentTempo)
             {
-                returnString = "\\tempo " + tempo.noteDuration + "=" + tempo.bpm + "\n";
+                currentTempo = tempo;
+                returnString = "\\tempo " + tempo.noteDuration + "=" + tempo.bpm + "\r\n";
             }
             return returnString;
         }
 
-        public Symbol WriteSection(Symbol startSymbol)
+        private Symbol WriteSection(Symbol startSymbol)
         {
             Symbol currentSymbol = startSymbol;
             while (currentSymbol != null && currentSymbol.GetType() == typeof(Note))
             {
-                currentSymbol = WriteNote((Note)currentSymbol);
+                Note n = currentSymbol as Note;
+                lilyString += WriteRelative(n.Octave);
+                currentSymbol = WriteNote(n);
                 currentSymbol = currentSymbol.nextSymbol;
             }
             return currentSymbol;
         }
 
-
-
-        public Symbol WriteRepeat(Symbol startSymbol)
+        private Symbol WriteRepeat(Symbol startSymbol)
         {
+            currentDuration = 0;
             Symbol currentSymbol = startSymbol.nextSymbol;
-            lilyString += "\\repeat volta 2 {\n";
+            lilyString += "\\repeat volta 2 {\r\n";
             currentSymbol = WriteSection(currentSymbol);
-            lilyString += "}\n";
+            lilyString += "}\r\n";
             WriteAlternative((BarLine)currentSymbol);
             currentSymbol = currentSymbol.nextSymbol;
             return currentSymbol;
         }
 
-        public void WriteAlternative(BarLine barline)
+        private void WriteAlternative(BarLine barline)
         {
-            lilyString += "\\Alternative {";
+            lilyString += "\\Alternative {\r\n";
             if (barline.Alternatives.Count > 0)
             {
                 foreach(Note note in barline.Alternatives)
                 {
+                    currentDuration = 0;
                     lilyString += "{";
                     WriteSection(note);
-                    lilyString += "}\n";
+                    lilyString += "}\r\n";
                 }
             }
-            lilyString += "}\n";
+            lilyString += "}\r\n";
         }
 
-        public string WriteBarlines()
+        private string WriteBarlines(Note note,int duration,int dotted)
         {
-            if (currentDuration >= CurrentBarTime)
+            float newDuration = 1 / (float)duration;
+            float durationModifier = (float)((Math.Pow(2,dotted)) - 1) / (float)((Math.Pow(2, dotted)))+1;
+            newDuration *= durationModifier;
+            if((note.nextSymbol != null  && note.nextSymbol.GetType() == typeof(BarLine)))
             {
                 currentDuration = 0;
-                return "|";
+                return "\r\n";
             }
+            else if (currentDuration+newDuration == CurrentBarTime && note.nextSymbol != null)
+            {
+                currentDuration = 0;
+                return "|\r\n";
+
+            } else if(currentDuration + newDuration < CurrentBarTime)
+            {
+                currentDuration += newDuration;
+                return "";
+            }
+            currentDuration = 0;
             return "";
         }
 
-        public string WritePitch(string pitch)
+        private string WritePitch(string pitch)
         {
             if (pitch.Equals(""))
             {
@@ -167,7 +210,7 @@ namespace DPA_Musicsheets.Savers
             return pitch;
         }
 
-        public string WriteDotted(int dots)
+        private string WriteDotted(int dots)
         {
             string returnString = "";
             for (int i = 0; i < dots; i++)
@@ -177,13 +220,12 @@ namespace DPA_Musicsheets.Savers
             return returnString;
         }
 
-        public string WriteDuration(int duration)
+        private string WriteDuration(int duration)
         {
-            currentDuration += 1/(float)duration;
             return duration.ToString();
         }
 
-        public Note WriteNote(Symbol symbol)
+        private Note WriteNote(Symbol symbol)
         {
             Note note = (Note)symbol;
             string returnString = "";
@@ -193,10 +235,11 @@ namespace DPA_Musicsheets.Savers
             returnString += WritePitch(note.Pitch);
             returnString += pitchModifiers[note.Semitone];
             returnString += WriteOctaveModifier(note.Octave);
-            returnString += WriteDotted(note.Dotted);
             returnString += WriteDuration((int)note.Duration);
-            returnString += WriteBarlines();
-            lilyString += returnString+" ";
+            returnString += WriteDotted(note.Dotted);
+            returnString += " ";
+            returnString += WriteBarlines(note,(int)note.Duration, (int)note.Dotted);
+            lilyString += returnString;
             return note;
         }
     }
