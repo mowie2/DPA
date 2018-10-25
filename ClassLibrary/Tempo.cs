@@ -8,6 +8,7 @@ namespace ClassLibrary
 {
     public class Tempo : Symbol
     {
+        public int noteDuration { get; set; }
         public int bpm { get; set; }
 
         public override void GetSymbol()

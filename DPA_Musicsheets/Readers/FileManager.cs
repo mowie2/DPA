@@ -22,7 +22,7 @@ namespace DPA_Musicsheet
         {
             savables = new Dictionary<string, ISavable>
             {
-                { ".pdf", new SaveToPDF() },
+                //{ ".pdf", new SaveToPDF() },
                 { ".ly", new SaveToLily() },
                 { ".mid", new SaveToMidi() }
             };
@@ -72,6 +72,11 @@ namespace DPA_Musicsheet
             {
                 string extension = Path.GetExtension(saveFileDialog.FileName);
                 if (!savables.ContainsKey(extension))
+                {
+                    ISavable saver = savables[extension];
+                    //saver.Save(saveFileDialog.FileName, musicData);
+                }
+                else
                 {
                     MessageBox.Show($"Extension {extension} is not supported.");
                     return;

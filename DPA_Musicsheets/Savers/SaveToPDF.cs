@@ -10,13 +10,13 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Savers
 {
-    public class SaveToPDF : ISavable
+    public class SaveToPDF// : ISavable
     {
         public void Save(string fileName, Note note)
         {
             string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string tmpFileName = $"{fileName}-tmp.ly";
-            write(tmpFileName, note);
+            //write(tmpFileName, musicData);
 
             string lilypondLocation = @"C:\Program Files (x86)\LilyPond\usr\bin\lilypond.exe";
             string sourceFolder = Path.GetDirectoryName(tmpFileName);
@@ -47,14 +47,16 @@ namespace DPA_Musicsheets.Savers
                 File.Delete(tmpFileName);
             }
         }
-
-        private void write(string fileName, Note musicData)
+    
+        private void write(string fileName, Symbol musicData)
         {
+            /*
             using (StreamWriter outputFile = new StreamWriter(fileName))
             {
                // outputFile.Write((string)musicData);
                 outputFile.Close();
             }
+            */
         }
     }
 }
