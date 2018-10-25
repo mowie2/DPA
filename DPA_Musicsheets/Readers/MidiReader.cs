@@ -302,9 +302,8 @@ namespace DPA_Musicsheets.Managers
 
         private void setNotePitch(int midiKey)
         {
-            int previousMidikey = 60;
             int octave = (midiKey / 12) - 1;
-
+            System.Diagnostics.Debug.Write(midiKey + " ");
             var x = pitches[midiKey % 12];
             var y = midiKey % 12;
             noteBuilder.SetPitch(pitches[y]);
@@ -359,95 +358,44 @@ namespace DPA_Musicsheets.Managers
             */
             #endregion
             noteBuilder.ClearOctave();
-            int distance = midiKey - previousMidikey;
-            while (distance < -6)
-            {
-                noteBuilder.ModifyOctave(-1);
-                distance += 8;
-            }
+            int octaveModifier = midiKey;
 
-            while (distance > 6)
+            while (octaveModifier < 54 || octaveModifier > 66)
             {
-                noteBuilder.ModifyOctave(1);
-                distance -= 8;
+                if (octaveModifier < 54)
+                {
+                    noteBuilder.ModifyOctave(-1);
+                    octaveModifier += 12;
+                } else if (octaveModifier > 66)
+                {
+                    noteBuilder.ModifyOctave(1);
+                    octaveModifier -= 12;
+                }
             }
         }
 
-
+        int piyt = 0;
         // absoluut ticks: start tijd
         // nextNoteAbosulutetick: eind tijd
         // division: 
         private void setNoteDuration(double deltaTicks, int division, int beatNote, int beatsPerBar, Note note)
         {
-            int duration = 0;
-            int dots = 0;
-            double percentageOfBar = 0;
-
-
-            double percentageOfBeatNote = deltaTicks / division;
-            percentageOfBar = (1.0 / beatsPerBar) * percentageOfBeatNote;
-
-            for (int noteLength = 32; noteLength >= 1; noteLength -= 1)
+            int smallestNote32 = division / 8;
+            int count = 0;
+            piyt++;
+            while (deltaTicks >= (smallestNote32 * Math.Pow(2, count+1)))
             {
-                double absoluteNoteLength = (1.0 / noteLength);
-
-                if (percentageOfBar <= absoluteNoteLength)
-                {
-                    if (noteLength < 2)
-                        noteLength = 2;
-
-
-                    int subtractDuration;
-
-                    if (noteLength == 32)
-                        subtractDuration = 32;
-                    else if (noteLength >= 16)
-                        subtractDuration = 16;
-                    else if (noteLength >= 8)
-                        subtractDuration = 8;
-                    else if (noteLength >= 4)
-                        subtractDuration = 4;
-                    else
-                        subtractDuration = 2;
-
-
-                    if (noteLength >= 17)
-                        duration = 32;
-                    else if (noteLength >= 9)
-                        duration = 16;
-                    else if (noteLength >= 5)
-                        duration = 8;
-                    else if (noteLength >= 3)
-                        duration = 4;
-                    else
-                        duration = 2;
-
-
-                    double currentTime = 0;
-
-                    while (currentTime < (noteLength - subtractDuration))
-                    {
-                        var addtime = 1 / ((subtractDuration / beatNote) * Math.Pow(2, dots));
-                        if (addtime <= 0)
-                            break;
-
-                        currentTime += addtime;
-                        if (currentTime <= (noteLength - subtractDuration))
-                        {
-                            dots++;
-                        }
-                        if (dots >= 4)
-                            break;
-                    }
-
-                    break;
-                }
+                count++;
+                //duration2 = ((double)deltaTicks - dotDuration) / (smallestNote32 * count);
             }
+            int duration = (int)(32 / Math.Pow(2, count));
+            double durationTick = division * (4.0 / duration);
+            float dotDuration = (float)((int)deltaTicks % durationTick)/(float)durationTick;
+            double dotted = -1*Math.Log(1-dotDuration)/ Math.Log(2);
+            int i;
 
-            note.Duration = duration;
-            note.Dotted = dots;
-            //noteBuilder.SetDuriation(duration);
-            //noteBuilder.SetDotted(dots);
+            //note.Duration = duration;
+            //note.Dotted = dots;
         }
 
         private void handleMetaMessage(IMidiMessage midiMessage)
