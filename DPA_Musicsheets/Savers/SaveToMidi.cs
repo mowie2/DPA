@@ -166,6 +166,11 @@ namespace DPA_Musicsheets.Savers
                 midiKey--;
             midiKey += octave * 12;
             System.Diagnostics.Debug.Write((midiKey + 60) + " ");
+            int test = midiKey + 60;
+            if (test < 0)
+                return 0;
+            if (test > 127)
+                return 0;
             return midiKey+60;
         }
     }

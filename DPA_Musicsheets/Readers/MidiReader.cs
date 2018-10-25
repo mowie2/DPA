@@ -370,8 +370,7 @@ namespace DPA_Musicsheets.Managers
                 }
             }
         }
-
-        int piyt = 0;
+        
         // absoluut ticks: start tijd
         // nextNoteAbosulutetick: eind tijd
         // division: 
@@ -379,7 +378,6 @@ namespace DPA_Musicsheets.Managers
         {
             int smallestNote32 = division / 8;
             int count = 0;
-            piyt++;
             while (deltaTicks >= (smallestNote32 * Math.Pow(2, count+1)))
             {
                 count++;
@@ -389,7 +387,9 @@ namespace DPA_Musicsheets.Managers
             double durationTick = division * (4.0 / duration);
             float dotDuration = (float)((int)deltaTicks % durationTick)/(float)durationTick;
             double dotted = -1*Math.Log(1-dotDuration)/ Math.Log(2);
-            int i;
+
+            note.Duration = duration;
+            note.Dotted =(int) dotted;
 
             //note.Duration = duration;
             //note.Dotted = dots;
