@@ -138,7 +138,10 @@ namespace DPA_Musicsheets.Savers
 
             TimeSignatureBuilder timeSignatureBuilder = new TimeSignatureBuilder();
             timeSignatureBuilder.Numerator = (byte)currentTimeSignature.TimeOfBeats;
-            timeSignatureBuilder.Denominator = (byte)currentTimeSignature.NumberOfBeats;
+            if (currentTimeSignature.NumberOfBeats == 9)
+                timeSignatureBuilder.Denominator = 8;
+            else
+                timeSignatureBuilder.Denominator = (byte)currentTimeSignature.NumberOfBeats;
             timeSignatureBuilder.ClocksPerMetronomeClick = 24;
             timeSignatureBuilder.ThirtySecondNotesPerQuarterNote = 8;
             timeSignatureBuilder.Build();

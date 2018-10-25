@@ -415,8 +415,8 @@ namespace DPA_Musicsheets.Managers
             var _beatsPerBar = (int)(1 / Math.Pow(timeSignatureBytes[1], -2));
 
             currentTimeSignature = new TimeSignature();
-            currentTimeSignature.NumberOfBeats = _beatNote;
-            currentTimeSignature.TimeOfBeats = _beatsPerBar;
+            currentTimeSignature.TimeOfBeats = _beatNote;
+            currentTimeSignature.NumberOfBeats = _beatsPerBar;
 
             noteBuilder.SetTimeSignature(currentTimeSignature);
         }
