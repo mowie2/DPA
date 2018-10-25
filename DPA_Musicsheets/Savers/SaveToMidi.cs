@@ -26,7 +26,7 @@ namespace DPA_Musicsheets.Savers
             sequence = new Sequence();
             sequence.Add(new Track());
             sequence.Add(new Track());
-
+            System.Diagnostics.Debug.WriteLine( "");
             readSymbolTillNull(symbol);
             foreach (var item in sequence)
             {
@@ -154,9 +154,9 @@ namespace DPA_Musicsheets.Savers
                 {"d", 2 },
                 {"e", 4 },
                 {"f", 5 },
-                {"g", 7 },
-                {"a", 9 },
-                {"b", 11 }
+                {"g", -5 },
+                {"a", -3 },
+                {"b", -1 }
             };
             int midiKey;
             pitchDictionary.TryGetValue(pitch, out midiKey);
@@ -165,12 +165,7 @@ namespace DPA_Musicsheets.Savers
             if (semitone == Semitone.SEMITONE.MAJOR)
                 midiKey--;
             midiKey += octave * 12;
-
-            if (midiKey > 127)
-                return 0;
-            if (midiKey < 0)
-                return 0;
-
+            System.Diagnostics.Debug.Write((midiKey + 60) + " ");
             return midiKey+60;
         }
     }
