@@ -18,9 +18,14 @@ namespace DPA_Musicsheets.Readers
         private readonly Symbol[] symbols;
         private readonly Dictionary<string, Semitone.SEMITONE> pitchModifiers;
         Dictionary<LilypondTokenKind, Delegate> parserFunctions;
+        List<string> notesOrder = new List<string>() { "c", "cis", "d", "dis", "e", "f", "fis", "g", "gis", "a", "ais", "b" };
+        private string relativePitch;
+        bool relative;
+        private Note prefNote;
 
         public LilyParser()
         {
+            relativePitch = "c";
             noteBuilder = new Builders.NoteBuilder();
             cleffs = new Dictionary<string, Clef.Key>
             {
@@ -52,6 +57,24 @@ namespace DPA_Musicsheets.Readers
                 [LilypondTokenKind.Repeat] = new Func<LilypondToken, LilypondToken>(SetRepeat),
                 [LilypondTokenKind.Alternative] = new Func<LilypondToken, LilypondToken>(SetAlternitive),
             };
+            relative = false;
+        }
+
+        public int RelativeOctaveModifier(string pitch)
+        {
+            if (prefNote != null)
+            {
+                int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefNote.Pitch);
+                if (distance > 3)
+                {
+                    return -1;
+                }
+                if (distance < -3)
+                {
+                    return 1;
+                }
+            }
+            return 0;
         }
 
         public void ReadLily(LilypondToken rootToken)
@@ -98,6 +121,7 @@ namespace DPA_Musicsheets.Readers
             LilypondToken currentToken = startToken.NextToken;
             if(currentToken.TokenKind == LilypondTokenKind.RelativeValue)
             {
+                relative = true;
                 Regex re = new Regex(@"^c([,'])*$");
                 var result = re.Match(currentToken.Value);
                 noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[1].Value));
@@ -218,10 +242,11 @@ namespace DPA_Musicsheets.Readers
             Match result = re.Match(text);
             noteBuilder.SetPitch(result.Groups[1].Value);
             noteBuilder.SetSemitone(pitchModifiers[result.Groups[2].Value]);
-            noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[3].Value));
+            noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[3].Value)+RelativeOctaveModifier(result.Groups[1].Value));
             noteBuilder.SetDuriation(int.Parse(result.Groups[4].Value));
             noteBuilder.SetDotted(result.Groups[5].Value.Length);
-            return noteBuilder.BuildNote();
+            prefNote = noteBuilder.BuildNote();
+            return prefNote;
         }
 
         private LilypondToken SetNextNote(LilypondToken startToken)
@@ -288,7 +313,6 @@ namespace DPA_Musicsheets.Readers
         }
         
         public Symbol GetRootSymbol()
-
         {
             return symbols[0];
         }
