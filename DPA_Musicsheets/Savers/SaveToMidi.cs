@@ -12,23 +12,28 @@ namespace DPA_Musicsheets.Savers
         private Tempo currentTempo;
         private int currentTick;
         private int PPQN;
-        private ChannelMessageBuilder builder;
-        private List<Track> tracks;
         private BarLine activeBarline;
         private int alternativeCount;
+        Sequence sequence;
 
 
         public SaveToMidi()
         {
-            builder = new ChannelMessageBuilder();
-            tracks.Add(new Track());
-            tracks.Add(new Track());
             currentTick = 0;
-            PPQN = 192;
         }
         public void Save(string fileName, Symbol symbol)
         {
+            sequence = new Sequence();
+            sequence.Add(new Track());
+            sequence.Add(new Track());
+
             readSymbolTillNull(symbol);
+            foreach (var item in sequence)
+            {
+                item.Insert(currentTick, MetaMessage.EndOfTrackMessage);
+            }
+
+            sequence.Save("testfile.mid");
         }
 
         private void readSymbolTillNull(Symbol symbol)
@@ -52,10 +57,11 @@ namespace DPA_Musicsheets.Savers
                 alternativeCount = 0;
             } else
                 alternativeCount++;
-            if (alternativeCount > barLine.Alternatives.Count)
+            if (alternativeCount > barLine.Alternatives.Count -1)
                 return;
 
             readSymbolTillNull(barLine.Alternatives[alternativeCount]);
+            readSymbolTillNull(barLine.Buddy.nextSymbol);
         }
 
         public void addNote(Note note)
@@ -63,12 +69,15 @@ namespace DPA_Musicsheets.Savers
             addTimeSignature(note.TimeSignature);
             addTempo(note.Tempo);
 
-            builder.MidiChannel = 0;
+            if(note.Pitch == "")
+            {
+                currentTick += calculateNewTick(note.Duration, note.Dotted);
+                return;
+            }
+
+            
             int midiPitch = calculatePitch(note.Pitch, note.Octave, note.Clef, note.Semitone);
-            builder.Data1 = midiPitch;
-            builder.Data2 = 90;
-            builder.Build();
-            tracks[1].Insert(currentTick, builder.Result);
+            sequence[1].Insert(currentTick, new ChannelMessage(ChannelCommand.NoteOn, 1, midiPitch, 90));
 
             setEndOfNote(note.Duration, note.Dotted, midiPitch);
         }
@@ -76,45 +85,65 @@ namespace DPA_Musicsheets.Savers
         private void setEndOfNote(float duration, int dotted, int midiPitch)
         {
             //Pulse Length = (BPM * PPQN) / 60 = 120 *192 / 60
-            builder.MidiChannel = 0;
-            builder.Data1 = midiPitch;
-            builder.Data2 = 0;
-            builder.Build();
+            currentTick += calculateNewTick(duration, dotted);
+
+            sequence[1].Insert(currentTick, new ChannelMessage(ChannelCommand.NoteOn, 1, midiPitch, 0));
+        }
+
+        private int calculateNewTick(float duration, int dotted)
+        {
+            float durationModifier = (float)((Math.Pow(2, dotted)) - 1) / (float)((Math.Pow(2, dotted))) + 1;
+            ////////////////////////////////////////////////////////
+
+            double absoluteLength = 1.0 / (double)duration;
+            absoluteLength += (absoluteLength / 2.0) * dotted;
+
+            double relationToQuartNote = 4 / 4.0;
+            double percentageOfBeatNote = (1.0 / 4) / absoluteLength;
+            double deltaTicks = (sequence.Division / relationToQuartNote) / percentageOfBeatNote;
             
-            double endSequence = 1 / duration * 4;
-            endSequence = endSequence * ((Math.Pow(2, dotted) - 1) / (Math.Pow(2, dotted) + endSequence));
-
-            int pulseLength =(int) (PPQN * endSequence) * 120 / 60;
-            currentTick += pulseLength;
-
-            tracks[1].Insert(currentTick, builder.Result);
+            return (int) deltaTicks;
         }
 
         private void addTempo(Tempo tempo)
         {
-            if (currentTempo == tempo)
+            if (currentTempo == tempo || tempo == null)
+            {
+                if (currentTempo == null)
+                    addTempo(new Tempo() { bpm = 120 });
                 return;
+            }
+            else
+                currentTempo = tempo;
+            
+            int speed = (60000000 / currentTempo.bpm);
+            byte[] newTempo = new byte[3];
+            newTempo[0] = (byte)((speed >> 16) & 0xff);
+            newTempo[1] = (byte)((speed >> 8) & 0xff);
+            newTempo[2] = (byte)(speed & 0xff);
 
-            TempoChangeBuilder tempoChangeBuilder = new TempoChangeBuilder();
-            tempoChangeBuilder.Tempo = 60000000 / tempo.bpm;
-            tempoChangeBuilder.Build();
-
-            tracks[0].Insert(currentTick, builder.Result);
+            sequence[0].Insert(currentTick, new MetaMessage(MetaType.Tempo, newTempo));
         }
 
         private void addTimeSignature(TimeSignature timeSignature)
         {
-            if (currentTimeSignature != timeSignature)
+            if (currentTimeSignature == timeSignature || timeSignature == null)
+            {
+                if (currentTimeSignature == null)
+                    addTimeSignature(new TimeSignature() { NumberOfBeats = 4, TimeOfBeats = 4 });
                 return;
+            }
+            else
+                currentTimeSignature = timeSignature;
 
             TimeSignatureBuilder timeSignatureBuilder = new TimeSignatureBuilder();
-            timeSignatureBuilder.Numerator = (byte)timeSignature.TimeOfBeats;
-            timeSignatureBuilder.Denominator = (byte)timeSignature.NumberOfBeats;
+            timeSignatureBuilder.Numerator = (byte)currentTimeSignature.TimeOfBeats;
+            timeSignatureBuilder.Denominator = (byte)currentTimeSignature.NumberOfBeats;
             timeSignatureBuilder.ClocksPerMetronomeClick = 24;
             timeSignatureBuilder.ThirtySecondNotesPerQuarterNote = 8;
-            builder.Build();
+            timeSignatureBuilder.Build();
 
-            tracks[0].Insert(currentTick, builder.Result);
+            sequence[0].Insert(currentTick, timeSignatureBuilder.Result);
         }
 
         private int calculatePitch(string pitch, int octave, Clef clef, Semitone.SEMITONE semitone)
@@ -136,6 +165,11 @@ namespace DPA_Musicsheets.Savers
             if (semitone == Semitone.SEMITONE.MAJOR)
                 midiKey--;
             midiKey += octave * 12;
+
+            if (midiKey > 127)
+                return 0;
+            if (midiKey < 0)
+                return 0;
 
             return midiKey+60;
         }
