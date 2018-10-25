@@ -1,6 +1,7 @@
 ﻿using ClassLibrary;
 using DPA_Musicsheets.Builders;
 using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Savers;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
@@ -55,6 +56,8 @@ namespace DPA_Musicsheets.Managers
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);
             processFile(midiSequence);
+            SaveToLily s = new SaveToLily();
+            s.Save("test.ly",firstNote);
             return firstNote;
         }
 
@@ -443,8 +446,8 @@ namespace DPA_Musicsheets.Managers
 
             note.Duration = duration;
             note.Dotted = dots;
-            noteBuilder.SetDuriation(duration);
-            noteBuilder.SetDotted(dots);
+            //noteBuilder.SetDuriation(duration);
+            //noteBuilder.SetDotted(dots);
         }
 
         private void handleMetaMessage(IMidiMessage midiMessage)

@@ -235,8 +235,8 @@ namespace DPA_Musicsheets.Savers
             returnString += WritePitch(note.Pitch);
             returnString += pitchModifiers[note.Semitone];
             returnString += WriteOctaveModifier(note.Octave);
-            returnString += WriteDotted(note.Dotted);
             returnString += WriteDuration((int)note.Duration);
+            returnString += WriteDotted(note.Dotted);
             returnString += " ";
             returnString += WriteBarlines(note,(int)note.Duration, (int)note.Dotted);
             lilyString += returnString;
