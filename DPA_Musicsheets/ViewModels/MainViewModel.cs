@@ -1,16 +1,7 @@
-﻿using DPA_Musicsheet;
-using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Win32;
-using PSAMWPFControlLibrary;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace DPA_Musicsheets.ViewModels
@@ -42,9 +33,9 @@ namespace DPA_Musicsheets.ViewModels
             set { _currentState = value; RaisePropertyChanged(() => CurrentState); }
         }
 
-        private MusicLoader _musicLoader;
+        private readonly MusicLoader _musicLoader;
         private MusicController musicController;
-
+        private readonly KeyBinding OpenCmdKeyBinding;
         public MainViewModel(MusicLoader musicLoader, MusicController ms)
         {
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?

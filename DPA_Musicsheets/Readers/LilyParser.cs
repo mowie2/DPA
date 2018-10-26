@@ -314,7 +314,10 @@ namespace DPA_Musicsheets.Readers
         
         public Symbol GetRootSymbol()
         {
-            return symbols[0];
+            Symbol s = symbols[0];
+            symbols[0] = null;
+            symbols[1] = null;
+            return s;
         }
     }
 }
