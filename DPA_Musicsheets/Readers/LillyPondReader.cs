@@ -1,4 +1,5 @@
 ﻿using ClassLibrary;
+using DPA_Musicsheets.Converters;
 using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Models;
 using DPA_Musicsheets.Savers;
@@ -31,14 +32,8 @@ namespace DPA_Musicsheets.Readers
         public Symbol readFile(string filename)
         {
             string file = ReadFile(filename);
-            string content = file.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ")+" ";
-            tokenizer.ReadLily(content);
-            parser.ReadLily(tokenizer.GetRootToken());
-            root = parser.GetRootSymbol();
-            //SaveToMidi d = new SaveToMidi();
-            //d.Save("newtest.mid", root);
-            SaveToLily s = new SaveToLily();
-            s.Save("tfewflwlj.ly",root);
+            LilyToDomain ld = new LilyToDomain();
+            root = ld.getRoot(file);
             return root;
         }
 

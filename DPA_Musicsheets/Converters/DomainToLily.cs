@@ -242,7 +242,7 @@ namespace DPA_Musicsheets.Converters
             return duration.ToString();
         }
 
-        private Note WriteNote(Symbol symbol)
+        private Symbol WriteNote(Symbol symbol)
         {
             Note note = (Note)symbol;
             string returnString = "";
