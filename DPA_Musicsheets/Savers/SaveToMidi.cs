@@ -8,7 +8,7 @@ namespace DPA_Musicsheets.Savers
 {
     public class SaveToMidi : ISavable
     {
-        private TimeSignature currentTimeSignature;
+        private AbstractTimeSignature currentTimeSignature;
         private Tempo currentTempo;
         private int currentTick;
         private int PPQN;
@@ -125,7 +125,7 @@ namespace DPA_Musicsheets.Savers
             sequence[0].Insert(currentTick, new MetaMessage(MetaType.Tempo, newTempo));
         }
 
-        private void addTimeSignature(TimeSignature timeSignature)
+        private void addTimeSignature(AbstractTimeSignature timeSignature)
         {
             if (currentTimeSignature == timeSignature || timeSignature == null)
             {

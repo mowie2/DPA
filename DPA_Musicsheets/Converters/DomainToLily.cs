@@ -16,7 +16,7 @@ namespace DPA_Musicsheets.Converters
         private string prefPitch;
         private Clef currentClef;
         private string lilyString;
-        private TimeSignature currentTimeSignature;
+        private AbstractTimeSignature currentTimeSignature;
         private float currentDuration;
         private float CurrentBarTime;
         private Tempo currentTempo;
@@ -128,7 +128,7 @@ namespace DPA_Musicsheets.Converters
             return returnString;
         }
 
-        private string WriteTimeSignature(TimeSignature timeSignature)
+        private string WriteTimeSignature(AbstractTimeSignature timeSignature)
         {
             string returnString = "";
             if (timeSignature != currentTimeSignature)

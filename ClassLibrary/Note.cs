@@ -9,18 +9,21 @@ namespace ClassLibrary
     public class Note : Symbol
     {
         public Clef Clef { get; set; }
-        public TimeSignature TimeSignature
+        private AbstractTimeSignature _TimeSignature;
+        public AbstractTimeSignature TimeSignature
         {
             get
             {
-                if (TimeSignature == null)
-                    return new TimeSignature();
-                return TimeSignature;
+                if (this._TimeSignature == null)
+                    return new NullTimeSignature();
+                return _TimeSignature;
             }
 
             set
             {
-                TimeSignature = value;
+                if (value == null)
+                    return;
+                _TimeSignature = value;
             }
         }
         public Tempo Tempo { get; set; }

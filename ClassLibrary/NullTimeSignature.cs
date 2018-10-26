@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    class NullTimeSignature : AbstractTimeSignature
+    public class NullTimeSignature : AbstractTimeSignature
     {
         public NullTimeSignature()
         {
