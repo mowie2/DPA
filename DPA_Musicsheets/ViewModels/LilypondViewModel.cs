@@ -11,8 +11,7 @@ namespace DPA_Musicsheets.ViewModels
 {
     public class LilypondViewModel : ViewModelBase
     {
-        private MusicLoader _musicLoader;
-        private MainViewModel _mainViewModel { get; set; }
+        
         private MusicController musicController;
         private Editor editor;
         private string _text;
@@ -45,14 +44,13 @@ namespace DPA_Musicsheets.ViewModels
         private static readonly int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
         private  bool _waitingForRender = false;
         private LilyToDomain lilyToDomain;
-        public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader, MusicController msc, Editor edit)
+        public LilypondViewModel( MusicController msc, Editor edit)
         {
 
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
-            _mainViewModel = mainViewModel;
-            _musicLoader = musicLoader;
-            _musicLoader.LilypondViewModel = this;
+          
+
             editor = edit;
             _text = "Your lilypond text will appear here.";
             musicController = msc;
@@ -78,7 +76,7 @@ namespace DPA_Musicsheets.ViewModels
                 _waitingForRender = true;
                 _lastChange = DateTime.Now;
 
-                _mainViewModel.CurrentState = "Rendering...";
+               
 
                 Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
                 {
@@ -86,11 +84,10 @@ namespace DPA_Musicsheets.ViewModels
                     {
                         _waitingForRender = false;
                         UndoCommand.RaiseCanExecuteChanged();
-
-                        //_musicLoader.LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+                        
                         LilypondText = editor.TextChanged(lilyToDomain.getRoot(LilypondText));
                         musicController.SetStaffs(lilyToDomain.getRoot(LilypondText));
-                        _mainViewModel.CurrentState = "";
+                        
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
             }

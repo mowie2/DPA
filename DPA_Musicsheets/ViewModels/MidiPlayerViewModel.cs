@@ -46,7 +46,7 @@ namespace DPA_Musicsheets.ViewModels
             slb.SquencePlayCompleted(_running);
             
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
-            musicLoader.MidiPlayerViewModel = this;
+            // musicLoader.MidiPlayerViewModel = this;
         }
 
         private void UpdateButtons()
@@ -71,7 +71,7 @@ namespace DPA_Musicsheets.ViewModels
                 slb.ContinueSequence();
                 UpdateButtons();
             }
-        }, () => !_running && slb.CheckSequence() == true);
+        });/*, () => !_running && slb.CheckSequence() == true);*/
 
         public RelayCommand StopCommand => new RelayCommand(() =>
         {
