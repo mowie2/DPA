@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public class TimeSignature : AbstractTimeSignature
+    class NullTimeSignature : AbstractTimeSignature
     {
+        public NullTimeSignature()
+        {
+            NumberOfBeats = 4;
+            TimeOfBeats = 4;
+        }
+
         public override void GetSymbol()
         {
             throw new NotImplementedException();
@@ -15,7 +21,7 @@ namespace ClassLibrary
 
         public override bool isNil()
         {
-            return false;
+            return true;
         }
     }
 }

@@ -9,7 +9,20 @@ namespace ClassLibrary
     public class Note : Symbol
     {
         public Clef Clef { get; set; }
-        public TimeSignature TimeSignature { get; set; }
+        public TimeSignature TimeSignature
+        {
+            get
+            {
+                if (TimeSignature == null)
+                    return new TimeSignature();
+                return TimeSignature;
+            }
+
+            set
+            {
+                TimeSignature = value;
+            }
+        }
         public Tempo Tempo { get; set; }
         public string Pitch { get; set; }
         public Semitone.SEMITONE Semitone { get; set; }

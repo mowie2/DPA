@@ -40,12 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AbstractTimeSignature.cs" />
     <Compile Include="Alternative.cs" />
     <Compile Include="BarLine.cs" />
     <Compile Include="Clef.cs" />
     <Compile Include="Composite.cs" />
     <Compile Include="MusicSymbol.cs" />
     <Compile Include="Note.cs" />
+    <Compile Include="NullTimeSignature.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Symbol.cs" />
     <Compile Include="Semitone.cs" />
