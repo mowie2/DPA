@@ -89,7 +89,9 @@ namespace DPA_Musicsheets.Models
 
         public LilypondToken GetRootToken()
         {
-            return rootToken;
+            LilypondToken t = rootToken;
+            rootToken = null;
+            return t;
         }
     }
 }

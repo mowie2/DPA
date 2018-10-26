@@ -12,6 +12,12 @@
             <command:EventToCommand Command="{Binding OnWindowClosingCommand}" PassEventArgsToCommand="True"  />
         </i:EventTrigger>
     </i:Interaction.Triggers>
+
+    <Window.InputBindings>
+        <KeyBinding Command="ApplicationCommands.Open"
+              Gesture="CTRL+R" />
+    </Window.InputBindings>
+    
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />

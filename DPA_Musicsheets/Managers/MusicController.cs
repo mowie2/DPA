@@ -29,16 +29,17 @@ namespace DPA_Musicsheets.Managers
             }
         }
         string path;
-        Symbol musicData;
+        public Symbol musicData;
         private PsamContolLib psamContolLib;
         private MusicLoader musicLoader;
         private Editor editor;
-        public MusicController(MusicLoader ml)
+        public MusicController(MusicLoader ml, Editor edit)
         {
             //musicData = ml.LilypondText;
             fileManager = new FileManager();
             psamContolLib = new PsamContolLib();
             musicLoader = ml;
+            editor = edit;
             //path = "C:\\Users\\mo\\Desktop\\School\\DPA\\DPA_Musicsheets\\Files\\Herhaling_metAlternatief.ly";
             //musicData = fileManager.LoadFile(path);
             //Test();
@@ -149,6 +150,11 @@ namespace DPA_Musicsheets.Managers
         {
             //LoadFile();
             musicLoader.StaffsViewModel.SetStaffs(psamContolLib.GetStaffsFromTokens(musicData));
+        }
+
+        public void SetStaffs(Symbol symbol)
+        {
+            musicLoader.StaffsViewModel.SetStaffs(psamContolLib.GetStaffsFromTokens(symbol));
         }
     }
 }
