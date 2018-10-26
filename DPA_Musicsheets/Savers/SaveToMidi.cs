@@ -26,7 +26,7 @@ namespace DPA_Musicsheets.Savers
             sequence = new Sequence();
             sequence.Add(new Track());
             sequence.Add(new Track());
-
+            System.Diagnostics.Debug.WriteLine( "");
             readSymbolTillNull(symbol);
             foreach (var item in sequence)
             {
@@ -138,7 +138,10 @@ namespace DPA_Musicsheets.Savers
 
             TimeSignatureBuilder timeSignatureBuilder = new TimeSignatureBuilder();
             timeSignatureBuilder.Numerator = (byte)currentTimeSignature.TimeOfBeats;
-            timeSignatureBuilder.Denominator = (byte)currentTimeSignature.NumberOfBeats;
+            if (currentTimeSignature.NumberOfBeats == 9)
+                timeSignatureBuilder.Denominator = 8;
+            else
+                timeSignatureBuilder.Denominator = (byte)currentTimeSignature.NumberOfBeats;
             timeSignatureBuilder.ClocksPerMetronomeClick = 24;
             timeSignatureBuilder.ThirtySecondNotesPerQuarterNote = 8;
             timeSignatureBuilder.Build();
@@ -154,9 +157,9 @@ namespace DPA_Musicsheets.Savers
                 {"d", 2 },
                 {"e", 4 },
                 {"f", 5 },
-                {"g", 7 },
-                {"a", 9 },
-                {"b", 11 }
+                {"g", -5 },
+                {"a", -3 },
+                {"b", -1 }
             };
             int midiKey;
             pitchDictionary.TryGetValue(pitch, out midiKey);
@@ -165,12 +168,12 @@ namespace DPA_Musicsheets.Savers
             if (semitone == Semitone.SEMITONE.MAJOR)
                 midiKey--;
             midiKey += octave * 12;
-
-            if (midiKey > 127)
+            System.Diagnostics.Debug.Write((midiKey + 60) + " ");
+            int test = midiKey + 60;
+            if (test < 0)
                 return 0;
-            if (midiKey < 0)
+            if (test > 127)
                 return 0;
-
             return midiKey+60;
         }
     }
