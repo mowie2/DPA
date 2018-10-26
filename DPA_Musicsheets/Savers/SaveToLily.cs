@@ -13,7 +13,8 @@ namespace DPA_Musicsheets.Savers
     {
         private readonly Dictionary<Type, Delegate> writeLilyLookupTable;
         private readonly Dictionary<Semitone.SEMITONE, string> pitchModifiers;
-
+        List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
+        private string prefPitch;
         private Clef currentClef;
         public string lilyString;
         private TimeSignature currentTimeSignature;
@@ -25,6 +26,7 @@ namespace DPA_Musicsheets.Savers
 
         public SaveToLily()
         {
+            prefPitch = "";
             lilyString = "";
             currentClef = null;
             currentTimeSignature = null;
@@ -79,6 +81,23 @@ namespace DPA_Musicsheets.Savers
                 return "\\relative c" + WriteOctaveModifier(octaveModifier) + "{\r\r\n";
             }
             return "";
+        }
+
+        public int RelativeOctaveModifier(string pitch,int octave)
+        {
+            if (!prefPitch.Equals(""))
+            {
+                int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefPitch);
+                if (distance > 3)
+                {
+                    return octave+1;
+                }
+                if (distance < -3)
+                {
+                    return octave-1;
+                }
+            }
+            return octave;
         }
 
         private string WriteOctaveModifier(int octaveModifier)
@@ -234,7 +253,7 @@ namespace DPA_Musicsheets.Savers
             returnString += WriteTempo(note.Tempo);
             returnString += WritePitch(note.Pitch);
             returnString += pitchModifiers[note.Semitone];
-            returnString += WriteOctaveModifier(note.Octave);
+            returnString += WriteOctaveModifier(RelativeOctaveModifier(note.Pitch,note.Octave));
             returnString += WriteDuration((int)note.Duration);
             returnString += WriteDotted(note.Dotted);
             returnString += " ";

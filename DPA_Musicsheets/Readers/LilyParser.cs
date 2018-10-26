@@ -18,14 +18,11 @@ namespace DPA_Musicsheets.Readers
         private readonly Symbol[] symbols;
         private readonly Dictionary<string, Semitone.SEMITONE> pitchModifiers;
         Dictionary<LilypondTokenKind, Delegate> parserFunctions;
-        List<string> notesOrder = new List<string>() { "c", "cis", "d", "dis", "e", "f", "fis", "g", "gis", "a", "ais", "b" };
-        private string relativePitch;
-        bool relative;
+        List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
         private Note prefNote;
 
         public LilyParser()
         {
-            relativePitch = "c";
             noteBuilder = new Builders.NoteBuilder();
             cleffs = new Dictionary<string, Clef.Key>
             {
@@ -57,7 +54,6 @@ namespace DPA_Musicsheets.Readers
                 [LilypondTokenKind.Repeat] = new Func<LilypondToken, LilypondToken>(SetRepeat),
                 [LilypondTokenKind.Alternative] = new Func<LilypondToken, LilypondToken>(SetAlternitive),
             };
-            relative = false;
         }
 
         public int RelativeOctaveModifier(string pitch)
@@ -121,7 +117,6 @@ namespace DPA_Musicsheets.Readers
             LilypondToken currentToken = startToken.NextToken;
             if(currentToken.TokenKind == LilypondTokenKind.RelativeValue)
             {
-                relative = true;
                 Regex re = new Regex(@"^c([,'])*$");
                 var result = re.Match(currentToken.Value);
                 noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[1].Value));

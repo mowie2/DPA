@@ -29,8 +29,10 @@ namespace DPA_Musicsheets.Readers
             tokenizer.ReadLily(content);
             parser.ReadLily(tokenizer.GetRootToken());
             root = parser.GetRootSymbol();
+            //SaveToMidi d = new SaveToMidi();
+            //d.Save("newtest.mid", root);
             SaveToLily s = new SaveToLily();
-            s.Save("test.y",root);
+            s.Save("tfewflwlj.ly",root);
             return root;
         }
 
