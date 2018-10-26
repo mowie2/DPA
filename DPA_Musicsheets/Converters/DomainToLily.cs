@@ -9,8 +9,8 @@ namespace DPA_Musicsheets.Converters
 {
     class DomainToLily
     {
-        private readonly Dictionary<Type, Delegate> writeLilyLookupTable;
-        private readonly Dictionary<Semitone.SEMITONE, string> pitchModifiers;
+        private Dictionary<Type, Delegate> writeLilyLookupTable;
+        private Dictionary<Semitone.SEMITONE, string> pitchModifiers;
         List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
         private int prefRelativeOctaveModifier;
         private string prefPitch;
@@ -23,8 +23,26 @@ namespace DPA_Musicsheets.Converters
         private int currentOctave;
         private bool setOctave;
 
+        
 
-        public DomainToLily()
+        public string GetLilyText(Symbol root)
+        {
+            Clear();
+            if (root != null)
+            {
+                Symbol currentSymbol = root;
+                while (currentSymbol != null)
+                {
+                    currentSymbol = (Symbol)writeLilyLookupTable[currentSymbol.GetType()].DynamicInvoke(currentSymbol);
+                }
+                lilyString += "}";
+            }
+            string returnString = lilyString;
+            lilyString = "";
+            return returnString;
+        }
+
+        private void Clear()
         {
             prefRelativeOctaveModifier = 0;
             prefPitch = "";
@@ -49,22 +67,6 @@ namespace DPA_Musicsheets.Converters
                 [Semitone.SEMITONE.MINOR] = "is",
                 [Semitone.SEMITONE.NORMAL] = ""
             };
-        }
-
-        public string GetLilyText(Symbol root)
-        {
-            if (root != null)
-            {
-                Symbol currentSymbol = root;
-                while (currentSymbol != null)
-                {
-                    currentSymbol = (Symbol)writeLilyLookupTable[currentSymbol.GetType()].DynamicInvoke(currentSymbol);
-                }
-                lilyString += "}";
-            }
-            string returnString = lilyString;
-            lilyString = "";
-            return returnString;
         }
 
         private string WriteRelative(int octaveModifier)
