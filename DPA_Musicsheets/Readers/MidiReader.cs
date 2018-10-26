@@ -377,7 +377,10 @@ namespace DPA_Musicsheets.Managers
             byte[] tempoBytes = metaMessage.GetBytes();
             int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
             var _bpm = 60000000 / tempo;
-            noteBuilder.SetTempo(new Tempo() { bpm = _bpm });
+            noteBuilder.setTempo(new Tempo()
+            {
+                bpm = _bpm
+            });
         }
     }
 }
