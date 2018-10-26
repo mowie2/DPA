@@ -62,7 +62,7 @@ namespace DPA_Musicsheets.Readers
         public void ReadLily(LilypondToken rootToken)
         {
             LilypondToken currentToken = rootToken;
-            while (currentToken.NextToken != null)
+            while (currentToken != null)
             {
                 if (parserFunctions.ContainsKey(currentToken.TokenKind))
                 {

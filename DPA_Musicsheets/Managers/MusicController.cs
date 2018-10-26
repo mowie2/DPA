@@ -29,7 +29,7 @@ namespace DPA_Musicsheets.Managers
             }
         }
         string path;
-        Symbol musicData;
+        public Symbol musicData;
         private PsamContolLib psamContolLib;
         private MusicLoader musicLoader;
         private Editor editor;
@@ -150,6 +150,11 @@ namespace DPA_Musicsheets.Managers
         {
             //LoadFile();
             musicLoader.StaffsViewModel.SetStaffs(psamContolLib.GetStaffsFromTokens(musicData));
+        }
+
+        public void SetStaffs(Symbol symbol)
+        {
+            musicLoader.StaffsViewModel.SetStaffs(psamContolLib.GetStaffsFromTokens(symbol));
         }
     }
 }

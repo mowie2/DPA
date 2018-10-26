@@ -18,9 +18,9 @@ namespace DPA_Musicsheets.Managers
         {
             converter = new DomainToLily();
         }
-        public string TextChanged()
+        public string TextChanged(Symbol symbol)
         {
-            return converter.GetLilyText(new Note());
+            return converter.GetLilyText(symbol);
         }
     }
 }
