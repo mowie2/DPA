@@ -23,7 +23,21 @@ namespace DPA_Musicsheets.Converters
         private int currentOctave;
         private bool setOctave;
 
-        
+        public DomainToLily()
+        {
+            writeLilyLookupTable = new Dictionary<Type, Delegate>
+            {
+                [typeof(Note)] = new Func<Symbol, Symbol>(WriteSection),
+                [typeof(BarLine)] = new Func<Symbol, Symbol>(WriteRepeat)
+            };
+
+            pitchModifiers = new Dictionary<Semitone.SEMITONE, string>
+            {
+                [Semitone.SEMITONE.MAJOR] = "es",
+                [Semitone.SEMITONE.MINOR] = "is",
+                [Semitone.SEMITONE.NORMAL] = ""
+            };
+        }
 
         public string GetLilyText(Symbol root)
         {
@@ -37,9 +51,7 @@ namespace DPA_Musicsheets.Converters
                 }
                 lilyString += "}";
             }
-            string returnString = lilyString;
-            lilyString = "";
-            return returnString;
+            return lilyString;
         }
 
         private void Clear()
@@ -54,19 +66,6 @@ namespace DPA_Musicsheets.Converters
             currentTempo = null;
             currentOctave = 0;
             setOctave = false;
-
-            writeLilyLookupTable = new Dictionary<Type, Delegate>
-            {
-                [typeof(Note)] = new Func<Symbol, Symbol>(WriteSection),
-                [typeof(BarLine)] = new Func<Symbol, Symbol>(WriteRepeat)
-            };
-
-            pitchModifiers = new Dictionary<Semitone.SEMITONE, string>
-            {
-                [Semitone.SEMITONE.MAJOR] = "es",
-                [Semitone.SEMITONE.MINOR] = "is",
-                [Semitone.SEMITONE.NORMAL] = ""
-            };
         }
 
         private string WriteRelative(int octaveModifier)

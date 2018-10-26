@@ -37,6 +37,8 @@ namespace DPA_Musicsheets.Readers
 
         private void Clear()
         {
+            symbols[0] = null;
+            symbols[1] = null;
             prefPitch = "";
             noteBuilder = new Builders.NoteBuilder();
             cleffs = new Dictionary<string, Clef.Key>

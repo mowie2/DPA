@@ -37,6 +37,12 @@ namespace DPA_Musicsheets.Models
             };
         }
 
+        private void Clear()
+        {
+            rootToken = null;
+            prefToken = null;
+        }
+
         public void ReadLily(string text)
         {
             string currentWord = "";
@@ -68,7 +74,7 @@ namespace DPA_Musicsheets.Models
             }
         }
 
-        public void SetNextToken(LilypondToken nextToken)
+        private void SetNextToken(LilypondToken nextToken)
         {
             if (rootToken == null)
             {
