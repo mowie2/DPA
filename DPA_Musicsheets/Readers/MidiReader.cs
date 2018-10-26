@@ -54,6 +54,11 @@ namespace DPA_Musicsheets.Managers
 
         public Symbol readFile(string fileName)
         {
+            currentTimeSignature = null;
+            firstNote = null;
+            prevNote = null;
+            lastAbsoluteTicks = 0;
+
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);
             processFile(midiSequence);
@@ -304,60 +309,12 @@ namespace DPA_Musicsheets.Managers
         private void setNotePitch(int midiKey)
         {
             int octave = (midiKey / 12) - 1;
-            System.Diagnostics.Debug.Write(midiKey + " ");
+            //System.Diagnostics.Debug.Write(midiKey + " ");
             var x = pitches[midiKey % 12];
             var y = midiKey % 12;
             noteBuilder.SetPitch(pitches[y]);
             NoteBuilderSetSemitone(y);
-
-            #region old code
-            /*
-                        switch (y)
-                        {
-                            case 0:
-
-                                break;
-                            case 1:
-                                noteBuilder.SetPitch(pitches[y]);
-                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                                break;
-                            case 2:
-                                noteBuilder.SetPitch(pitches[y]);
-                                break;
-                            case 3:
-                                noteBuilder.SetPitch(pitches[y]);
-                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                                break;
-                            case 4:
-                                noteBuilder.SetPitch(pitches[y]);
-                                break;
-                            case 5:
-                                noteBuilder.SetPitch(pitches[y]);
-                                break;
-                            case 6:
-                                noteBuilder.SetPitch(pitches[y]);
-                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                                break;
-                            case 7:
-                                noteBuilder.SetPitch(pitches[y]);
-                                break;
-                            case 8:
-                                noteBuilder.SetPitch(pitches[y]);
-                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                                break;
-                            case 9:
-                                noteBuilder.SetPitch(pitches[y]);
-                                break;
-                            case 10:
-                                noteBuilder.SetPitch(pitches[y]);
-                                noteBuilder.SetSemitone(Semitone.SEMITONE.MINOR);
-                                break;
-                            case 11:
-                                noteBuilder.SetPitch(pitches[y]);
-                                break;
-                        }
-            */
-            #endregion
+            
             noteBuilder.ClearOctave();
             int octaveModifier = midiKey;
 
@@ -375,9 +332,6 @@ namespace DPA_Musicsheets.Managers
             }
         }
         
-        // absoluut ticks: start tijd
-        // nextNoteAbosulutetick: eind tijd
-        // division: 
         private void setNoteDuration(double deltaTicks, int division, int beatNote, int beatsPerBar, Note note)
         {
             int smallestNote32 = division / 8;
@@ -394,9 +348,6 @@ namespace DPA_Musicsheets.Managers
 
             note.Duration = duration;
             note.Dotted =(int) dotted;
-
-            //note.Duration = duration;
-            //note.Dotted = dots;
         }
 
         private void handleMetaMessage(IMidiMessage midiMessage)
@@ -430,7 +381,10 @@ namespace DPA_Musicsheets.Managers
             byte[] tempoBytes = metaMessage.GetBytes();
             int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
             var _bpm = 60000000 / tempo;
-            //builder set tempo
+            noteBuilder.setTempo(new Tempo()
+            {
+                bpm = _bpm
+            });
         }
 
         public string GetMusicText()
