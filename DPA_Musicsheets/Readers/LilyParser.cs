@@ -18,9 +18,12 @@ namespace DPA_Musicsheets.Readers
         private readonly Symbol[] symbols;
         private readonly Dictionary<string, Semitone.SEMITONE> pitchModifiers;
         Dictionary<LilypondTokenKind, Delegate> parserFunctions;
+        List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
+        private string prefPitch;
 
         public LilyParser()
         {
+            prefPitch = "";
             noteBuilder = new Builders.NoteBuilder();
             cleffs = new Dictionary<string, Clef.Key>
             {
@@ -54,6 +57,8 @@ namespace DPA_Musicsheets.Readers
             };
         }
 
+        
+
         public void ReadLily(LilypondToken rootToken)
         {
             LilypondToken currentToken = rootToken;
@@ -81,6 +86,25 @@ namespace DPA_Musicsheets.Readers
             symbols[1] = nextSymbol;
 
             return symbols;
+        }
+
+        public int RelativeOctaveModifier(string pitch)
+        {
+            int returnOctave = 0;
+            if (!prefPitch.Equals(""))
+            {
+                int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefPitch);
+                if (distance > 3)
+                {
+                    returnOctave -= 1;
+                }
+                else if (distance < -3)
+                {
+                    returnOctave += 1;
+                }
+            }
+            prefPitch = pitch;
+            return returnOctave;
         }
 
         private int FindOctaveModifier(string text)
@@ -218,7 +242,7 @@ namespace DPA_Musicsheets.Readers
             Match result = re.Match(text);
             noteBuilder.SetPitch(result.Groups[1].Value);
             noteBuilder.SetSemitone(pitchModifiers[result.Groups[2].Value]);
-            noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[3].Value));
+            noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[3].Value)+RelativeOctaveModifier(result.Groups[1].Value));
             noteBuilder.SetDuriation(int.Parse(result.Groups[4].Value));
             noteBuilder.SetDotted(result.Groups[5].Value.Length);
             return noteBuilder.BuildNote();
@@ -251,7 +275,7 @@ namespace DPA_Musicsheets.Readers
         private LilypondToken SetRepeat(LilypondToken startToken)
         {
             LilypondToken currentToken = startToken.NextToken.NextToken.NextToken;
-            BarLine firstBarline = new BarLine { Type = BarLine.TYPE.REPEAT };
+            BarLine firstBarline = new BarLine { Type = BarLine.TYPE.START };
             BarLine lastBarline = new BarLine
             {
                 Type = BarLine.TYPE.REPEAT,
@@ -288,7 +312,6 @@ namespace DPA_Musicsheets.Readers
         }
         
         public Symbol GetRootSymbol()
-
         {
             return symbols[0];
         }

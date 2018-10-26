@@ -9,6 +9,7 @@ namespace DPA_Musicsheets.Interfaces
 {
     interface IReader
     {
-        Note readFile(string filename);
+        Symbol readFile(string filename);
+        string GetMusicText();
     }
 }

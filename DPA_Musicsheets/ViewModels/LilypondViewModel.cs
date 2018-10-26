@@ -1,13 +1,7 @@
-﻿using DPA_Musicsheet;
-using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
-using Microsoft.Win32;
 using System;
-using System.IO;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Input;
 
 namespace DPA_Musicsheets.ViewModels
@@ -44,20 +38,21 @@ namespace DPA_Musicsheets.ViewModels
         }
 
         private bool _textChangedByLoad = false;
-        private DateTime _lastChange;
-        private static int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
-        private bool _waitingForRender = false;
+        private readonly DateTime _lastChange;
+        private static readonly int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
+        private readonly bool _waitingForRender = false;
 
-        public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader)
+        public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader, MusicController msc)
         {
-            musicController = new MusicController(musicLoader);
+
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
             _mainViewModel = mainViewModel;
             _musicLoader = musicLoader;
             _musicLoader.LilypondViewModel = this;
-            
+
             _text = "Your lilypond text will appear here.";
+            musicController = msc;
         }
 
         public void LilypondTextLoaded(string text)
@@ -70,29 +65,30 @@ namespace DPA_Musicsheets.ViewModels
         /// <summary>
         /// This occurs when the text in the textbox has changed. This can either be by loading or typing.
         /// </summary>
-        public ICommand TextChangedCommand => new RelayCommand<TextChangedEventArgs>((args) =>
-        {
-            // If we were typing, we need to do things.
-            if (!_textChangedByLoad)
-            {
-                _waitingForRender = true;
-                _lastChange = DateTime.Now;
+        //public ICommand TextChangedCommand => new RelayCommand<TextChangedEventArgs>((args) =>
+        //{
+        //    // If we were typing, we need to do things.
+        //    if (!_textChangedByLoad)
+        //    {
+        //        _waitingForRender = true;
+        //        _lastChange = DateTime.Now;
 
-                _mainViewModel.CurrentState = "Rendering...";
+        //        _mainViewModel.CurrentState = "Rendering...";
 
-                Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
-                {
-                    if ((DateTime.Now - _lastChange).TotalMilliseconds >= MILLISECONDS_BEFORE_CHANGE_HANDLED)
-                    {
-                        _waitingForRender = false;
-                        UndoCommand.RaiseCanExecuteChanged();
+        //        Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
+        //        {
+        //            if ((DateTime.Now - _lastChange).TotalMilliseconds >= MILLISECONDS_BEFORE_CHANGE_HANDLED)
+        //            {
+        //                _waitingForRender = false;
+        //                UndoCommand.RaiseCanExecuteChanged();
 
-                        _musicLoader.LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
-                        _mainViewModel.CurrentState = "";
-                    }
-                }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
-            }
-        });
+        //                //_musicLoader.LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+        //                musicController.SetStaffs();
+        //                _mainViewModel.CurrentState = "";
+        //            }
+        //        }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
+        //    }
+        //});
 
         #region Commands for buttons like Undo, Redo and SaveAs
         public RelayCommand UndoCommand => new RelayCommand(() =>

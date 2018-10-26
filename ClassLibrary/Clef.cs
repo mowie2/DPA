@@ -8,12 +8,12 @@ namespace ClassLibrary
 {
     public class Clef : Symbol
     {
-        public enum Key { G, F, C};
+        public enum Key { G, F, C, NOTSET};
         public Key key;
 
         public Clef()
         {
-
+            this.key = Key.NOTSET;
         }
 
         public Clef(Key key)

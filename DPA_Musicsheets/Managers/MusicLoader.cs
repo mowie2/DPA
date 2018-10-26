@@ -72,12 +72,11 @@ namespace DPA_Musicsheets.Managers
             {
                 throw new NotSupportedException($"File extension {Path.GetExtension(fileName)} is not supported.");
             }
-            MidiReader reader = new MidiReader();
-            
-            ClassLibrary.Note firstnote = reader.readFile(fileName);
-            Savers.SaveToMidi save = new Savers.SaveToMidi();
-            save.Save("testfile", firstnote);
-            //LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+
+            //LillyPondReader tokenizer = new LillyPondReader();
+            //tokenizer.ReadLily(LilypondText);
+
+            LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
         }
 
         /// <summary>

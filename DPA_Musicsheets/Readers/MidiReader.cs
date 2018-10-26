@@ -1,6 +1,7 @@
 ﻿using ClassLibrary;
 using DPA_Musicsheets.Builders;
 using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Savers;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
@@ -16,6 +17,7 @@ namespace DPA_Musicsheets.Managers
         private Note firstNote;
         private Note prevNote;
         private int lastAbsoluteTicks;
+        private string midiText;
 
         private readonly Dictionary<int, string> pitches;
         List<int> SemitonValues;
@@ -50,7 +52,7 @@ namespace DPA_Musicsheets.Managers
             };
         }
 
-        public Note readFile(string fileName)
+        public Symbol readFile(string fileName)
         {
             currentTimeSignature = null;
             firstNote = null;
@@ -60,6 +62,8 @@ namespace DPA_Musicsheets.Managers
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);
             processFile(midiSequence);
+            SaveToLily s = new SaveToLily();
+            s.Save("test.ly",firstNote);
             return firstNote;
         }
 
@@ -381,6 +385,11 @@ namespace DPA_Musicsheets.Managers
             {
                 bpm = _bpm
             });
+        }
+
+        public string GetMusicText()
+        {
+            return midiText;
         }
     }
 }
