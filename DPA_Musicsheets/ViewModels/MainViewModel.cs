@@ -51,6 +51,8 @@ namespace DPA_Musicsheets.ViewModels
             _musicLoader = musicLoader;
             musicController = ms;
             FileName = @"Files/Alle-eendjes-zwemmen-in-het-water.mid";
+
+            //CurrentState = this.ed.CurrentState;
         }
 
         public ICommand OpenFileCommand => new RelayCommand(() =>
@@ -64,7 +66,7 @@ namespace DPA_Musicsheets.ViewModels
         public ICommand LoadCommand => new RelayCommand(() =>
         {
             //_musicLoader.OpenFile(FileName);
-            musicController.SetStaffs();
+            musicController.LoadFile();
         });
 
         #region Focus and key commands, these can be used for implementing hotkeys

@@ -17,6 +17,7 @@ namespace DPA_Musicsheets.Managers
         private Note firstNote;
         private Note prevNote;
         private int lastAbsoluteTicks;
+        private string midiText;
 
         private readonly Dictionary<int, string> pitches;
         List<int> SemitonValues;
@@ -430,6 +431,11 @@ namespace DPA_Musicsheets.Managers
             int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
             var _bpm = 60000000 / tempo;
             //builder set tempo
+        }
+
+        public string GetMusicText()
+        {
+            return midiText;
         }
     }
 }

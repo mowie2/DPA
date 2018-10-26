@@ -10,14 +10,28 @@ namespace DPA_Musicsheets.Facade
         private List<MusicalSymbol> symbols;
 
         private Symbol currentNote;
-        private Dictionary<Type, Action> actions;
-        private readonly Dictionary<ClassLibrary.Clef.Key, ClefType> clefs;
-        private readonly Dictionary<ClassLibrary.BarLine.TYPE, RepeatSignType> reapeatType;
         private readonly ClassLibrary.TimeSignature timeSignature;
         private readonly ClassLibrary.Clef clef;
         private float barlinecount = 0;
+
+        private Dictionary<Type, Action> actions;
+        private readonly Dictionary<ClassLibrary.Clef.Key, ClefType> clefs;
+        private readonly Dictionary<ClassLibrary.BarLine.TYPE, RepeatSignType> reapeatType;
+        private readonly Dictionary<float, MusicalSymbolDuration> durriation;
+        private Dictionary<Semitone.SEMITONE, int> semitones;
         public PsamContolLib()
         {
+            durriation = new Dictionary<float, MusicalSymbolDuration>()
+            {
+                {1, MusicalSymbolDuration.Whole },
+                {2, MusicalSymbolDuration.Half },
+                {4, MusicalSymbolDuration.Quarter },
+                {8,MusicalSymbolDuration.Eighth },
+                {16, MusicalSymbolDuration.Sixteenth },
+                {32, MusicalSymbolDuration.d32nd },
+                {64, MusicalSymbolDuration.d64th },
+                {128, MusicalSymbolDuration.d128th }
+            };
             actions = new Dictionary<Type, Action>
             {
                 { typeof(ClassLibrary.Note), DoNote },
@@ -41,7 +55,12 @@ namespace DPA_Musicsheets.Facade
                 { ClassLibrary.BarLine.TYPE.REPEAT, RepeatSignType.Backward }
             };
             timeSignature = new ClassLibrary.TimeSignature();
-
+            semitones = new Dictionary<Semitone.SEMITONE, int>
+            {
+                { Semitone.SEMITONE.MAJOR, 1 },
+                { Semitone.SEMITONE.MINOR, -1 },
+                { Semitone.SEMITONE.NORMAL, 0 }
+            };
 
         }
 
@@ -68,19 +87,17 @@ namespace DPA_Musicsheets.Facade
 
         private void DoNote()
         {
-            Dictionary<float, MusicalSymbolDuration> durriation = new Dictionary<float, MusicalSymbolDuration>()
-            {
-                {1, MusicalSymbolDuration.Whole },
-                {2, MusicalSymbolDuration.Half },
-                {4, MusicalSymbolDuration.Quarter },
-                {8,MusicalSymbolDuration.Eighth },
-                {16, MusicalSymbolDuration.Sixteenth },
-                {32, MusicalSymbolDuration.d32nd },
-                {64, MusicalSymbolDuration.d64th },
-                {128, MusicalSymbolDuration.d128th }
-            };
             ClassLibrary.Note cr = (ClassLibrary.Note)currentNote;
-            PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch, 0, 4, durriation[cr.Duration],
+
+            if(cr.Pitch == "")
+            {
+                Rest r = new Rest(durriation[cr.Duration]);
+                r.NumberOfDots = cr.Dotted;
+                symbols.Add(r);
+                return;
+            }
+
+            PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch.ToUpper(), 0, 2 + cr.Octave, durriation[cr.Duration],
             NoteStemDirection.Up, NoteTieType.None,
             new List<NoteBeamType>() { NoteBeamType.Single });
 
@@ -139,6 +156,11 @@ namespace DPA_Musicsheets.Facade
 
         private bool ShouldDoBarline()
         {
+            if (currentNote.nextSymbol != null && currentNote.nextSymbol.GetType() == typeof(BarLine))
+            {
+                return false;
+            }
+
             return barlinecount == 1;
         }
 
@@ -148,8 +170,47 @@ namespace DPA_Musicsheets.Facade
 
             Barline b = new Barline();
 
-            b.RepeatSign = reapeatType[br.Type];
+            //b.RepeatSign = reapeatType[br.Type];
 
+            if (br.Type == BarLine.TYPE.REPEAT)
+            {
+                int alt = 1;
+                Barline startAlt = new Barline();
+                startAlt.AlternateRepeatGroup = alt;
+                symbols.Add(startAlt);
+
+                for (int i = 0; i < br.Alternatives.Count; i++)
+                {
+                    Symbol temp = br.Alternatives[i];
+                    while (temp != null)
+                    {
+                        ClassLibrary.Note cr = (ClassLibrary.Note)temp;
+                        PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch.ToUpper(), 0, 2 + cr.Octave, durriation[cr.Duration],
+                        NoteStemDirection.Up, NoteTieType.None,
+                        new List<NoteBeamType>() { NoteBeamType.Single });
+                        symbols.Add(n);
+                        temp = temp.nextSymbol;
+                    }
+
+                    if (i == 0)
+                    {
+                        alt++;
+                        Barline blt = new Barline();
+                        blt.RepeatSign = RepeatSignType.Backward;
+                        blt.AlternateRepeatGroup = alt;
+                        symbols.Add(blt);
+
+                        continue;
+                    }
+
+                    //Barline endAlt = new Barline();
+                    //endAlt.RepeatSign = RepeatSignType.None;
+                    //endAlt.AlternateRepeatGroup = alt;
+                    //symbols.Add(endAlt);
+                }
+                return;
+            }
+            b.RepeatSign = reapeatType[br.Type];
             symbols.Add(b);
             barlinecount = 0;
 

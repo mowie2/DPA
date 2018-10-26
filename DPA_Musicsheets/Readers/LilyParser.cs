@@ -19,10 +19,11 @@ namespace DPA_Musicsheets.Readers
         private readonly Dictionary<string, Semitone.SEMITONE> pitchModifiers;
         Dictionary<LilypondTokenKind, Delegate> parserFunctions;
         List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
-        private Note prefNote;
+        private string prefPitch;
 
         public LilyParser()
         {
+            prefPitch = "";
             noteBuilder = new Builders.NoteBuilder();
             cleffs = new Dictionary<string, Clef.Key>
             {
@@ -56,22 +57,7 @@ namespace DPA_Musicsheets.Readers
             };
         }
 
-        public int RelativeOctaveModifier(string pitch)
-        {
-            if (prefNote != null)
-            {
-                int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefNote.Pitch);
-                if (distance > 3)
-                {
-                    return -1;
-                }
-                if (distance < -3)
-                {
-                    return 1;
-                }
-            }
-            return 0;
-        }
+        
 
         public void ReadLily(LilypondToken rootToken)
         {
@@ -100,6 +86,25 @@ namespace DPA_Musicsheets.Readers
             symbols[1] = nextSymbol;
 
             return symbols;
+        }
+
+        public int RelativeOctaveModifier(string pitch)
+        {
+            int returnOctave = 0;
+            if (!prefPitch.Equals(""))
+            {
+                int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefPitch);
+                if (distance > 3)
+                {
+                    returnOctave -= 1;
+                }
+                else if (distance < -3)
+                {
+                    returnOctave += 1;
+                }
+            }
+            prefPitch = pitch;
+            return returnOctave;
         }
 
         private int FindOctaveModifier(string text)
@@ -240,8 +245,7 @@ namespace DPA_Musicsheets.Readers
             noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[3].Value)+RelativeOctaveModifier(result.Groups[1].Value));
             noteBuilder.SetDuriation(int.Parse(result.Groups[4].Value));
             noteBuilder.SetDotted(result.Groups[5].Value.Length);
-            prefNote = noteBuilder.BuildNote();
-            return prefNote;
+            return noteBuilder.BuildNote();
         }
 
         private LilypondToken SetNextNote(LilypondToken startToken)

@@ -10,5 +10,6 @@ namespace DPA_Musicsheets.Interfaces
     interface IReader
     {
         Symbol readFile(string filename);
+        string GetMusicText();
     }
 }

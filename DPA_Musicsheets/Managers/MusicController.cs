@@ -3,6 +3,7 @@ using DPA_Musicsheet;
 using DPA_Musicsheets.Facade;
 using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.ViewModels;
+using GalaSoft.MvvmLight;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,14 +12,27 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Managers
 {
-    public class MusicController
+    public class MusicController : ViewModelBase
     {
         FileManager fileManager;
+        private string _lilyPondText;
+        public string lilyPondText
+        {
+            get
+            {
+                return _lilyPondText;
+            }
+            set
+            {
+                _lilyPondText = value;
+                base.RaisePropertyChanged("lilyPondText");
+            }
+        }
         string path;
         Symbol musicData;
         private PsamContolLib psamContolLib;
         private MusicLoader musicLoader;
-
+        private Editor editor;
         public MusicController(MusicLoader ml)
         {
             //musicData = ml.LilypondText;
@@ -125,11 +139,13 @@ namespace DPA_Musicsheets.Managers
         public void LoadFile()
         {
             musicData = fileManager.LoadFile(path);
+            lilyPondText = fileManager.lilypondText;
+            SetStaffs();
         }
 
         public void SetStaffs()
         {
-            LoadFile();
+            //LoadFile();
             musicLoader.StaffsViewModel.SetStaffs(psamContolLib.GetStaffsFromTokens(musicData));
         }
     }

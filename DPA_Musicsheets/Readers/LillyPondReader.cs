@@ -16,10 +16,16 @@ namespace DPA_Musicsheets.Readers
         private LilyParser parser;
         private LilyTokenizer tokenizer; 
         private Symbol root;
+        private string liliePondText;
         public LillyPondReader()
         {
             parser = new LilyParser();
             tokenizer = new LilyTokenizer();
+        }
+
+        public string GetMusicText()
+        {
+            return liliePondText;
         }
 
         public Symbol readFile(string filename)
@@ -39,7 +45,8 @@ namespace DPA_Musicsheets.Readers
 
         private string ReadFile(string filePath)
         {
-            return System.IO.File.ReadAllText(filePath);
+            liliePondText = System.IO.File.ReadAllText(filePath);
+            return liliePondText;
         }
     }
 }

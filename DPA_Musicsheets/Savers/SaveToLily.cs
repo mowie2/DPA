@@ -14,6 +14,7 @@ namespace DPA_Musicsheets.Savers
         private readonly Dictionary<Type, Delegate> writeLilyLookupTable;
         private readonly Dictionary<Semitone.SEMITONE, string> pitchModifiers;
         List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
+        private int prefRelativeOctaveModifier;
         private string prefPitch;
         private Clef currentClef;
         public string lilyString;
@@ -26,6 +27,7 @@ namespace DPA_Musicsheets.Savers
 
         public SaveToLily()
         {
+            prefRelativeOctaveModifier = 0;
             prefPitch = "";
             lilyString = "";
             currentClef = null;
@@ -83,21 +85,24 @@ namespace DPA_Musicsheets.Savers
             return "";
         }
 
-        public int RelativeOctaveModifier(string pitch,int octave)
+        public int RelativeOctaveModifier(string pitch)
         {
+            int returnOctave = 0 + prefRelativeOctaveModifier;
             if (!prefPitch.Equals(""))
             {
                 int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefPitch);
                 if (distance > 3)
                 {
-                    return octave+1;
+                    returnOctave += 1;
                 }
-                if (distance < -3)
+                else if (distance < -3)
                 {
-                    return octave-1;
+                    returnOctave -= 1;
                 }
             }
-            return octave;
+            prefPitch = pitch;
+            prefRelativeOctaveModifier = returnOctave;
+            return returnOctave;
         }
 
         private string WriteOctaveModifier(int octaveModifier)
@@ -253,7 +258,7 @@ namespace DPA_Musicsheets.Savers
             returnString += WriteTempo(note.Tempo);
             returnString += WritePitch(note.Pitch);
             returnString += pitchModifiers[note.Semitone];
-            returnString += WriteOctaveModifier(RelativeOctaveModifier(note.Pitch,note.Octave));
+            returnString += WriteOctaveModifier(RelativeOctaveModifier(note.Pitch)+note.Octave);
             returnString += WriteDuration((int)note.Duration);
             returnString += WriteDotted(note.Dotted);
             returnString += " ";
