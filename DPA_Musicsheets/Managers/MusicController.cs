@@ -127,6 +127,8 @@ namespace DPA_Musicsheets.Managers
                 Clef = new Clef(Clef.Key.G)
             };
         }
+
+
         public void Save()
         {
             fileManager.SaveFile(musicData);
