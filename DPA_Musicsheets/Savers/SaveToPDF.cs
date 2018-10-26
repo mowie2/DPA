@@ -12,7 +12,7 @@ namespace DPA_Musicsheets.Savers
 {
     public class SaveToPDF// : ISavable
     {
-        public void Save(string fileName, Note note)
+        public void Save(string fileName, Symbol note)
         {
             string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string tmpFileName = $"{fileName}-tmp.ly";
