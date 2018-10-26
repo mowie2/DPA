@@ -13,15 +13,29 @@ namespace DPA_Musicsheets.Readers
     class LilyParser
     {
         private Builders.NoteBuilder noteBuilder;
-        private readonly Dictionary<string, Clef.Key> cleffs;
-        private readonly Dictionary<char, int> octaveModifier;
-        private readonly Symbol[] symbols;
-        private readonly Dictionary<string, Semitone.SEMITONE> pitchModifiers;
+        private Dictionary<string, Clef.Key> cleffs;
+        private Dictionary<char, int> octaveModifier;
+        private Symbol[] symbols;
+        private Dictionary<string, Semitone.SEMITONE> pitchModifiers;
         Dictionary<LilypondTokenKind, Delegate> parserFunctions;
         List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
         private string prefPitch;
 
-        public LilyParser()
+        public void ReadLily(LilypondToken rootToken)
+        {
+            Clear();
+            LilypondToken currentToken = rootToken;
+            while (currentToken.NextToken != null)
+            {
+                if (parserFunctions.ContainsKey(currentToken.TokenKind))
+                {
+                    currentToken = (LilypondToken)parserFunctions[currentToken.TokenKind].DynamicInvoke(currentToken);
+                }
+                currentToken = currentToken.NextToken;
+            }
+        }
+
+        private void Clear()
         {
             prefPitch = "";
             noteBuilder = new Builders.NoteBuilder();
@@ -48,28 +62,13 @@ namespace DPA_Musicsheets.Readers
             {
                 [LilypondTokenKind.Relative] = new Func<LilypondToken, LilypondToken>(FindRelative),
                 [LilypondTokenKind.Time] = new Func<LilypondToken, LilypondToken>(FindTimeSignature),
-                [LilypondTokenKind.Tempo] = new Func<LilypondToken,LilypondToken>(FindTempo),
+                [LilypondTokenKind.Tempo] = new Func<LilypondToken, LilypondToken>(FindTempo),
                 [LilypondTokenKind.Note] = new Func<LilypondToken, LilypondToken>(SetNextNote),
                 [LilypondTokenKind.Rest] = new Func<LilypondToken, LilypondToken>(SetNextRest),
                 [LilypondTokenKind.Clef] = new Func<LilypondToken, LilypondToken>(FindClef),
                 [LilypondTokenKind.Repeat] = new Func<LilypondToken, LilypondToken>(SetRepeat),
                 [LilypondTokenKind.Alternative] = new Func<LilypondToken, LilypondToken>(SetAlternitive),
             };
-        }
-
-        
-
-        public void ReadLily(LilypondToken rootToken)
-        {
-            LilypondToken currentToken = rootToken;
-            while (currentToken.NextToken != null)
-            {
-                if (parserFunctions.ContainsKey(currentToken.TokenKind))
-                {
-                    currentToken = (LilypondToken)parserFunctions[currentToken.TokenKind].DynamicInvoke(currentToken);
-                }
-                currentToken = currentToken.NextToken;
-            }
         }
 
         private Symbol[] SetNextSymbol(Symbol[] symbols, Symbol nextSymbol)
@@ -88,7 +87,7 @@ namespace DPA_Musicsheets.Readers
             return symbols;
         }
 
-        public int RelativeOctaveModifier(string pitch)
+        private int RelativeOctaveModifier(string pitch)
         {
             int returnOctave = 0;
             if (!prefPitch.Equals(""))
