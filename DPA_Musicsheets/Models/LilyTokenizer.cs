@@ -9,55 +9,60 @@ namespace DPA_Musicsheets.Models
 {
     class LilyTokenizer
     {
-        private readonly Dictionary<string, LilypondToken> lookupTable;
+        private readonly Dictionary<string, LilypondTokenKind> lookupTable;
         private LilypondToken rootToken;
-        LilypondToken prefToken;
+        private LilypondToken prefToken;
 
         public LilyTokenizer()
         {
-            lookupTable = new Dictionary<string, LilypondToken>
+            lookupTable = new Dictionary<string, LilypondTokenKind>
             {
-                ["\\relative"] = new LilypondToken { TokenKind = LilypondTokenKind.Relative },
-                [@"([a-g])([eis]*)([,']*)([0-14]+)([.]*)"] = new LilypondToken { TokenKind = LilypondTokenKind.Note },
-                [@"(r)(\d+)"] = new LilypondToken { TokenKind = LilypondTokenKind.Rest },
+                [@"^\\relative$"] = LilypondTokenKind.Relative,
+                [@"^c([,'])*$"] = LilypondTokenKind.RelativeValue,
+                [@"^([a-g])([eis]*)([,']*)(\d+)([.]*)$"] = LilypondTokenKind.Note,
+                [@"^r(\d+)([.]*)$"] = LilypondTokenKind.Rest,
                 //Bar,
-                ["\\clef"] = new LilypondToken { TokenKind = LilypondTokenKind.Clef },
-                ["treble"] = new LilypondToken { TokenKind = LilypondTokenKind.ClefValue },
-                ["bass"] = new LilypondToken { TokenKind = LilypondTokenKind.ClefValue },
-                ["alto"] = new LilypondToken { TokenKind = LilypondTokenKind.ClefValue },
-                ["\\time"] = new LilypondToken { TokenKind = LilypondTokenKind.Time },
-                [@"(\d+)/(\d+)"] = new LilypondToken { TokenKind = LilypondTokenKind.TimeValue},
-                ["\\tempo"] = new LilypondToken { TokenKind = LilypondTokenKind.Tempo },
-                ["\\repeat"] = new LilypondToken { TokenKind = LilypondTokenKind.Repeat },
-                ["\\alternitive"] = new LilypondToken { TokenKind = LilypondTokenKind.Alternative },
-                ["{"] = new LilypondToken { TokenKind = LilypondTokenKind.SectionStart },
-                ["}"] = new LilypondToken { TokenKind = LilypondTokenKind.SectionEnd }
+                [@"^\\clef$"] = LilypondTokenKind.Clef,
+                [@"^treble$"] = LilypondTokenKind.ClefValue,
+                [@"^bass$"] = LilypondTokenKind.ClefValue,
+                [@"^alto$"] = LilypondTokenKind.ClefValue,
+                [@"^\\time$"] = LilypondTokenKind.Time,
+                [@"^(\d+)/(\d+)$"] = LilypondTokenKind.TimeValue,
+                [@"^\\tempo$"] = LilypondTokenKind.Tempo,
+                [@"^(\d+)=(\d+)$"] = LilypondTokenKind.TempoValue,
+                [@"^\\repeat$"] = LilypondTokenKind.Repeat,
+                [@"^\\alternative$"] = LilypondTokenKind.Alternative,
+                [@"^{$"] = LilypondTokenKind.SectionStart,
+                [@"^}$"] = LilypondTokenKind.SectionEnd 
             };
-            rootToken = new LilypondToken();
-            prefToken = new LilypondToken();
         }
+
         public void ReadLily(string text)
         {
             string currentWord = "";
             int position = 0;
             
-            while (position <= text.Length)
+            while (position < text.Length)
             {
-                LilypondToken[] resultToken = lookupTable.Where(pv => Regex.IsMatch(currentWord, pv.Key)).Select(pv => pv.Value).ToArray();
-                if (text[position].Equals(" ") || resultToken.Length > 0)
+                LilypondTokenKind[] resultToken = lookupTable.Where(pv => Regex.IsMatch(currentWord, pv.Key)).Select(pv => pv.Value).ToArray();
+                char currentChar = text[position];
+                if (currentChar.Equals(' '))
                 {
                     LilypondToken tempToken = new LilypondToken { TokenKind = LilypondTokenKind.Unknown };
                     if (resultToken.Length > 0)
                     {
-                        tempToken = resultToken[0];
+                        tempToken = new LilypondToken { TokenKind = resultToken[0] };
                         tempToken.Value = currentWord;
                     }
-                    SetNextToken(tempToken);
+                    if (currentWord.Length > 0)
+                    {
+                        SetNextToken(tempToken);
+                    }
                     currentWord = "";
                 }
                 else
                 {
-                    currentWord += text[position];
+                    currentWord += currentChar;
                 }
                 position++;
             }
@@ -74,10 +79,7 @@ namespace DPA_Musicsheets.Models
                 prefToken.NextToken = nextToken;
             }
             prefToken = nextToken;
-
         }
-
-
 
         public LilypondToken GetRootToken()
         {
