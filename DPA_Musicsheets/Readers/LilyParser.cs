@@ -13,16 +13,31 @@ namespace DPA_Musicsheets.Readers
     class LilyParser
     {
         private Builders.NoteBuilder noteBuilder;
-        private readonly Dictionary<string, Clef.Key> cleffs;
-        private readonly Dictionary<char, int> octaveModifier;
-        private readonly Symbol[] symbols;
-        private readonly Dictionary<string, Semitone.SEMITONE> pitchModifiers;
+        private Dictionary<string, Clef.Key> cleffs;
+        private Dictionary<char, int> octaveModifier;
+        private Symbol[] symbols;
+        private Dictionary<string, Semitone.SEMITONE> pitchModifiers;
         Dictionary<LilypondTokenKind, Delegate> parserFunctions;
         List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
         private string prefPitch;
 
-        public LilyParser()
+        public void ReadLily(LilypondToken rootToken)
         {
+            Clear();
+            LilypondToken currentToken = rootToken;
+            while (currentToken.NextToken != null)
+            {
+                if (parserFunctions.ContainsKey(currentToken.TokenKind))
+                {
+                    currentToken = (LilypondToken)parserFunctions[currentToken.TokenKind].DynamicInvoke(currentToken);
+                }
+                currentToken = currentToken.NextToken;
+            }
+        }
+
+        private void Clear()
+        {
+            symbols = new Symbol[2];
             prefPitch = "";
             noteBuilder = new Builders.NoteBuilder();
             cleffs = new Dictionary<string, Clef.Key>
@@ -43,33 +58,18 @@ namespace DPA_Musicsheets.Readers
                 ['\''] = 1,
                 [','] = -1
             };
-            symbols = new Symbol[2];
+            
             parserFunctions = new Dictionary<LilypondTokenKind, Delegate>
             {
                 [LilypondTokenKind.Relative] = new Func<LilypondToken, LilypondToken>(FindRelative),
                 [LilypondTokenKind.Time] = new Func<LilypondToken, LilypondToken>(FindTimeSignature),
-                [LilypondTokenKind.Tempo] = new Func<LilypondToken,LilypondToken>(FindTempo),
+                [LilypondTokenKind.Tempo] = new Func<LilypondToken, LilypondToken>(FindTempo),
                 [LilypondTokenKind.Note] = new Func<LilypondToken, LilypondToken>(SetNextNote),
                 [LilypondTokenKind.Rest] = new Func<LilypondToken, LilypondToken>(SetNextRest),
                 [LilypondTokenKind.Clef] = new Func<LilypondToken, LilypondToken>(FindClef),
                 [LilypondTokenKind.Repeat] = new Func<LilypondToken, LilypondToken>(SetRepeat),
                 [LilypondTokenKind.Alternative] = new Func<LilypondToken, LilypondToken>(SetAlternitive),
             };
-        }
-
-        
-
-        public void ReadLily(LilypondToken rootToken)
-        {
-            LilypondToken currentToken = rootToken;
-            while (currentToken.NextToken != null)
-            {
-                if (parserFunctions.ContainsKey(currentToken.TokenKind))
-                {
-                    currentToken = (LilypondToken)parserFunctions[currentToken.TokenKind].DynamicInvoke(currentToken);
-                }
-                currentToken = currentToken.NextToken;
-            }
         }
 
         private Symbol[] SetNextSymbol(Symbol[] symbols, Symbol nextSymbol)
@@ -88,7 +88,7 @@ namespace DPA_Musicsheets.Readers
             return symbols;
         }
 
-        public int RelativeOctaveModifier(string pitch)
+        private int RelativeOctaveModifier(string pitch)
         {
             int returnOctave = 0;
             if (!prefPitch.Equals(""))
@@ -122,7 +122,7 @@ namespace DPA_Musicsheets.Readers
             LilypondToken currentToken = startToken.NextToken;
             if(currentToken.TokenKind == LilypondTokenKind.RelativeValue)
             {
-                Regex re = new Regex(@"^c([,'])*$");
+                Regex re = new Regex(@"^c([,']*)$");
                 var result = re.Match(currentToken.Value);
                 noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[1].Value));
             }
@@ -313,7 +313,10 @@ namespace DPA_Musicsheets.Readers
         
         public Symbol GetRootSymbol()
         {
-            return symbols[0];
+            Symbol s = symbols[0];
+            symbols[0] = null;
+            symbols[1] = null;
+            return s;
         }
     }
 }

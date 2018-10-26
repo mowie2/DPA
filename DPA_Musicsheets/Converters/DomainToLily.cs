@@ -9,8 +9,9 @@ namespace DPA_Musicsheets.Converters
 {
     class DomainToLily
     {
-        private readonly Dictionary<Type, Delegate> writeLilyLookupTable;
-        private readonly Dictionary<Semitone.SEMITONE, string> pitchModifiers;
+        private Dictionary<Type, Delegate> writeLilyLookupTable;
+        private Dictionary<Semitone.SEMITONE, string> pitchModifiers;
+        private Dictionary<Clef.Key, string> clefs;
         List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
         private int prefRelativeOctaveModifier;
         private string prefPitch;
@@ -23,24 +24,19 @@ namespace DPA_Musicsheets.Converters
         private int currentOctave;
         private bool setOctave;
 
-
         public DomainToLily()
         {
-            prefRelativeOctaveModifier = 0;
-            prefPitch = "";
-            lilyString = "";
-            currentClef = null;
-            currentTimeSignature = null;
-            currentDuration = 0;
-            CurrentBarTime = 0;
-            currentTempo = null;
-            currentOctave = 0;
-            setOctave = false;
-
             writeLilyLookupTable = new Dictionary<Type, Delegate>
             {
                 [typeof(Note)] = new Func<Symbol, Symbol>(WriteSection),
                 [typeof(BarLine)] = new Func<Symbol, Symbol>(WriteRepeat)
+            };
+
+            clefs = new Dictionary<Clef.Key, string>
+            {
+                [Clef.Key.G] = "treble",
+                [Clef.Key.F] = "bass",
+                [Clef.Key.C] = "alto",
             };
 
             pitchModifiers = new Dictionary<Semitone.SEMITONE, string>
@@ -53,6 +49,7 @@ namespace DPA_Musicsheets.Converters
 
         public string GetLilyText(Symbol root)
         {
+            Clear();
             if (root != null)
             {
                 Symbol currentSymbol = root;
@@ -62,9 +59,21 @@ namespace DPA_Musicsheets.Converters
                 }
                 lilyString += "}";
             }
-            string returnString = lilyString;
+            return lilyString;
+        }
+
+        private void Clear()
+        {
+            prefRelativeOctaveModifier = 0;
+            prefPitch = "";
             lilyString = "";
-            return returnString;
+            currentClef = null;
+            currentTimeSignature = null;
+            currentDuration = 0;
+            CurrentBarTime = 0;
+            currentTempo = null;
+            currentOctave = 0;
+            setOctave = false;
         }
 
         private string WriteRelative(int octaveModifier)
@@ -72,7 +81,7 @@ namespace DPA_Musicsheets.Converters
             if (!setOctave)
             {
                 setOctave = true;
-                return "\\relative c" + WriteOctaveModifier(octaveModifier) + "{\r\r\n";
+                return "\\relative c" + WriteOctaveModifier(octaveModifier) + " {\r\n";
             }
             return "";
         }
@@ -123,7 +132,7 @@ namespace DPA_Musicsheets.Converters
             if (clef != currentClef)
             {
                 currentClef = clef;
-                returnString = "\\clef " + clef.key.ToString() + "\r\n";
+                returnString = "\\clef " + clefs[clef.key] + "\r\n";
             }
             return returnString;
         }
@@ -179,13 +188,13 @@ namespace DPA_Musicsheets.Converters
 
         private void WriteAlternative(BarLine barline)
         {
-            lilyString += "\\Alternative {\r\n";
+            lilyString += "\\alternative {\r\n";
             if (barline.Alternatives.Count > 0)
             {
                 foreach (Note note in barline.Alternatives)
                 {
                     currentDuration = 0;
-                    lilyString += "{";
+                    lilyString += "{ ";
                     WriteSection(note);
                     lilyString += "}\r\n";
                 }
@@ -242,7 +251,7 @@ namespace DPA_Musicsheets.Converters
             return duration.ToString();
         }
 
-        private Note WriteNote(Symbol symbol)
+        private Symbol WriteNote(Symbol symbol)
         {
             Note note = (Note)symbol;
             string returnString = "";

@@ -41,6 +41,7 @@ namespace DPA_Musicsheets.Facade
                // {typeof(ClassLibrary.al) }
             };
 
+
             clefs = new Dictionary<ClassLibrary.Clef.Key, ClefType>
             {
                 { ClassLibrary.Clef.Key.C, ClefType.CClef },
@@ -64,8 +65,13 @@ namespace DPA_Musicsheets.Facade
 
         }
 
+        
         public IList<MusicalSymbol> GetStaffsFromTokens(Symbol rootNote)
         {
+            if (rootNote == null) return new List<MusicalSymbol>();
+            clef.key = ClassLibrary.Clef.Key.NOTSET;
+            timeSignature.NumberOfBeats = 0;
+            timeSignature.TimeOfBeats = 0;
             symbols = new List<MusicalSymbol>();
             currentNote = rootNote;
             DoClef();
@@ -101,13 +107,11 @@ namespace DPA_Musicsheets.Facade
             NoteStemDirection.Up, NoteTieType.None,
             new List<NoteBeamType>() { NoteBeamType.Single });
 
-
             float count = 1 / cr.Duration;
             float dur = (float)((Math.Pow(2, cr.Dotted) - 1) / Math.Pow(2, cr.Dotted)) + 1;
             barlinecount += (count * dur);
             symbols.Add(n);
         }
-
         private void DoTimesig()
         {
             if (currentNote.GetType() != typeof(ClassLibrary.Note)) return;
