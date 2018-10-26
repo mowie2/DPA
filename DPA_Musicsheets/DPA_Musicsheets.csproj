@@ -107,6 +107,7 @@
     <Compile Include="Facade\SanfordLib.cs" />
     <Compile Include="Builder\NoteBuilder.cs" />
     <Compile Include="Interfaces\IReader.cs" />
+    <Compile Include="Managers\Editor.cs" />
     <Compile Include="Models\Context.cs" />
     <Compile Include="Models\LilyTokenizer.cs" />
     <Compile Include="Readers\FileManager.cs" />

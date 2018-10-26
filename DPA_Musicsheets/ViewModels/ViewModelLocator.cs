@@ -1,4 +1,5 @@
-﻿using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Facade;
+using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight.Ioc;
 using Microsoft.Practices.ServiceLocation;
 
@@ -13,6 +14,8 @@ namespace DPA_Musicsheets.ViewModels
         {
             ServiceLocator.SetLocatorProvider(() => SimpleIoc.Default);
 
+     
+
             SimpleIoc.Default.Register<MainViewModel>();
             SimpleIoc.Default.Register<LilypondViewModel>();
             SimpleIoc.Default.Register<StaffsViewModel>();
@@ -20,6 +23,8 @@ namespace DPA_Musicsheets.ViewModels
 
             SimpleIoc.Default.Register<MusicLoader>();
             SimpleIoc.Default.Register<MusicController>();
+            SimpleIoc.Default.Register<PsamContolLib>();
+            SimpleIoc.Default.Register<Editor>();
         }
 
 
@@ -27,6 +32,8 @@ namespace DPA_Musicsheets.ViewModels
         public StaffsViewModel StaffsViewModel => ServiceLocator.Current.GetInstance<StaffsViewModel>();
         public MidiPlayerViewModel MidiPlayerViewModel => ServiceLocator.Current.GetInstance<MidiPlayerViewModel>();
         public MainViewModel MainViewModel => ServiceLocator.Current.GetInstance<MainViewModel>();
+
+        public Editor Editor => ServiceLocator.Current.GetInstance<Editor>();
 
         public static void Cleanup()
         {

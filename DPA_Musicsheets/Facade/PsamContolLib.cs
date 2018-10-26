@@ -96,7 +96,7 @@ namespace DPA_Musicsheets.Facade
                 symbols.Add(r);
                 return;
             }
-            PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch.ToUpper(), 0, 4, durriation[cr.Duration],
+            PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch.ToUpper(), 0, 3 + cr.Octave, durriation[cr.Duration],
             NoteStemDirection.Up, NoteTieType.None,
             new List<NoteBeamType>() { NoteBeamType.Single });
 

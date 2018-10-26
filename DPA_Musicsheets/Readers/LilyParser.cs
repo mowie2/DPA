@@ -242,7 +242,7 @@ namespace DPA_Musicsheets.Readers
             Match result = re.Match(text);
             noteBuilder.SetPitch(result.Groups[1].Value);
             noteBuilder.SetSemitone(pitchModifiers[result.Groups[2].Value]);
-            noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[3].Value)+RelativeOctaveModifier(result.Groups[1].Value));
+            noteBuilder.ModifyOctave(/*FindOctaveModifier(result.Groups[3].Value)+*/RelativeOctaveModifier(result.Groups[1].Value));
             noteBuilder.SetDuriation(int.Parse(result.Groups[4].Value));
             noteBuilder.SetDotted(result.Groups[5].Value.Length);
             prefNote = noteBuilder.BuildNote();

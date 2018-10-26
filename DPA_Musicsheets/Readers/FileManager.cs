@@ -17,6 +17,7 @@ namespace DPA_Musicsheet
         private readonly Dictionary<string, IReader> readers;
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
+        public string lilypondText;
 
 
         public FileManager()
@@ -45,7 +46,9 @@ namespace DPA_Musicsheet
             {
                 IReader reader = readers[extension];
                 string fileName = openFileDialog.FileName;
-                return reader.readFile(fileName);
+                Symbol root = reader.readFile(fileName);
+                lilypondText = reader.GetMusicText();
+                return root;
             }
             return null;
         }
