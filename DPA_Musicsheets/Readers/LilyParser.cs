@@ -37,8 +37,7 @@ namespace DPA_Musicsheets.Readers
 
         private void Clear()
         {
-            symbols[0] = null;
-            symbols[1] = null;
+            symbols = new Symbol[2];
             prefPitch = "";
             noteBuilder = new Builders.NoteBuilder();
             cleffs = new Dictionary<string, Clef.Key>
@@ -59,7 +58,7 @@ namespace DPA_Musicsheets.Readers
                 ['\''] = 1,
                 [','] = -1
             };
-            symbols = new Symbol[2];
+            
             parserFunctions = new Dictionary<LilypondTokenKind, Delegate>
             {
                 [LilypondTokenKind.Relative] = new Func<LilypondToken, LilypondToken>(FindRelative),
@@ -123,7 +122,7 @@ namespace DPA_Musicsheets.Readers
             LilypondToken currentToken = startToken.NextToken;
             if(currentToken.TokenKind == LilypondTokenKind.RelativeValue)
             {
-                Regex re = new Regex(@"^c([,'])*$");
+                Regex re = new Regex(@"^c([,']*)$");
                 var result = re.Match(currentToken.Value);
                 noteBuilder.ModifyOctave(FindOctaveModifier(result.Groups[1].Value));
             }

@@ -15,7 +15,7 @@ namespace DPA_Musicsheets.Converters
         {
             LilyTokenizer tokenizer = new LilyTokenizer();
             LilyParser parser = new LilyParser();
-            string content = lilyText.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  ", " ") + " ";
+            string content = lilyText.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("}", " } ").Replace("{", " { ").Replace("  ", " ") + " ";
             tokenizer.ReadLily(content);
             parser.ReadLily(tokenizer.GetRootToken());
             Symbol root = parser.GetRootSymbol();
