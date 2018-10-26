@@ -8,7 +8,22 @@ namespace ClassLibrary
 {
     public class Note : Symbol
     {
-        public Clef Clef { get; set; }
+        private AbstractClef _Clef;
+        public AbstractClef Clef {
+            get
+            {
+                if (this._Clef == null)
+                    return new NullClef();
+                return _Clef;
+            }
+
+            set
+            {
+                if (value == null)
+                    return;
+                _Clef = value;
+            }
+        }
         private AbstractTimeSignature _TimeSignature;
         public AbstractTimeSignature TimeSignature
         {
@@ -26,7 +41,22 @@ namespace ClassLibrary
                 _TimeSignature = value;
             }
         }
-        public Tempo Tempo { get; set; }
+        private AbstractTempo _Tempo;
+        public AbstractTempo Tempo {
+            get
+            {
+                if (this.Tempo == null)
+                    return new NullTempo();
+                return _Tempo;
+            }
+
+            set
+            {
+                if (value == null)
+                    return;
+                _Tempo = value;
+            }
+        }
         public string Pitch { get; set; }
         public Semitone.SEMITONE Semitone { get; set; }
         public float Duration { get; set; }

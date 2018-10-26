@@ -14,12 +14,12 @@ namespace DPA_Musicsheets.Converters
         List<string> notesOrder = new List<string>() { "c", "d", "e", "f", "g", "a", "b" };
         private int prefRelativeOctaveModifier;
         private string prefPitch;
-        private Clef currentClef;
+        private AbstractClef currentClef;
         private string lilyString;
         private AbstractTimeSignature currentTimeSignature;
         private float currentDuration;
         private float CurrentBarTime;
-        private Tempo currentTempo;
+        private AbstractTempo currentTempo;
         private int currentOctave;
         private bool setOctave;
 
@@ -117,7 +117,7 @@ namespace DPA_Musicsheets.Converters
             return returnString;
         }
 
-        private string WriteClef(Clef clef)
+        private string WriteClef(AbstractClef clef)
         {
             string returnString = "";
             if (clef != currentClef)
@@ -141,7 +141,7 @@ namespace DPA_Musicsheets.Converters
             return returnString;
         }
 
-        private string WriteTempo(Tempo tempo)
+        private string WriteTempo(AbstractTempo tempo)
         {
             string returnString = "";
             if (tempo != currentTempo)

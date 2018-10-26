@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public class Tempo : AbstractTempo
+    public class NullTempo : AbstractTempo
     {
+        public NullTempo()
+        {
+            bpm = 120;
+            noteDuration = 4;
+        }
+
         public override void GetSymbol()
         {
             throw new NotImplementedException();

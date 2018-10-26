@@ -9,7 +9,7 @@ namespace DPA_Musicsheets.Savers
     public class SaveToMidi : ISavable
     {
         private AbstractTimeSignature currentTimeSignature;
-        private Tempo currentTempo;
+        private AbstractTempo currentTempo;
         private int currentTick;
         private int PPQN;
         private BarLine activeBarline;
@@ -105,7 +105,7 @@ namespace DPA_Musicsheets.Savers
             return (int) deltaTicks;
         }
 
-        private void addTempo(Tempo tempo)
+        private void addTempo(AbstractTempo tempo)
         {
             if (currentTempo == tempo || tempo == null)
             {
@@ -149,7 +149,7 @@ namespace DPA_Musicsheets.Savers
             sequence[0].Insert(currentTick, timeSignatureBuilder.Result);
         }
 
-        private int calculatePitch(string pitch, int octave, Clef clef, Semitone.SEMITONE semitone)
+        private int calculatePitch(string pitch, int octave, AbstractClef clef, Semitone.SEMITONE semitone)
         {
             Dictionary<string, int> pitchDictionary = new Dictionary<string, int>()
             {

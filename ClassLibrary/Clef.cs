@@ -6,11 +6,8 @@ using System.Threading.Tasks;
 
 namespace ClassLibrary
 {
-    public class Clef : Symbol
+    public class Clef : AbstractClef
     {
-        public enum Key { G, F, C, NOTSET};
-        public Key key;
-
         public Clef()
         {
             this.key = Key.NOTSET;
@@ -24,6 +21,11 @@ namespace ClassLibrary
         public override void GetSymbol()
         {
             throw new NotImplementedException();
+        }
+
+        public override bool isNil()
+        {
+            return false;
         }
     }
 }
