@@ -245,9 +245,9 @@
     <Content Include="Files\Eenvoudige voorbeeldfiles\Standaard_noten.ly" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ClassLibrary\ClassLibrary.csproj">
+    <ProjectReference Include="..\ClassLibrary\DomainModel.csproj">
       <Project>{3c3c2126-abc1-4fc0-bc86-c3e359bd2724}</Project>
-      <Name>ClassLibrary</Name>
+      <Name>DomainModel</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

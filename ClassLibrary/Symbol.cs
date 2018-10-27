@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 
-namespace ClassLibrary
+namespace DomainModel
 {
     public abstract class Symbol : MusicSymbol
     {

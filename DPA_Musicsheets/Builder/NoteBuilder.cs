@@ -1,4 +1,4 @@
-﻿using ClassLibrary;
+﻿using DomainModel;
 
 namespace DPA_Musicsheets.Builders
 {
@@ -17,7 +17,7 @@ namespace DPA_Musicsheets.Builders
 
         public NoteBuilder()
         {
-            this.semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
+            this.semitone = DomainModel.Semitone.SEMITONE.NORMAL;
             this.dotted = 0;
             this.duration = 0;
             this.ocataveModifier = 0;
@@ -45,7 +45,7 @@ namespace DPA_Musicsheets.Builders
         {
             this.dotted = 0;
             this.duration = 0;
-            this.semitone = ClassLibrary.Semitone.SEMITONE.NORMAL;
+            this.semitone = DomainModel.Semitone.SEMITONE.NORMAL;
             this.pitch = "";
         }
         public void SetClef(Clef clef)
