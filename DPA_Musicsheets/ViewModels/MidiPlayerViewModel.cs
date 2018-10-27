@@ -38,6 +38,8 @@ namespace DPA_Musicsheets.ViewModels
 
         public MidiPlayerViewModel(MusicController musicController)
         {
+            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
+            this.musicController = musicController;
             // The OutputDevice is a midi device on the midi channel of your computer.
             // The audio will be streamed towards this output.
             // DeviceID 0 is your computer's audio channel.
@@ -45,13 +47,12 @@ namespace DPA_Musicsheets.ViewModels
             //_sequencer = new Sequencer();
 
             //slb = new SanfordLib(PlayCommand, UpdateButtons);
-            //slb.SequencerChannelMessagedPlayed(slb.ChannelMessagePlayed);
-
+            //musicController.midiPlayer.SequencerChannelMessagedPlayed(slb.ChannelMessagePlayed);
+            
             // Wanneer de sequence klaar is moeten we alles closen en stoppen.
             //slb.SquencePlayCompleted(_running);
 
-            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
-            this.musicController = musicController;
+            
         }
 
         private void UpdateButtons()

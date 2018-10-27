@@ -59,6 +59,11 @@ namespace DPA_Musicsheets.Facade
             this._sequencer = new Sequencer();
             this._outputDevice = new OutputDevice(0);
 
+            _sequencer.ChannelMessagePlayed += ChannelMessagePlayed;
+            SequencerChannelMessagedPlayed(this.ChannelMessagePlayed);
+
+
+
             //this.StopCommand = stop;
             //this.UpdateButtons = update;
 

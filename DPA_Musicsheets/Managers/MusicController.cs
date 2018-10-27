@@ -2,6 +2,7 @@
 using DPA_Musicsheet;
 using DPA_Musicsheets.Facade;
 using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Savers;
 using DPA_Musicsheets.ViewModels;
 using GalaSoft.MvvmLight;
 using System;
@@ -136,7 +137,7 @@ namespace DPA_Musicsheets.Managers
 
         public void Play()
         {
-            midiPlayer.SetMidisequence(musicData);
+            //midiPlayer.SetMidisequence(musicData);
             midiPlayer.ContinueSequence();
         }
 

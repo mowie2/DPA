@@ -25,7 +25,7 @@ namespace DPA_Musicsheets.Readers
         {
             Clear();
             LilypondToken currentToken = rootToken;
-            while (currentToken.NextToken != null)
+            while (currentToken != null)
             {
                 if (parserFunctions.ContainsKey(currentToken.TokenKind))
                 {
