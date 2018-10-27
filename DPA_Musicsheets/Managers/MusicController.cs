@@ -37,7 +37,12 @@ namespace DPA_Musicsheets.Managers
         public MusicController(MusicLoader ml, Editor edit)
         {
             #region uitleg
-            ///getAsseblies() moet alle adapters laden maar doet dat niet
+            ///Als je hieraan gaat werken:
+            ///Bouw LilypondAdapter en SanfordAdapter.
+            ///Bij DPAMusicsheets->References rechtermuis, add references.
+            ///Ga naar browse en dan de lilypondAdapter.dll en SanfordAdapter.dll opzoeken en die toevoegen.
+            /// 
+            /// getAsseblies() moet alle adapters laden maar doet dat niet
             ///Als je een klasse maakt uit de adapter doet hij het wel,
             ///maar dit is niet netjes. Dan is het namelijk hardcoded
             /// 
