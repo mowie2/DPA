@@ -9,8 +9,11 @@ namespace LilypondAdapter
         private LilyTokenizer tokenizer; 
         private Symbol root;
         private string liliePondText;
+        private string extention;
+
         public LillyPondReader()
         {
+            extention = ".ly";
             parser = new LilyParser();
             tokenizer = new LilyTokenizer();
         }
@@ -33,6 +36,11 @@ namespace LilypondAdapter
         {
             liliePondText = System.IO.File.ReadAllText(filePath);
             return liliePondText;
+        }
+
+        public string GetExtention()
+        {
+            return extention;
         }
     }
 }

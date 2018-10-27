@@ -10,5 +10,6 @@ namespace DomainModel
     public interface ISavable
     {
         void Save(string fileName, Symbol symbol);
+        string GetExtention();
     }
 }

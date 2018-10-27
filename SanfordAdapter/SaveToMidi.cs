@@ -33,7 +33,7 @@ namespace SanfordAdapter
                 item.Insert(currentTick, MetaMessage.EndOfTrackMessage);
             }
 
-            sequence.Save("testfile.mid");
+            sequence.Save(fileName);
         }
 
         private void readSymbolTillNull(Symbol symbol)
@@ -175,6 +175,11 @@ namespace SanfordAdapter
             if (test > 127)
                 return 0;
             return midiKey+60;
+        }
+
+        public string GetExtention()
+        {
+            return extention;
         }
     }
 }

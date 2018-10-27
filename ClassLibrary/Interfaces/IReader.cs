@@ -11,5 +11,6 @@ namespace DPA_Musicsheets.Interfaces
     {
         Symbol readFile(string filename);
         string GetMusicText();
+        string GetExtention();
     }
 }

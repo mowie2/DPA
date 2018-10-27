@@ -39,6 +39,7 @@ namespace DPA_Musicsheets.Managers
 
         public MusicController(MusicLoader ml, Editor edit)
         {
+
             #region uitleg
             ///Als je hieraan gaat werken:
             ///Bouw LilypondAdapter en SanfordAdapter.
@@ -53,6 +54,7 @@ namespace DPA_Musicsheets.Managers
             ///https://blogs.msdn.microsoft.com/benjaminperkins/2017/04/13/how-to-make-a-simple-dll-as-an-assembly-reference-just-for-fun/
             ///Hieronder ben ik gewoon de get aan het testen, kijken of ik de midiReader en lilypondReader terug kan krijgen
             #endregion
+            /*
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
 
             //var l = new LilypondAdapter.LilypondReader();
@@ -65,14 +67,14 @@ namespace DPA_Musicsheets.Managers
                 .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
 
             var readers = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IReader)Activator.CreateInstance(c)).ToList();
-
+            readers = readers.Where(p => p.GetExtention().Equals(".ly")).ToList();
 
             var type2 = typeof(ISavable);
             var test2 = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
                 .Where(p => p.IsAssignableFrom(type2) && !p.IsInterface)
                 .Select(x => x.Name).ToList();
-
+            */
             //musicData = ml.LilypondText;
             fileManager = new FileManager();
             psamContolLib = new PsamContolLib();

@@ -16,5 +16,9 @@ namespace LilypondAdapter
                 outputFile.Close();
             }       
         }
+        public string GetExtention()
+        {
+            return extention;
+        }
     }
 }
