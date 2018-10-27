@@ -31,6 +31,8 @@ namespace DPA_Musicsheets.Memento
                 canUndo = true;
                 canRedo = false;
             }
+
+
         }
 
         public Memento GetCurrentMemento()
@@ -44,21 +46,48 @@ namespace DPA_Musicsheets.Memento
             {
                 currentMemento = currentMemento.Previous;
             }
-            else
+
+            if (currentMemento.Previous == null)
             {
                 canUndo = false;
+            }
+            else
+            {
+                canUndo = true;
+            }
+            if (currentMemento.Next == null)
+            {
+                canRedo = false;
+            }
+            else
+            {
+                canRedo = true;
             }
         }
 
         public void Redo()
         {
-            if (currentMemento.Next == null)
+            if (currentMemento.Next != null)
             {
                 currentMemento = currentMemento.Next;
             }
-            else
+
+            if (currentMemento.Previous == null)
             {
                 canUndo = false;
+            }
+            else
+            {
+                canUndo = true;
+            }
+
+            if (currentMemento.Next == null)
+            {
+                canRedo = false;
+            }
+            else
+            {
+                canRedo = true;
             }
         }
     }
