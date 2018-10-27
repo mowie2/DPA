@@ -88,6 +88,8 @@ namespace DPA_Musicsheets.Facade
             temp.Load(filename);
 
             this.MidiSequence = temp;
+
+            
         }
     }
 }

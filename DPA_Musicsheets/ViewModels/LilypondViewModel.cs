@@ -7,6 +7,9 @@ using System;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Collections.Generic;
+using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Commands;
 
 namespace DPA_Musicsheets.ViewModels
 {
@@ -16,7 +19,7 @@ namespace DPA_Musicsheets.ViewModels
         private MusicController musicController;
         private Editor editor;
         private string _text;
-
+        List<Icommand> Commands;
 
         private DPA_Musicsheets.Memento.CareTaker careTaker;
         /// <summary>
@@ -56,6 +59,8 @@ namespace DPA_Musicsheets.ViewModels
             musicController = msc;
             lilyToDomain = new LilyToDomain();
             careTaker = new CareTaker();
+            Commands = new List<Icommand>();
+
         } 
         /// <summary>
         /// This occurs when the text in the textbox has changed. This can either be by loading or typing.
@@ -119,5 +124,20 @@ namespace DPA_Musicsheets.ViewModels
             musicController.Save();
         });
         #endregion Commands for buttons like Undo, Redo and SaveAs
+
+        public void InsertKeys(List<KeyEventArgs> pressedKeys)
+        {
+            PopulateCommands(pressedKeys);
+
+            foreach(Icommand command in Commands)
+            {
+                command.Execute();
+            }
+        }
+
+        private void PopulateCommands(List<KeyEventArgs> pressedKeys)
+        {
+            Commands.Add(new ClefCommand(pressedKeys, LilypondText));
+        }
     }
 }
