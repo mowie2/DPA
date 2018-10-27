@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Reflection;
 
 namespace DPA_Musicsheets.Managers
 {
@@ -35,9 +36,19 @@ namespace DPA_Musicsheets.Managers
         private Editor editor;
         public MusicController(MusicLoader ml, Editor edit)
         {
+            var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
+
+
+            var type = typeof(IReader);
             var test = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
-                .Where(x => typeof(IReader).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Where(p => type.IsAssignableFrom(p))
+                .Select(x => x.Name).ToList();
+
+            var type2 = typeof(ISavable);
+            var test2 = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(p => type2.IsAssignableFrom(p))
                 .Select(x => x.Name).ToList();
 
             //musicData = ml.LilypondText;

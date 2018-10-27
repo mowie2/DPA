@@ -11,10 +11,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanfordAdapter", "SanfordAd
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LilypondAdapter", "LilypondAdapter\LilypondAdapter.csproj", "{67501AA7-CDFB-450B-AD3A-7912966FF783}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SanfordAdapterNonDLL", "SanfordAdapterNonDLL\SanfordAdapterNonDLL.csproj", "{CA8F8137-587E-432A-B360-DE76BFB73731}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Test", "Test\Test.csproj", "{405051E8-F575-4686-A123-2736F43D1C97}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -37,14 +33,6 @@ Global
 		{67501AA7-CDFB-450B-AD3A-7912966FF783}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{67501AA7-CDFB-450B-AD3A-7912966FF783}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{67501AA7-CDFB-450B-AD3A-7912966FF783}.Release|Any CPU.Build.0 = Release|Any CPU
-		{CA8F8137-587E-432A-B360-DE76BFB73731}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{CA8F8137-587E-432A-B360-DE76BFB73731}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{CA8F8137-587E-432A-B360-DE76BFB73731}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{CA8F8137-587E-432A-B360-DE76BFB73731}.Release|Any CPU.Build.0 = Release|Any CPU
-		{405051E8-F575-4686-A123-2736F43D1C97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{405051E8-F575-4686-A123-2736F43D1C97}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{405051E8-F575-4686-A123-2736F43D1C97}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{405051E8-F575-4686-A123-2736F43D1C97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
