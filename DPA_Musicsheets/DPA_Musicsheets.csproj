@@ -104,10 +104,12 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Converters\DomainToLily.cs" />
+    <Compile Include="Converters\DomainToMidi.cs" />
     <Compile Include="Converters\LilyToDomain.cs" />
     <Compile Include="Facade\PsamContolLib.cs" />
     <Compile Include="Facade\SanfordLib.cs" />
     <Compile Include="Builder\NoteBuilder.cs" />
+    <Compile Include="Interfaces\IMidiPlayer.cs" />
     <Compile Include="Interfaces\IReader.cs" />
     <Compile Include="Managers\Editor.cs" />
     <Compile Include="Models\Context.cs" />

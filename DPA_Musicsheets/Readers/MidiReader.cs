@@ -62,8 +62,6 @@ namespace DPA_Musicsheets.Managers
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);
             processFile(midiSequence);
-            SaveToLily s = new SaveToLily();
-            s.Save("test.ly",firstNote);
             return firstNote;
         }
 

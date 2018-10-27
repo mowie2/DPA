@@ -1,50 +1,66 @@
-﻿using GalaSoft.MvvmLight.CommandWpf;
+﻿using ClassLibrary;
+using DPA_Musicsheets.Converters;
+using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Managers;
+using GalaSoft.MvvmLight.CommandWpf;
 using Sanford.Multimedia.Midi;
 using System;
 
 namespace DPA_Musicsheets.Facade
 {
-    public class SanfordLib
+    public class SanfordLib: IMidiPlayer
     {
         public OutputDevice _outputDevice { get; set; }
+        private DomainToMidi domainToMidi;
         private Sequencer _sequencer;
         public Sequence MidiSequence
         {
             get { return _sequencer.Sequence; }
             set
             {
-                StopCommand.Execute(null);
+                //StopCommand.Execute(null);
                 _sequencer.Sequence = value;
-                UpdateButtons();
+                //UpdateButtons();
             }
+        }
+
+        public void SetMidisequence(Symbol symbol)
+        {
+            MidiSequence = domainToMidi.GetMidiSequence(symbol);
         }
 
         public bool CheckSequence()
         {
             return _sequencer.Sequence != null;
         }
+
         public void SetSequncerPosition(int position)
         {
             _sequencer.Position = position;
         }
+
         public void SequencerStop()
         {
             _sequencer.Stop();
         }
+
         public void ContinueSequence()
         {
             _sequencer.Continue();
         }
+
         private RelayCommand StopCommand;
         private readonly Action UpdateButtons;
 
-        public SanfordLib(RelayCommand stop, Action update)
+        public SanfordLib(/*RelayCommand stop, Action update*/)
         {
             this._sequencer = new Sequencer();
             this._outputDevice = new OutputDevice(0);
 
-            this.StopCommand = stop;
-            this.UpdateButtons = update;
+            //this.StopCommand = stop;
+            //this.UpdateButtons = update;
+
+            this.domainToMidi = new DomainToMidi();
         }
 
         public void Cleanup()
@@ -53,6 +69,7 @@ namespace DPA_Musicsheets.Facade
             _sequencer.Dispose();
             _outputDevice.Dispose();
         }
+
         public void SquencePlayCompleted(bool running)
         {
             _sequencer.PlayingCompleted += (playingSender, playingEvent) =>
@@ -66,6 +83,7 @@ namespace DPA_Musicsheets.Facade
         {
             _sequencer.ChannelMessagePlayed += e;
         }
+
         public void ChannelMessagePlayed(object sender, ChannelMessageEventArgs e)
         {
             try

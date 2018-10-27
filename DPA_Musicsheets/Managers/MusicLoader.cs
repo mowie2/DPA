@@ -76,7 +76,7 @@ namespace DPA_Musicsheets.Managers
             //LillyPondReader tokenizer = new LillyPondReader();
             //tokenizer.ReadLily(LilypondText);
 
-            LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+//            LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
         }
 
         /// <summary>
@@ -473,7 +473,7 @@ namespace DPA_Musicsheets.Managers
             metaTrack.Insert(absoluteTicks, MetaMessage.EndOfTrackMessage);
             return sequence;
         }
-
+        /*
         internal void SaveToPDF(string fileName)
         {
             string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
@@ -499,14 +499,14 @@ namespace DPA_Musicsheets.Managers
 
             process.Start();
             while (!process.HasExited) { /* Wait for exit */
-                }
+            /*    }
                 if (sourceFolder != targetFolder || sourceFileName != targetFileName)
             {
                 File.Move(sourceFolder + "\\" + sourceFileName + ".pdf", targetFolder + "\\" + targetFileName + ".pdf");
                 File.Delete(tmpFileName);
             }
-        }
-
+        }*/
+        /*
         internal void SaveToLilypond(string fileName)
         {
             using (StreamWriter outputFile = new StreamWriter(fileName))
@@ -515,6 +515,7 @@ namespace DPA_Musicsheets.Managers
                 outputFile.Close();
             }
         }
+        */
         #endregion Saving to files
     }
 }
