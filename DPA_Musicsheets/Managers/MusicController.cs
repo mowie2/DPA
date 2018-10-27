@@ -36,6 +36,15 @@ namespace DPA_Musicsheets.Managers
         private Editor editor;
         public MusicController(MusicLoader ml, Editor edit)
         {
+            #region uitleg
+            ///getAsseblies() moet alle adapters laden maar doet dat niet
+            ///Als je een klasse maakt uit de adapter doet hij het wel,
+            ///maar dit is niet netjes. Dan is het namelijk hardcoded
+            /// 
+            /// links die ik gebruikt heb:
+            ///https://blogs.msdn.microsoft.com/benjaminperkins/2017/04/13/how-to-make-a-simple-dll-as-an-assembly-reference-just-for-fun/
+            ///Hieronder ben ik gewoon de get aan het testen, kijken of ik de midiReader en lilypondReader terug kan krijgen
+            #endregion
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
 
 
@@ -59,8 +68,6 @@ namespace DPA_Musicsheets.Managers
             //path = "C:\\Users\\mo\\Desktop\\School\\DPA\\DPA_Musicsheets\\Files\\Herhaling_metAlternatief.ly";
             //musicData = fileManager.LoadFile(path);
             //Test();
-
-            ///hier ben ik gewoon de get aan het testen, kijken of ik de midiReader terug kan krijgen
         }
 
         void Test()
