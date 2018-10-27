@@ -33,7 +33,6 @@ namespace DPA_Musicsheets.Managers
         private PsamContolLib psamContolLib;
         private Editor editor;
         private StaffsViewModel staffsViewModel;
-        private LilypondViewModel lilypondViewModel;
         public MusicController(StaffsViewModel staffs, Editor edit)
         {
             //musicData = ml.LilypondText;
