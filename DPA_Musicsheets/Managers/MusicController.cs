@@ -17,7 +17,7 @@ namespace DPA_Musicsheets.Managers
         FileManager fileManager;
         //public MidiPlayerViewModel midiPlayerView;
         private string _lilyPondText;
-        public SanfordLib midiPlayer;
+        public IMidiPlayer midiPlayer;
 
         public string lilyPondText
         {

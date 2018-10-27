@@ -26,6 +26,8 @@ namespace DPA_Musicsheets.Facade
 
         public void SetMidisequence(Symbol symbol)
         {
+            SequencerStop();
+            SetSequncerPosition(0);
             MidiSequence = domainToMidi.GetMidiSequence(symbol);
         }
 
