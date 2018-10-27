@@ -71,12 +71,14 @@ namespace DPA_Musicsheets.ViewModels
         #region buttons for play, stop, pause
         public RelayCommand PlayCommand => new RelayCommand(() =>
         {
+            musicController.midiPlayer.SquencePlayCompleted(_running);
             if (!_running)
             {
                 _running = true;
                 musicController.Play();
                 //slb.ContinueSequence();
-                UpdateButtons();
+                //UpdateButtons();
+                musicController.midiPlayer.SquencePlayCompleted(_running);
             }
         }, () => !_running && musicController.midiPlayer.CheckSequence() == true);
 
@@ -85,14 +87,16 @@ namespace DPA_Musicsheets.ViewModels
             _running = false;
             musicController.midiPlayer.SequencerStop();
             musicController.midiPlayer.SetSequncerPosition(0);
-            UpdateButtons();
+            //UpdateButtons();
+            musicController.midiPlayer.SquencePlayCompleted(_running);
         }, () => _running);
 
         public RelayCommand PauseCommand => new RelayCommand(() =>
         {
             _running = false;
             musicController.midiPlayer.SequencerStop();
-            UpdateButtons();
+            //UpdateButtons();
+            musicController.midiPlayer.SquencePlayCompleted(_running);
         }, () => _running);
 
         #endregion buttons for play, stop, pause

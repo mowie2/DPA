@@ -14,6 +14,7 @@ namespace DPA_Musicsheets.Interfaces
         void SetSequncerPosition(int position);
         void SequencerStop();
         void ContinueSequence();
+        void SquencePlayCompleted(bool running);
         void Cleanup();
     }
 }
