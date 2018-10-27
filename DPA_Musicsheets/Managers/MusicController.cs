@@ -135,6 +135,11 @@ namespace DPA_Musicsheets.Managers
             };
         }
 
+        public void SetMidiPlayer()
+        {
+            midiPlayer.SetMidisequence(musicData);
+        }
+
         public void Play()
         {
             //midiPlayer.SetMidisequence(musicData);
@@ -155,7 +160,7 @@ namespace DPA_Musicsheets.Managers
         {
             musicData = fileManager.LoadFile(path);
             lilyPondText = fileManager.lilypondText;
-            midiPlayer.SetMidisequence(musicData);
+            SetMidiPlayer();
             SetStaffs();
             return lilyPondText;
         }

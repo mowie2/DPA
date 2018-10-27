@@ -82,7 +82,7 @@ namespace DPA_Musicsheets.ViewModels
                         musicController.musicData = lilyToDomain.getRoot(LilypondText);
                         LilypondText = editor.TextChanged(musicController.musicData);
                         musicController.SetStaffs();
-                        //musicController
+                        musicController.SetMidiPlayer();
                         
 
                         CreateMemento();
