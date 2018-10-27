@@ -1,24 +1,27 @@
 ﻿using DPA_Musicsheets.Converters;
 using DPA_Musicsheets.Managers;
+using DPA_Musicsheets.Memento;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
+using System.Collections.Generic;
+using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Commands;
 
 namespace DPA_Musicsheets.ViewModels
 {
     public class LilypondViewModel : ViewModelBase
     {
-        private MusicLoader _musicLoader;
-        private MainViewModel _mainViewModel { get; set; }
+        
         private MusicController musicController;
         private Editor editor;
         private string _text;
-        private string _previousText;
-        private string _nextText;
+        List<Icommand> Commands;
 
+        private DPA_Musicsheets.Memento.CareTaker careTaker;
         /// <summary>
         /// This text will be in the textbox.
         /// It can be filled either by typing or loading a file so we only want to set previoustext when it's caused by typing.
@@ -33,7 +36,7 @@ namespace DPA_Musicsheets.ViewModels
             {
                 if (!_waitingForRender && !_textChangedByLoad)
                 {
-                    _previousText = _text;
+                  
                 }
                 _text = value;
                 RaisePropertyChanged(() => LilypondText);
@@ -45,27 +48,20 @@ namespace DPA_Musicsheets.ViewModels
         private static readonly int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
         private  bool _waitingForRender = false;
         private LilyToDomain lilyToDomain;
-        public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader, MusicController msc, Editor edit)
+        private bool ShouldCreateMemento = false;
+        public LilypondViewModel(MusicController msc, Editor edit)
         {
 
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
-            _mainViewModel = mainViewModel;
-            _musicLoader = musicLoader;
-            _musicLoader.LilypondViewModel = this;
             editor = edit;
             _text = "Your lilypond text will appear here.";
             musicController = msc;
             lilyToDomain = new LilyToDomain();
-        }
+            careTaker = new CareTaker();
+            Commands = new List<Icommand>();
 
-        public void LilypondTextLoaded(string text)
-        {
-            _textChangedByLoad = true;
-            LilypondText = _previousText = text;
-            _textChangedByLoad = false;
-        }
- 
+        } 
         /// <summary>
         /// This occurs when the text in the textbox has changed. This can either be by loading or typing.
         /// </summary>
@@ -78,7 +74,7 @@ namespace DPA_Musicsheets.ViewModels
                 _waitingForRender = true;
                 _lastChange = DateTime.Now;
 
-                _mainViewModel.CurrentState = "Rendering...";
+               
 
                 Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
                 {
@@ -86,36 +82,62 @@ namespace DPA_Musicsheets.ViewModels
                     {
                         _waitingForRender = false;
                         UndoCommand.RaiseCanExecuteChanged();
-
-                        //_musicLoader.LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
+                        
                         LilypondText = editor.TextChanged(lilyToDomain.getRoot(LilypondText));
                         musicController.SetStaffs(lilyToDomain.getRoot(LilypondText));
-                        _mainViewModel.CurrentState = "";
+
+                        CreateMemento();
+                        ShouldCreateMemento = true;
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
             }
         });
 
+
+        private void CreateMemento()
+        {
+            if (ShouldCreateMemento)
+            {
+                DPA_Musicsheets.Memento.Memento memento = new DPA_Musicsheets.Memento.Memento(LilypondText);
+                careTaker.AddMemento(memento);
+                
+            }
+        }
         #region Commands for buttons like Undo, Redo and SaveAs
         public RelayCommand UndoCommand => new RelayCommand(() =>
         {
-            _nextText = LilypondText;
-            LilypondText = _previousText;
-            _previousText = null;
-        }, () => _previousText != null && _previousText != LilypondText);
+            careTaker.Undo();
+            LilypondText = careTaker.GetCurrentMemento().Text;
+            ShouldCreateMemento = false;
+        }, () => careTaker.canUndo);
 
         public RelayCommand RedoCommand => new RelayCommand(() =>
         {
-            _previousText = LilypondText;
-            LilypondText = _nextText;
-            _nextText = null;
+            careTaker.Redo();
+            LilypondText = careTaker.GetCurrentMemento().Text;
             RedoCommand.RaiseCanExecuteChanged();
-        }, () => _nextText != null && _nextText != LilypondText);
+            ShouldCreateMemento = false;
+        }, () => careTaker.canRedo);
 
         public ICommand SaveAsCommand => new RelayCommand(() =>
         {
             musicController.Save();
         });
         #endregion Commands for buttons like Undo, Redo and SaveAs
+
+        public void InsertKeys(List<KeyEventArgs> pressedKeys)
+        {
+            PopulateCommands(pressedKeys);
+
+            foreach(Icommand command in Commands)
+            {
+                command.Execute();
+            }
+        }
+
+        private void PopulateCommands(List<KeyEventArgs> pressedKeys)
+        {
+            Commands.Add(new ClefCommand(pressedKeys, LilypondText));
+        }
     }
 }

@@ -103,11 +103,13 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="Commands\ClefCommand.cs" />
     <Compile Include="Converters\DomainToLily.cs" />
     <Compile Include="Converters\LilyToDomain.cs" />
     <Compile Include="Facade\PsamContolLib.cs" />
     <Compile Include="Facade\SanfordLib.cs" />
     <Compile Include="Builder\NoteBuilder.cs" />
+    <Compile Include="Interfaces\Icommand.cs" />
     <Compile Include="Interfaces\IReader.cs" />
     <Compile Include="Managers\Editor.cs" />
     <Compile Include="Memento\CareTaker.cs" />
