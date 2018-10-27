@@ -78,8 +78,12 @@ namespace DPA_Musicsheets.ViewModels
                         _waitingForRender = false;
                         UndoCommand.RaiseCanExecuteChanged();
                         
-                        LilypondText = editor.TextChanged(lilyToDomain.getRoot(LilypondText));
-                        musicController.SetStaffs(lilyToDomain.getRoot(LilypondText));
+                        
+                        musicController.musicData = lilyToDomain.getRoot(LilypondText);
+                        LilypondText = editor.TextChanged(musicController.musicData);
+                        musicController.SetStaffs();
+                        //musicController
+                        
 
                         CreateMemento();
                         ShouldCreateMemento = true;
