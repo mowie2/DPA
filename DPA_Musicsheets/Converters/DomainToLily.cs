@@ -89,7 +89,7 @@ namespace DPA_Musicsheets.Converters
         private int RelativeOctaveModifier(string pitch)
         {
             int returnOctave = 0 + prefRelativeOctaveModifier;
-            if (!prefPitch.Equals(""))
+            if (!prefPitch.Equals("") && !pitch.Equals(""))
             {
                 int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefPitch);
                 if (distance > 3)
