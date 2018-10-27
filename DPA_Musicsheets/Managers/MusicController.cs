@@ -10,6 +10,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Reflection;
+using System.IO;
 
 namespace DPA_Musicsheets.Managers
 {
@@ -34,6 +35,8 @@ namespace DPA_Musicsheets.Managers
         private PsamContolLib psamContolLib;
         private MusicLoader musicLoader;
         private Editor editor;
+        private IEnumerable<Type> assemblies;
+
         public MusicController(MusicLoader ml, Editor edit)
         {
             #region uitleg
@@ -52,17 +55,22 @@ namespace DPA_Musicsheets.Managers
             #endregion
             var loadedAssemblies = AppDomain.CurrentDomain.GetAssemblies().ToList();
 
+            //var l = new LilypondAdapter.LilypondReader();
 
             var type = typeof(IReader);
-            var test = AppDomain.CurrentDomain.GetAssemblies()
-                .SelectMany(x => x.GetTypes())
-                .Where(p => type.IsAssignableFrom(p))
-                .Select(x => x.Name).ToList();
+            var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            assemblies = Directory.GetFiles(spath, "*.dll")
+                .Select(dll => Assembly.LoadFile(dll))
+                .SelectMany(s => s.GetTypes())
+                .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
+
+            var readers = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IReader)Activator.CreateInstance(c)).ToList();
+
 
             var type2 = typeof(ISavable);
             var test2 = AppDomain.CurrentDomain.GetAssemblies()
                 .SelectMany(x => x.GetTypes())
-                .Where(p => type2.IsAssignableFrom(p))
+                .Where(p => p.IsAssignableFrom(type2) && !p.IsInterface)
                 .Select(x => x.Name).ToList();
 
             //musicData = ml.LilypondText;

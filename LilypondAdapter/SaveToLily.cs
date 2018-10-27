@@ -4,7 +4,8 @@ using System.IO;
 namespace LilypondAdapter
 {
     public class SaveToLily : ISavable
-    {   
+    {
+        public string extention { get; } = ".ly";
         public void Save(string fileName, Symbol root)
         {
             DomainToLily domainToLily = new DomainToLily();

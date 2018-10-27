@@ -15,7 +15,7 @@ namespace SanfordAdapter
         private BarLine activeBarline;
         private int alternativeCount;
         Sequence sequence;
-
+        public string extention { get; } = ".mid";
 
         public SaveToMidi()
         {
