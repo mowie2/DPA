@@ -5,11 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Interfaces
+namespace DomainModel
 {
-    interface IReader
+    public interface ISavable
     {
-        Symbol readFile(string filename);
-        string GetMusicText();
+        void Save(string fileName, Symbol symbol);
     }
 }

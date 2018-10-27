@@ -1,12 +1,10 @@
 ﻿using DomainModel;
-using DPA_Musicsheets.Builders;
 using DPA_Musicsheets.Interfaces;
-using DPA_Musicsheets.Savers;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
 
-namespace DPA_Musicsheets.Managers
+namespace SanfordAdapter
 {
     public class MidiReader : IReader
     {
@@ -62,8 +60,6 @@ namespace DPA_Musicsheets.Managers
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);
             processFile(midiSequence);
-            SaveToLily s = new SaveToLily();
-            s.Save("test.ly",firstNote);
             return firstNote;
         }
 

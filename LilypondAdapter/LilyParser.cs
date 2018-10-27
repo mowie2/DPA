@@ -1,18 +1,13 @@
 ﻿using DomainModel;
-using DPA_Musicsheets.Models;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
-using System.Windows;
 
-namespace DPA_Musicsheets.Readers
+namespace LilypondAdapter
 {
     class LilyParser
     {
-        private Builders.NoteBuilder noteBuilder;
+        private NoteBuilder noteBuilder;
         private Dictionary<string, Clef.Key> cleffs;
         private Dictionary<char, int> octaveModifier;
         private Symbol[] symbols;
@@ -39,7 +34,7 @@ namespace DPA_Musicsheets.Readers
         {
             symbols = new Symbol[2];
             prefPitch = "";
-            noteBuilder = new Builders.NoteBuilder();
+            noteBuilder = new NoteBuilder();
             cleffs = new Dictionary<string, Clef.Key>
             {
                 ["treble"] = Clef.Key.G,

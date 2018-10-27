@@ -1,5 +1,4 @@
-﻿using DPA_Musicsheets.Converters;
-using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
@@ -44,7 +43,7 @@ namespace DPA_Musicsheets.ViewModels
         private  DateTime _lastChange;
         private static readonly int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
         private  bool _waitingForRender = false;
-        private LilyToDomain lilyToDomain;
+        //private LilyToDomain lilyToDomain;
         public LilypondViewModel(MainViewModel mainViewModel, MusicLoader musicLoader, MusicController msc, Editor edit)
         {
 
@@ -56,7 +55,7 @@ namespace DPA_Musicsheets.ViewModels
             editor = edit;
             _text = "Your lilypond text will appear here.";
             musicController = msc;
-            lilyToDomain = new LilyToDomain();
+            //lilyToDomain = new LilyToDomain();
         }
 
         public void LilypondTextLoaded(string text)
@@ -88,8 +87,8 @@ namespace DPA_Musicsheets.ViewModels
                         UndoCommand.RaiseCanExecuteChanged();
 
                         //_musicLoader.LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
-                        LilypondText = editor.TextChanged(lilyToDomain.getRoot(LilypondText));
-                        musicController.SetStaffs(lilyToDomain.getRoot(LilypondText));
+                        //LilypondText = editor.TextChanged(lilyToDomain.getRoot(LilypondText));
+                        //musicController.SetStaffs(lilyToDomain.getRoot(LilypondText));
                         _mainViewModel.CurrentState = "";
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.

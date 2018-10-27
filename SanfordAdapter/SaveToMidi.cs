@@ -4,7 +4,7 @@ using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
 
-namespace DPA_Musicsheets.Savers
+namespace SanfordAdapter
 {
     public class SaveToMidi : ISavable
     {

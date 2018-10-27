@@ -1,6 +1,6 @@
 ﻿using DomainModel;
 
-namespace DPA_Musicsheets.Builders
+namespace DomainModel
 {
     public class NoteBuilder
     {

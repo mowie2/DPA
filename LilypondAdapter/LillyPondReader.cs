@@ -1,16 +1,7 @@
 ﻿using DomainModel;
-using DPA_Musicsheets.Converters;
 using DPA_Musicsheets.Interfaces;
-using DPA_Musicsheets.Models;
-using DPA_Musicsheets.Savers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Readers
+namespace LilypondAdapter
 {
     public class LillyPondReader : IReader
     {

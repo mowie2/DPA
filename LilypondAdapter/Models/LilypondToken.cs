@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Models
+namespace LilypondAdapter
 {
     public class LilypondToken
     {

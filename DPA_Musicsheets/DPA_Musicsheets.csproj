@@ -103,28 +103,15 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="Converters\DomainToLily.cs" />
-    <Compile Include="Converters\LilyToDomain.cs" />
     <Compile Include="Facade\PsamContolLib.cs" />
     <Compile Include="Facade\SanfordLib.cs" />
-    <Compile Include="Builder\NoteBuilder.cs" />
-    <Compile Include="Interfaces\IReader.cs" />
     <Compile Include="Managers\Editor.cs" />
     <Compile Include="Memento\CareTaker.cs" />
     <Compile Include="Memento\Memento.cs" />
-    <Compile Include="Models\LilyTokenizer.cs" />
-    <Compile Include="Readers\FileManager.cs" />
-    <Compile Include="Readers\LillyPondReader.cs" />
-    <Compile Include="Interfaces\ISavable.cs" />
-    <Compile Include="Readers\MidiReader.cs" />
+    <Compile Include="Managers\FileManager.cs" />
     <Compile Include="Managers\MidiToLilyHelper.cs" />
     <Compile Include="Managers\MusicController.cs" />
     <Compile Include="Managers\MusicLoader.cs" />
-    <Compile Include="Models\LilypondToken.cs" />
-    <Compile Include="Models\LilypondTokenKind.cs" />
-    <Compile Include="Readers\LilyParser.cs" />
-    <Compile Include="Savers\SaveToLily.cs" />
-    <Compile Include="Savers\SaveToMidi.cs" />
     <Compile Include="Savers\SaveToPDF.cs" />
     <Compile Include="ViewModels\MidiPlayerViewModel.cs" />
     <Compile Include="ViewModels\StaffsViewModel.cs" />
@@ -248,6 +235,14 @@
     <ProjectReference Include="..\ClassLibrary\DomainModel.csproj">
       <Project>{3c3c2126-abc1-4fc0-bc86-c3e359bd2724}</Project>
       <Name>DomainModel</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\LilypondAdapter\LilypondAdapter.csproj">
+      <Project>{67501aa7-cdfb-450b-ad3a-7912966ff783}</Project>
+      <Name>LilypondAdapter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanfordAdapter\SanfordAdapter.csproj">
+      <Project>{816c1583-f582-4281-ad6b-3976cdc328e9}</Project>
+      <Name>SanfordAdapter</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup />

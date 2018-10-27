@@ -1,8 +1,5 @@
 ﻿using DomainModel;
 using DPA_Musicsheets.Interfaces;
-using DPA_Musicsheets.Managers;
-using DPA_Musicsheets.Readers;
-using DPA_Musicsheets.Savers;
 using Microsoft.Win32;
 using System;
 using System.Collections.Generic;
@@ -25,14 +22,14 @@ namespace DPA_Musicsheet
             savables = new Dictionary<string, ISavable>
             {
                 //{ ".pdf", new SaveToPDF() },
-                { ".ly", new SaveToLily() },
-                { ".mid", new SaveToMidi() }
+                //{ ".ly", new SaveToLily() },
+                //{ ".mid", new SaveToMidi() }
             };
 
             readers = new Dictionary<string, IReader>()
             {
-                {".mid", new MidiReader() },
-                {".ly", new LillyPondReader() }
+                //{".mid", new MidiReader() },
+                //{".ly", new LillyPondReader() }
             };
 
             openFileDialog = new OpenFileDialog() { Filter = "Midi or LilyPond files (*.mid *.ly)|*.mid;*.ly" };

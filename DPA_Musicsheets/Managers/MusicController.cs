@@ -35,6 +35,11 @@ namespace DPA_Musicsheets.Managers
         private Editor editor;
         public MusicController(MusicLoader ml, Editor edit)
         {
+            var test = AppDomain.CurrentDomain.GetAssemblies()
+                .SelectMany(x => x.GetTypes())
+                .Where(x => typeof(IReader).IsAssignableFrom(x) && !x.IsInterface && !x.IsAbstract)
+                .Select(x => x.Name).ToList();
+
             //musicData = ml.LilypondText;
             fileManager = new FileManager();
             psamContolLib = new PsamContolLib();
@@ -43,6 +48,8 @@ namespace DPA_Musicsheets.Managers
             //path = "C:\\Users\\mo\\Desktop\\School\\DPA\\DPA_Musicsheets\\Files\\Herhaling_metAlternatief.ly";
             //musicData = fileManager.LoadFile(path);
             //Test();
+
+            ///hier ben ik gewoon de get aan het testen, kijken of ik de midiReader terug kan krijgen
         }
 
         void Test()

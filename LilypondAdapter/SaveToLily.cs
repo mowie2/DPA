@@ -1,14 +1,7 @@
 ﻿using DomainModel;
-using DPA_Musicsheets.Converters;
-using DPA_Musicsheets.Interfaces;
-using System;
-using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Savers
+namespace LilypondAdapter
 {
     public class SaveToLily : ISavable
     {   

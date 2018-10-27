@@ -1,13 +1,6 @@
 ﻿using DomainModel;
-using DPA_Musicsheets.Models;
-using DPA_Musicsheets.Readers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Converters
+namespace LilypondAdapter
 {
     class LilyToDomain
     {
