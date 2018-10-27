@@ -89,7 +89,7 @@ namespace DPA_Musicsheets.Converters
         private int RelativeOctaveModifier(string pitch)
         {
             int returnOctave = 0 + prefRelativeOctaveModifier;
-            if (!prefPitch.Equals(""))
+            if (!prefPitch.Equals("") && !pitch.Equals(""))
             {
                 int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefPitch);
                 if (distance > 3)
@@ -188,9 +188,9 @@ namespace DPA_Musicsheets.Converters
 
         private void WriteAlternative(BarLine barline)
         {
-            lilyString += "\\alternative {\r\n";
             if (barline.Alternatives.Count > 0)
             {
+                lilyString += "\\alternative {\r\n";
                 foreach (Note note in barline.Alternatives)
                 {
                     currentDuration = 0;
@@ -198,8 +198,8 @@ namespace DPA_Musicsheets.Converters
                     WriteSection(note);
                     lilyString += "}\r\n";
                 }
+                lilyString += "}\r\n";
             }
-            lilyString += "}\r\n";
         }
 
         private string WriteBarlines(Note note, int duration, int dotted)

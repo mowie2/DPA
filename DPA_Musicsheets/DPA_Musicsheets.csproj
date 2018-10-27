@@ -112,7 +112,8 @@
     <Compile Include="Interfaces\IMidiPlayer.cs" />
     <Compile Include="Interfaces\IReader.cs" />
     <Compile Include="Managers\Editor.cs" />
-    <Compile Include="Models\Context.cs" />
+    <Compile Include="Memento\CareTaker.cs" />
+    <Compile Include="Memento\Memento.cs" />
     <Compile Include="Models\LilyTokenizer.cs" />
     <Compile Include="Readers\FileManager.cs" />
     <Compile Include="Readers\LillyPondReader.cs" />
