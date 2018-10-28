@@ -1,6 +1,7 @@
 ﻿using ClassLibrary.Interfaces;
 using DomainModel;
 using DPA_Musicsheets.Commands;
+using DPA_Musicsheets.Converters;
 using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Managers;
 using DPA_Musicsheets.Memento;
@@ -71,34 +72,9 @@ namespace DPA_Musicsheets.ViewModels
             Commands = new List<Icommand>();
             //lilyToDomain = new LilyToDomain();
 
-
-
-
-            IEnumerable<Type> assemblies;
-            var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            assemblies = Directory.GetFiles(spath, "*.dll")
-                .Select(dll => Assembly.LoadFile(dll))
-                .SelectMany(s => s.GetTypes())
-                .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
-
-            var type = typeof(IConvertToDomain);
-            var convertersTo = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToDomain)Activator.CreateInstance(c)).ToList();
-            convertersTo = convertersTo.Where(p => p.GetExtention().Equals(".ly")).ToList();
-
-            if (convertersTo.Count > 0)
-            {
-                converterToDomain = convertersTo[0];
-            }
-
-            type = typeof(IConvertToExtention);
-            var convertersFrom = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToExtention)Activator.CreateInstance(c)).ToList();
-            convertersFrom = convertersFrom.Where(p => p.GetExtention().Equals(".ly")).ToList();
-
-            if (convertersFrom.Count > 0)
-            {
-                converterToExtention = convertersFrom[0];
-            }
-
+            ConverterGetter converterGetter = new ConverterGetter();
+            converterToDomain = converterGetter.GetConvertToDomain(".ly");
+            converterToExtention = converterGetter.GetConvertToExtention(".ly");
         }
         /*
         public void SetLilyText()

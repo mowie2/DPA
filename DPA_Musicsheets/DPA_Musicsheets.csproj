@@ -112,6 +112,7 @@
     <Compile Include="Commands\TimeSig4Command.cs" />
     <Compile Include="Commands\TimeSig6Command.cs" />
     <Compile Include="Commands\TimeSigCommand.cs" />
+    <Compile Include="Converters\ConverterGetter.cs" />
     <Compile Include="Facade\PsamContolLib.cs" />
     <Compile Include="Facade\SanfordLib.cs" />
     <Compile Include="Interfaces\Icommand.cs" />
@@ -256,9 +257,7 @@
       <Name>SanfordAdapter</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Converters\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
