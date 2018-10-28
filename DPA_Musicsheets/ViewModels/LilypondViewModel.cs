@@ -77,13 +77,13 @@ namespace DPA_Musicsheets.ViewModels
             converterToDomain = converterGetter.GetConvertToDomain(".ly");
             converterToExtention = converterGetter.GetConvertToExtention(".ly");
         }
-        /*
+        
         public void SetLilyText()
         {
             if (converterToExtention == null) return;
             LilypondText = converterToExtention.Convert(musicController.musicData) as string;
         }
-        */
+        
         /// <summary>
         /// This occurs when the text in the textbox has changed. This can either be by loading or typing.
         /// </summary>
@@ -109,8 +109,7 @@ namespace DPA_Musicsheets.ViewModels
                         LilypondText = editor.TextChanged(converterToDomain.Convert(LilypondText));
                         musicController.SetStaffs(converterToDomain.Convert(LilypondText));
                         musicController.SetMusicPlayer();
-                        //musicController.SetStaffs();
-                        //SetLilyText();
+                        SetLilyText();
 
                         CreateMemento();
                         ShouldCreateMemento = true;
@@ -121,7 +120,7 @@ namespace DPA_Musicsheets.ViewModels
         });
 
 
-        private void CreateMemento()
+        public void CreateMemento()
         {
             if (ShouldCreateMemento)
             {

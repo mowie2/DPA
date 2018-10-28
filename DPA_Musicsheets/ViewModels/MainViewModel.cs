@@ -64,7 +64,8 @@ namespace DPA_Musicsheets.ViewModels
                 MessageBox.Show("Please select a file");
                 return;
             }
-            lilypondViewModel.LilypondText = musicController.LoadFile();
+            musicController.LoadFile();
+            lilypondViewModel.SetLilyText();
         });
 
         #region Focus and key commands, these can be used for implementing hotkeys
