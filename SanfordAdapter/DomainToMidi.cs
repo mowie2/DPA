@@ -157,9 +157,9 @@ namespace SanfordAdapter
                 {"d", 2 },
                 {"e", 4 },
                 {"f", 5 },
-                {"g", -5 },
-                {"a", -3 },
-                {"b", -1 }
+                {"g", 7 },
+                {"a", 9 },
+                {"b", 11 }
             };
             int midiKey;
             pitchDictionary.TryGetValue(pitch, out midiKey);
@@ -167,8 +167,8 @@ namespace SanfordAdapter
                 midiKey++;
             if (semitone == Semitone.SEMITONE.MAJOR)
                 midiKey--;
-            midiKey += octave * 12;
-            System.Diagnostics.Debug.Write((midiKey + 60) + " ");
+            midiKey += (octave-2) * 12;
+            //System.Diagnostics.Debug.Write((midiKey + 60) + " ");
             int test = midiKey + 60;
             if (test < 0)
                 return 0;
