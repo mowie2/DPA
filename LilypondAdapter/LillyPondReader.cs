@@ -9,11 +9,11 @@ namespace LilypondAdapter
         private LilyTokenizer tokenizer; 
         private Symbol root;
         private string liliePondText;
-        private string extention;
+        private readonly string extention = ".ly";
+        private readonly string fancyName = "Lilypond";
 
         public LillyPondReader()
         {
-            extention = ".ly";
             parser = new LilyParser();
             tokenizer = new LilyTokenizer();
         }
@@ -45,6 +45,11 @@ namespace LilypondAdapter
         public string GetExtention()
         {
             return extention;
+        }
+
+        public string GetFancyName()
+        {
+            return fancyName;
         }
     }
 }

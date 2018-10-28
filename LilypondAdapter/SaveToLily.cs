@@ -11,6 +11,7 @@ namespace LilypondAdapter
     public class SaveToLily : ISavable
     {
         public readonly string extention = ".ly";
+        public readonly string fancyName = "Lilypond";
         private IConvertToExtention converter;
 
         public SaveToLily()
@@ -31,6 +32,11 @@ namespace LilypondAdapter
         public string GetExtention()
         {
             return extention;
+        }
+
+        public string GetFancyName()
+        {
+            return fancyName;
         }
     }
 }

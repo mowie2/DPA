@@ -28,8 +28,14 @@ namespace DPA_Musicsheet
         {
 
             converterGetter = new ConverterGetter();
-            openFileDialog = new OpenFileDialog() { Filter = "Midi or LilyPond files (*.mid *.ly)|*.mid;*.ly" };
-            saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
+            
+            openFileDialog = new OpenFileDialog() { Filter = converterGetter.GetOpenExtensions() };
+            saveFileDialog = new SaveFileDialog() { Filter = converterGetter.GetSaveExtensionsFilter() };
+        }
+
+        public void setSaveFileDialogExtensions()
+        {
+            //saveFileDialog = new SaveFileDialog() {  Filter = }
         }
 
         internal Symbol LoadFile(string path)

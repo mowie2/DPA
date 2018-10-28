@@ -17,6 +17,7 @@ namespace SanfordAdapter
         private int lastAbsoluteTicks;
 
         private readonly string extention = ".mid";
+        private readonly string fancyName = "MIDI";
 
         private readonly Dictionary<int, string> pitches;
         List<int> SemitonValues;
@@ -389,6 +390,11 @@ namespace SanfordAdapter
         public string GetExtention()
         {
             return extention;
+        }
+
+        public string GetFancyName()
+        {
+            return fancyName;
         }
     }
 }

@@ -15,6 +15,7 @@ namespace LilypondAdapter
     public class SaveToPDF : ISavable
     {
         private string extention;
+        private readonly string fancyName = "PDF";
         private IConvertToExtention converter;
 
         public SaveToPDF()
@@ -86,6 +87,11 @@ namespace LilypondAdapter
         public string GetExtention()
         {
             return extention;
+        }
+
+        public string GetFancyName()
+        {
+            return fancyName;
         }
     }
 }

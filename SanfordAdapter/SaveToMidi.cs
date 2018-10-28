@@ -8,7 +8,7 @@ namespace SanfordAdapter
 {
     public class SaveToMidi : ISavable
     {
-        
+        private readonly string fancyName = "MIDI";
         private readonly string extention = ".mid";
 
         public void Save(string fileName, Symbol symbol)
@@ -21,6 +21,11 @@ namespace SanfordAdapter
         public string GetExtention()
         {
             return extention;
+        }
+
+        public string GetFancyName()
+        {
+            return fancyName;
         }
     }
 }

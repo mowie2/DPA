@@ -11,5 +11,7 @@ namespace DomainModel
     {
         void Save(string fileName, Symbol symbol);
         string GetExtention();
+
+        string GetFancyName();
     }
 }
