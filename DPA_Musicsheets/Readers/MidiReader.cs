@@ -314,15 +314,16 @@ namespace DPA_Musicsheets.Managers
             NoteBuilderSetSemitone(y);
             
             noteBuilder.ClearOctave();
+            noteBuilder.ModifyOctave(2);
             int octaveModifier = midiKey;
-
-            while (octaveModifier < 54 || octaveModifier > 66)
+            
+            while (octaveModifier < 60 || octaveModifier > 71)
             {
-                if (octaveModifier < 54)
+                if (octaveModifier < 60)
                 {
                     noteBuilder.ModifyOctave(-1);
                     octaveModifier += 12;
-                } else if (octaveModifier > 66)
+                } else if (octaveModifier > 71)
                 {
                     noteBuilder.ModifyOctave(1);
                     octaveModifier -= 12;
