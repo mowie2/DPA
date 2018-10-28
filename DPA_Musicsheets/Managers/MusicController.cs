@@ -11,9 +11,9 @@ namespace DPA_Musicsheets.Managers
     public class MusicController : ViewModelBase
     {
         FileManager fileManager;
-        private string _lilyPondText;
+        //private string _lilyPondText;
         public IMusicPlayer musicPlayer;
-        DomainToLily domainToLily;
+        /*
         public string lilyPondText
         {
             get
@@ -26,7 +26,7 @@ namespace DPA_Musicsheets.Managers
                 base.RaisePropertyChanged("lilyPondText");
             }
         }
-
+        */
         string path;
         public Symbol musicData;
         private PsamContolLib psamContolLib;
@@ -35,7 +35,7 @@ namespace DPA_Musicsheets.Managers
         private StaffsViewModel staffsViewModel;
         public MusicController(StaffsViewModel staffs, Editor edit)
         {
-            domainToLily = new DomainToLily();
+            //domainToLily = new DomainToLily();
 
 
             #region uitleg
@@ -112,11 +112,10 @@ namespace DPA_Musicsheets.Managers
         public string LoadFile()
         {
             musicData = fileManager.LoadFile(path);
-            lilyPondText = fileManager.lilypondText;
+            //lilyPondText = fileManager.lilypondText;
             SetMusicPlayer();
-            //SetMidiPlayer();
             SetStaffs(musicData);
-            return lilyPondText;
+            return "";//lilyPondText;
         }
         public void SetStaffs(Symbol symbol)
         {

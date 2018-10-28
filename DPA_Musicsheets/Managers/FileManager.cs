@@ -21,7 +21,7 @@ namespace DPA_Musicsheet
         //private 
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
-        public string lilypondText;
+        //public string lilypondText;
 
 
         public FileManager()
@@ -36,13 +36,13 @@ namespace DPA_Musicsheet
         {
             string extension = Path.GetExtension(openFileDialog.FileName);
             IReader reader = converterGetter.GetReader(extension);
-            IConvertToExtention converter = converterGetter.GetConvertToExtention(".ly");
+            //IConvertToExtention converter = converterGetter.GetConvertToExtention(".ly");
 
-            if (reader != null && converter != null)
+            if (reader != null /*&& converter != null*/)
             {
                 string fileName = openFileDialog.FileName;
                 Symbol root = reader.readFile(fileName);
-                lilypondText = converter.Convert(root) as string;
+                //lilypondText = converter.Convert(root) as string;
                 return root;
             }
             return null;
