@@ -18,9 +18,9 @@ namespace DPA_Musicsheets.Managers
     public class MusicController : ViewModelBase
     {
         FileManager fileManager;
-        private string _lilyPondText;
+        //private string _lilyPondText;
         public IMusicPlayer musicPlayer;
-
+        /*
         public string lilyPondText
         {
             get
@@ -33,7 +33,7 @@ namespace DPA_Musicsheets.Managers
                 base.RaisePropertyChanged("lilyPondText");
             }
         }
-
+        */
         string path;
         public Symbol musicData;
         private PsamContolLib psamContolLib;
@@ -81,10 +81,10 @@ namespace DPA_Musicsheets.Managers
         public string LoadFile()
         {
             musicData = fileManager.LoadFile(path);
-            lilyPondText = fileManager.lilypondText;
+            //lilyPondText = fileManager.lilypondText;
             SetMusicPlayer();
             SetStaffs();
-            return lilyPondText;
+            return "";//lilyPondText;
         }
 
         public void SetStaffs()
