@@ -78,9 +78,6 @@
     <Reference Include="Sanford.Multimedia.Midi, Version=6.4.1.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Sanford.Multimedia.Midi.6.4.1\lib\net20\Sanford.Multimedia.Midi.dll</HintPath>
     </Reference>
-    <Reference Include="SanfordAdapter">
-      <HintPath>..\SanfordAdapter\bin\Debug\SanfordAdapter.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
@@ -253,6 +250,10 @@
     <ProjectReference Include="..\LilypondAdapter\LilypondAdapter.csproj">
       <Project>{67501aa7-cdfb-450b-ad3a-7912966ff783}</Project>
       <Name>LilypondAdapter</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\SanfordAdapter\SanfordAdapter.csproj">
+      <Project>{816c1583-f582-4281-ad6b-3976cdc328e9}</Project>
+      <Name>SanfordAdapter</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
