@@ -105,6 +105,7 @@ namespace DPA_Musicsheets.Facade
             PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch.ToUpper(), semitones[cr.Semitone], 2 + cr.Octave, durriation[cr.Duration],
             NoteStemDirection.Up, NoteTieType.None,
             new List<NoteBeamType>() { NoteBeamType.Single });
+            n.NumberOfDots = cr.Dotted;
 
             float count = 1 / cr.Duration;
             float dur = (float)((Math.Pow(2, cr.Dotted) - 1) / Math.Pow(2, cr.Dotted)) + 1;

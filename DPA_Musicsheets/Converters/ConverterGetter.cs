@@ -35,6 +35,32 @@ namespace DPA_Musicsheets.Converters
         }
         */
 
+        public List<string> GetSupportOpenTypes()
+        {
+            var type = typeof(IReader);
+            var readers = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IReader)Activator.CreateInstance(c)).ToList();
+            List<string> types = readers.Select(p => p.GetExtention()).ToList();
+
+
+
+            return types;
+
+        }
+
+        public List<string> GetSupportCloseTypes()
+        {
+            var type = typeof(ISavable);
+            var readers = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (ISavable)Activator.CreateInstance(c)).ToList();
+            List<string> types = readers.Select(p => p.GetExtention()).ToList();
+
+
+
+            return types;
+
+        }
+
+
+
         public IReader GetReader(string extention)
         {
             var type = typeof(IReader);

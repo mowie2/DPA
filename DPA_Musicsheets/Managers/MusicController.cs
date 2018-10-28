@@ -109,13 +109,13 @@ namespace DPA_Musicsheets.Managers
             return path;
         }
 
-        public string LoadFile()
+        public void LoadFile()
         {
             musicData = fileManager.LoadFile(path);
             //lilyPondText = fileManager.lilypondText;
             SetMusicPlayer();
             SetStaffs(musicData);
-            return "";//lilyPondText;
+            //lilyPondText;
         }
         public void SetStaffs(Symbol symbol)
         {
