@@ -51,7 +51,7 @@ namespace DPA_Musicsheets.ViewModels
         private DateTime _lastChange;
         private static readonly int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
         
-        private bool ShouldCreateMemento = false;
+        private bool ShouldCreateMemento = true;
         private bool _waitingForRender = false;
         //private LilyToDomain lilyToDomain;
         public LilypondViewModel(MusicController msc, Editor edit)
@@ -60,7 +60,7 @@ namespace DPA_Musicsheets.ViewModels
             // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer and viewmodels don't know each other?
             // And viewmodels don't 
             editor = edit;
-            _text = "Your lilypond text will appear here.";
+            _text = "";
             musicController = msc;
             careTaker = new CareTaker();
             Commands = new List<Icommand>();
@@ -112,7 +112,6 @@ namespace DPA_Musicsheets.ViewModels
                         LilypondText = editor.TextChanged(converter.Convert(LilypondText));
                         musicController.SetStaffs(converter.Convert(LilypondText));
                         musicController.SetMidiPlayer();
-                        musicController.SetStaffs();
 
                         CreateMemento();
                         ShouldCreateMemento = true;

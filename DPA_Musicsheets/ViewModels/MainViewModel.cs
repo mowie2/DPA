@@ -4,6 +4,7 @@ using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 
 namespace DPA_Musicsheets.ViewModels
@@ -45,7 +46,7 @@ namespace DPA_Musicsheets.ViewModels
             pressedKeys = new List<KeyEventArgs>();
             musicController = ms;
             lilypondViewModel = lvm;
-            FileName = @"Files/Alle-eendjes-zwemmen-in-het-water.mid";
+            FileName = "";
 
             //CurrentState = this.ed.CurrentState;
         }
@@ -57,6 +58,11 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand LoadCommand => new RelayCommand(() =>
         {   
+            if(FileName == "")
+            {
+                MessageBox.Show("Please select a file");
+                return;
+            }
             lilypondViewModel.LilypondText = musicController.LoadFile();
         });
 
