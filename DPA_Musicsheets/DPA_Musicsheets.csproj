@@ -118,6 +118,7 @@
     <Compile Include="Facade\PsamContolLib.cs" />
     <Compile Include="Facade\SanfordLib.cs" />
     <Compile Include="Interfaces\Icommand.cs" />
+    <Compile Include="Interfaces\IMidiPlayer.cs" />
     <Compile Include="Managers\Editor.cs" />
     <Compile Include="Memento\CareTaker.cs" />
     <Compile Include="Memento\Memento.cs" />
@@ -254,7 +255,9 @@
       <Name>LilypondAdapter</Name>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Converters\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

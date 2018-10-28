@@ -187,9 +187,9 @@ namespace LilypondAdapter
 
         private void WriteAlternative(BarLine barline)
         {
-            lilyString += "\\alternative {\r\n";
             if (barline.Alternatives.Count > 0)
             {
+                lilyString += "\\alternative {\r\n";
                 foreach (Note note in barline.Alternatives)
                 {
                     currentDuration = 0;
@@ -197,8 +197,8 @@ namespace LilypondAdapter
                     WriteSection(note);
                     lilyString += "}\r\n";
                 }
+                lilyString += "}\r\n";
             }
-            lilyString += "}\r\n";
         }
 
         private string WriteBarlines(Note note, int duration, int dotted)

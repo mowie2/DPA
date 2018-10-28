@@ -15,9 +15,8 @@ namespace SanfordAdapter
         private Note firstNote;
         private Note prevNote;
         private int lastAbsoluteTicks;
-        private string midiText;
 
-        private string extention;
+        private readonly string extention = ".mid";
 
         private readonly Dictionary<int, string> pitches;
         List<int> SemitonValues;
@@ -25,7 +24,7 @@ namespace SanfordAdapter
 
         public MidiReader()
         {
-            extention = ".mid";
+            
             noteBuilder = new NoteBuilder();
             openNotes = new Dictionary<int, Tuple<MidiEvent, Note>>();
             pitches = new Dictionary<int, string>()
@@ -384,11 +383,6 @@ namespace SanfordAdapter
             {
                 bpm = _bpm
             });
-        }
-
-        public string GetMusicText()
-        {
-            return midiText;
         }
 
         public string GetExtention()

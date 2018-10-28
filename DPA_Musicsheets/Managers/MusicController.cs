@@ -2,6 +2,7 @@
 using DPA_Musicsheet;
 using DPA_Musicsheets.Facade;
 using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Savers;
 using DPA_Musicsheets.ViewModels;
 using GalaSoft.MvvmLight;
 using System;
@@ -17,7 +18,10 @@ namespace DPA_Musicsheets.Managers
     public class MusicController : ViewModelBase
     {
         FileManager fileManager;
+        //public MidiPlayerViewModel midiPlayerView;
         private string _lilyPondText;
+        public IMusicPlayer musicPlayer;
+
         public string lilyPondText
         {
             get
@@ -30,6 +34,7 @@ namespace DPA_Musicsheets.Managers
                 base.RaisePropertyChanged("lilyPondText");
             }
         }
+
         string path;
         public Symbol musicData;
         private PsamContolLib psamContolLib;
@@ -80,6 +85,8 @@ namespace DPA_Musicsheets.Managers
             psamContolLib = new PsamContolLib();
             staffsViewModel = staffs;
             editor = edit;
+
+            musicPlayer = new SanfordLib();
             //path = "C:\\Users\\mo\\Desktop\\School\\DPA\\DPA_Musicsheets\\Files\\Herhaling_metAlternatief.ly";
             //musicData = fileManager.LoadFile(path);
             //Test();
@@ -168,6 +175,16 @@ namespace DPA_Musicsheets.Managers
             };
         }
 
+        public void SetMidiPlayer()
+        {
+            musicPlayer.SetMusic(musicData);
+        }
+
+        public void Play()
+        {
+            //midiPlayer.SetMidisequence(musicData);
+            musicPlayer.Continue();
+        }
 
         public void Save()
         {
@@ -189,6 +206,7 @@ namespace DPA_Musicsheets.Managers
         {
             musicData = fileManager.LoadFile(path);
             lilyPondText = fileManager.lilypondText;
+            SetMidiPlayer();
             SetStaffs();
             return lilyPondText;
         }

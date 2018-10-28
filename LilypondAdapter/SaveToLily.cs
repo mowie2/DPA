@@ -10,7 +10,7 @@ namespace LilypondAdapter
 {
     public class SaveToLily : ISavable
     {
-        public string extention = ".ly";
+        public readonly string extention = ".ly";
         private IConvertToExtention converter;
 
         public SaveToLily()
@@ -40,6 +40,7 @@ namespace LilypondAdapter
                 outputFile.Close();
             }       
         }
+
         public string GetExtention()
         {
             return extention;

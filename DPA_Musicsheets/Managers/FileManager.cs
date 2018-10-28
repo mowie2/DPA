@@ -1,4 +1,5 @@
-﻿using DomainModel;
+﻿using ClassLibrary.Interfaces;
+using DomainModel;
 using DPA_Musicsheets.Interfaces;
 using Microsoft.Win32;
 using System;
@@ -16,6 +17,9 @@ namespace DPA_Musicsheet
         //private readonly Dictionary<string, IReader> readers;
         private readonly List<IReader> readers;
         private readonly List<ISavable> savables;
+        private readonly List<IConvertToExtention> converters;
+
+        //private 
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
         public string lilypondText;
@@ -23,17 +27,22 @@ namespace DPA_Musicsheet
 
         public FileManager()
         {
-            var type = typeof(IReader);
+            
             IEnumerable<Type> assemblies;
             var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             assemblies = Directory.GetFiles(spath, "*.dll")
                 .Select(dll => Assembly.LoadFile(dll))
                 .SelectMany(s => s.GetTypes())
                 .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
+
+            var type = typeof(IReader);
             readers = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IReader)Activator.CreateInstance(c)).ToList();
 
             type = typeof(ISavable);
             savables = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (ISavable)Activator.CreateInstance(c)).ToList();
+
+            type = typeof(IConvertToExtention);
+            converters = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToExtention)Activator.CreateInstance(c)).ToList();
 
 
             //savables = new Dictionary<string, ISavable>
@@ -58,13 +67,14 @@ namespace DPA_Musicsheet
             string extension = Path.GetExtension(openFileDialog.FileName);
 
             List<IReader> readerWithExtention = readers.Where(p => p.GetExtention().Equals(extension)).ToList();
+            List<IConvertToExtention> convertersWithExtention = converters.Where(p => p.GetExtention().Equals(".ly")).ToList();
 
-            if (readerWithExtention.Count >0)
+            if (readerWithExtention.Count() >0 && convertersWithExtention.Count() >0)
             {
                 IReader reader = readerWithExtention[0];
                 string fileName = openFileDialog.FileName;
                 Symbol root = reader.readFile(fileName);
-                lilypondText = reader.GetMusicText();
+                lilypondText = convertersWithExtention[0].Convert(root) as string;
                 return root;
             }
             return null;

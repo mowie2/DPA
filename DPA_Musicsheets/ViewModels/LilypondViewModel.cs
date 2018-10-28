@@ -20,6 +20,7 @@ namespace DPA_Musicsheets.ViewModels
     {
 
         private MusicController musicController;
+        private IConvertToDomain converter;
         private Editor editor;
         private string _text;
         private List<Icommand> Commands;
@@ -65,6 +66,26 @@ namespace DPA_Musicsheets.ViewModels
             Commands = new List<Icommand>();
             //lilyToDomain = new LilyToDomain();
 
+
+
+
+            IEnumerable<Type> assemblies;
+            var type = typeof(IConvertToDomain);
+            var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            assemblies = Directory.GetFiles(spath, "*.dll")
+                .Select(dll => Assembly.LoadFile(dll))
+                .SelectMany(s => s.GetTypes())
+                .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
+
+            var converters = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToDomain)Activator.CreateInstance(c)).ToList();
+            converters = converters.Where(p => p.GetExtention().Equals(".ly")).ToList();
+
+            if (converters.Count > 0)
+            {
+                converter = converters[0];
+            }
+
+
         }
         /// <summary>
         /// This occurs when the text in the textbox has changed. This can either be by loading or typing.
@@ -86,24 +107,17 @@ namespace DPA_Musicsheets.ViewModels
                     {
                         _waitingForRender = false;
                         UndoCommand.RaiseCanExecuteChanged();
-                        //var l = new LilypondAdapter.LilypondReader();
+                        
 
 
-                        IEnumerable<Type> assemblies;
-                        var type = typeof(IConvertToDomain);
-                        var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-                        assemblies = Directory.GetFiles(spath, "*.dll")
-                            .Select(dll => Assembly.LoadFile(dll))
-                            .SelectMany(s => s.GetTypes())
-                            .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
-
-                        var converters = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToDomain)Activator.CreateInstance(c)).ToList();
-                        converters = converters.Where(p => p.GetExtention().Equals(".ly")).ToList();
-
-                        if (converters.Count == 0) return;
-                        var converter = converters[0];
+                        
                         LilypondText = editor.TextChanged(converter.Convert(LilypondText));
                         musicController.SetStaffs(converter.Convert(LilypondText));
+                        musicController.SetMidiPlayer();
+                        musicController.SetStaffs();
+
+
+
 
                         CreateMemento();
                         ShouldCreateMemento = true;

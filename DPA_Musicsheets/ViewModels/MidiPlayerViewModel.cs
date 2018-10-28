@@ -1,5 +1,6 @@
 ﻿using DPA_Musicsheets.Facade;
 using DPA_Musicsheets.Managers;
+using DPA_Musicsheets.Savers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 
@@ -12,6 +13,7 @@ namespace DPA_Musicsheets.ViewModels
     public class MidiPlayerViewModel : ViewModelBase
     {
         public SanfordLib slb;
+        private MusicController musicController;
         //private OutputDevice _outputDevice;
         private bool _running;
 
@@ -31,22 +33,25 @@ namespace DPA_Musicsheets.ViewModels
         //    }
         //}
 
-        public MidiPlayerViewModel(MusicLoader musicLoader)
+        
+
+        public MidiPlayerViewModel(MusicController musicController)
         {
+            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
+            this.musicController = musicController;
             // The OutputDevice is a midi device on the midi channel of your computer.
             // The audio will be streamed towards this output.
             // DeviceID 0 is your computer's audio channel.
             //_outputDevice = new OutputDevice(0);
             //_sequencer = new Sequencer();
 
-            slb = new SanfordLib(PlayCommand, UpdateButtons);
-            slb.SequencerChannelMessagedPlayed(slb.ChannelMessagePlayed);
-
-            // Wanneer de sequence klaar is moeten we alles closen en stoppen.
-            slb.SquencePlayCompleted(_running);
+            //slb = new SanfordLib(PlayCommand, UpdateButtons);
+            //musicController.midiPlayer.SequencerChannelMessagedPlayed(slb.ChannelMessagePlayed);
             
-            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
-            // musicLoader.MidiPlayerViewModel = this;
+            // Wanneer de sequence klaar is moeten we alles closen en stoppen.
+            musicController.musicPlayer.SquencePlayCompleted(_running);
+
+            
         }
 
         private void UpdateButtons()
@@ -65,27 +70,29 @@ namespace DPA_Musicsheets.ViewModels
         #region buttons for play, stop, pause
         public RelayCommand PlayCommand => new RelayCommand(() =>
         {
+            musicController.musicPlayer.SquencePlayCompleted(_running);
             if (!_running)
             {
                 _running = true;
-                slb.ContinueSequence();
+                musicController.Play();
+                //slb.ContinueSequence();
                 UpdateButtons();
             }
-        });/*, () => !_running && slb.CheckSequence() == true);*/
+        }, () => !_running && musicController.musicPlayer.Check() == true);
 
         public RelayCommand StopCommand => new RelayCommand(() =>
         {
             _running = false;
-            slb.SequencerStop();
-            slb.SetSequncerPosition(0);
-            UpdateButtons();
+            musicController.musicPlayer.Stop();
+            musicController.musicPlayer.Rewind();
+            //UpdateButtons();
         }, () => _running);
 
         public RelayCommand PauseCommand => new RelayCommand(() =>
         {
             _running = false;
-            slb.SequencerStop();
-            UpdateButtons();
+            musicController.musicPlayer.Stop();
+            //UpdateButtons();
         }, () => _running);
 
         #endregion buttons for play, stop, pause
@@ -95,7 +102,7 @@ namespace DPA_Musicsheets.ViewModels
         /// </summary>
         public override void Cleanup()
         {
-            slb.Cleanup();
+            musicController.musicPlayer.Cleanup();
             base.Cleanup();
         }
     }
