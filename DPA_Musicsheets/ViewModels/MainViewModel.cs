@@ -52,15 +52,11 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand OpenFileCommand => new RelayCommand(() =>
         {
-            //FileManager fr = new FileManager();
-            //FileName = fr.OpenFile();
-
-            musicController.OpenFile();
+            FileName = musicController.OpenFile();
         });
 
         public ICommand LoadCommand => new RelayCommand(() =>
-        {
-             
+        {   
             lilypondViewModel.LilypondText = musicController.LoadFile();
         });
 
@@ -88,12 +84,14 @@ namespace DPA_Musicsheets.ViewModels
         });
         #endregion Focus and key commands, these can be used for implementing hotkeys
 
-        private static int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1000;
+        private static int MILLISECONDS_BEFORE_CHANGE_HANDLED = 500;
         private void ShortCutes(KeyEventArgs key)
         {
             _lastChange = DateTime.Now;
 
             pressedKeys.Add(key);
+
+            
             Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
             {
                 if ((DateTime.Now - _lastChange).TotalMilliseconds >= MILLISECONDS_BEFORE_CHANGE_HANDLED)

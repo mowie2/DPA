@@ -1,4 +1,5 @@
 ﻿using ClassLibrary;
+using DPA_Musicsheets.Converters;
 using DPA_Musicsheets.Interfaces;
 using System;
 using System.Collections.Generic;
@@ -10,13 +11,13 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Savers
 {
-    public class SaveToPDF// : ISavable
+    public class SaveToPDF : ISavable
     {
-        public void Save(string fileName, Symbol note)
+        public void Save(string fileName, Symbol musicData)
         {
             string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string tmpFileName = $"{fileName}-tmp.ly";
-            //write(tmpFileName, musicData);
+            write(tmpFileName, musicData);
 
             string lilypondLocation = @"C:\Program Files (x86)\LilyPond\usr\bin\lilypond.exe";
             string sourceFolder = Path.GetDirectoryName(tmpFileName);
@@ -50,13 +51,14 @@ namespace DPA_Musicsheets.Savers
     
         private void write(string fileName, Symbol musicData)
         {
-            /*
+            
             using (StreamWriter outputFile = new StreamWriter(fileName))
             {
-               // outputFile.Write((string)musicData);
+                DomainToLily domainToLily = new DomainToLily();
+                outputFile.Write(domainToLily.GetLilyText(musicData));
                 outputFile.Close();
             }
-            */
+            
         }
     }
 }

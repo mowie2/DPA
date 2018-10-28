@@ -134,9 +134,15 @@ namespace DPA_Musicsheets.Managers
             fileManager.SaveFile(musicData);
         }
 
-        public void OpenFile()
+        public void SaveToPDF()
+        {
+            fileManager.SaveFile(musicData, ".pdf");
+        }
+
+        public string OpenFile()
         {
             path = fileManager.OpenFile();
+            return path;
         }
 
         public string LoadFile()

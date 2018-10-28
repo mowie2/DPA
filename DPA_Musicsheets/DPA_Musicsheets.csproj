@@ -104,6 +104,14 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="Commands\ClefCommand.cs" />
+    <Compile Include="Commands\OpenCommand.cs" />
+    <Compile Include="Commands\SaveCommand.cs" />
+    <Compile Include="Commands\SaveToPDFCommand.cs" />
+    <Compile Include="Commands\TempoCommand.cs" />
+    <Compile Include="Commands\TimeSig3Command.cs" />
+    <Compile Include="Commands\TimeSig4Command.cs" />
+    <Compile Include="Commands\TimeSig6Command.cs" />
+    <Compile Include="Commands\TimeSigCommand.cs" />
     <Compile Include="Converters\DomainToLily.cs" />
     <Compile Include="Converters\LilyToDomain.cs" />
     <Compile Include="Facade\PsamContolLib.cs" />

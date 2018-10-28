@@ -1,30 +1,29 @@
-﻿using System;
+﻿using DPA_Musicsheets.Interfaces;
+using DPA_Musicsheets.Managers;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DPA_Musicsheets.Interfaces;
+
 namespace DPA_Musicsheets.Commands
 {
-    class ClefCommand : Icommand
+    class OpenCommand: Icommand
     {
+        private MusicController musicController;
         public List<KeyEventArgs> PressedKeys { get; }
-        string text;
-
-        public ClefCommand(List<KeyEventArgs> pressedKeys, string text)
+        public OpenCommand(MusicController musicController, List<KeyEventArgs> pressedKeys)
         {
+            this.musicController = musicController;
             this.PressedKeys = pressedKeys;
-            this.text = text;
         }
-
-
         public bool CanExecute()
         {
             if (PressedKeys.Count > 2) return false;
 
-            if (PressedKeys[0].Key != Key.LeftAlt) return false;
-            if (PressedKeys[1].Key != Key.C) return false;
+            if (PressedKeys[0].Key != Key.LeftCtrl) return false;
+            if (PressedKeys[1].Key != Key.O) return false;
 
             return true;
         }
@@ -33,7 +32,7 @@ namespace DPA_Musicsheets.Commands
         {
             if (!CanExecute()) return;
 
-            text += " \\clef treble";
+            musicController.OpenFile();
         }
     }
 }

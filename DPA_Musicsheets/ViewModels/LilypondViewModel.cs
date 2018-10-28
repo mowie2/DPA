@@ -1,25 +1,25 @@
-﻿using DPA_Musicsheets.Converters;
+﻿using DPA_Musicsheets.Commands;
+using DPA_Musicsheets.Converters;
+using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Managers;
 using DPA_Musicsheets.Memento;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 using System;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Input;
-using System.Collections.Generic;
-using DPA_Musicsheets.Interfaces;
-using DPA_Musicsheets.Commands;
 
 namespace DPA_Musicsheets.ViewModels
 {
     public class LilypondViewModel : ViewModelBase
     {
-        
+
         private MusicController musicController;
         private Editor editor;
         private string _text;
-        List<Icommand> Commands;
+        private List<Icommand> Commands;
 
         private DPA_Musicsheets.Memento.CareTaker careTaker;
         /// <summary>
@@ -36,17 +36,17 @@ namespace DPA_Musicsheets.ViewModels
             {
                 if (!_waitingForRender && !_textChangedByLoad)
                 {
-                  
+
                 }
                 _text = value;
                 RaisePropertyChanged(() => LilypondText);
             }
         }
 
-        private bool _textChangedByLoad = false;
-        private  DateTime _lastChange;
+        private readonly bool _textChangedByLoad = false;
+        private DateTime _lastChange;
         private static readonly int MILLISECONDS_BEFORE_CHANGE_HANDLED = 1500;
-        private  bool _waitingForRender = false;
+        private bool _waitingForRender = false;
         private LilyToDomain lilyToDomain;
         private bool ShouldCreateMemento = false;
         public LilypondViewModel(MusicController msc, Editor edit)
@@ -61,20 +61,20 @@ namespace DPA_Musicsheets.ViewModels
             careTaker = new CareTaker();
             Commands = new List<Icommand>();
 
-        } 
+        }
         /// <summary>
         /// This occurs when the text in the textbox has changed. This can either be by loading or typing.
         /// </summary>
         public ICommand TextChangedCommand => new RelayCommand<TextChangedEventArgs>((args) =>
         {
-            
+
             // If we were typing, we need to do things.
             if (!_textChangedByLoad)
             {
                 _waitingForRender = true;
                 _lastChange = DateTime.Now;
 
-               
+
 
                 Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
                 {
@@ -82,7 +82,7 @@ namespace DPA_Musicsheets.ViewModels
                     {
                         _waitingForRender = false;
                         UndoCommand.RaiseCanExecuteChanged();
-                        
+
                         LilypondText = editor.TextChanged(lilyToDomain.getRoot(LilypondText));
                         musicController.SetStaffs(lilyToDomain.getRoot(LilypondText));
 
@@ -100,7 +100,7 @@ namespace DPA_Musicsheets.ViewModels
             {
                 DPA_Musicsheets.Memento.Memento memento = new DPA_Musicsheets.Memento.Memento(LilypondText);
                 careTaker.AddMemento(memento);
-                
+
             }
         }
         #region Commands for buttons like Undo, Redo and SaveAs
@@ -129,15 +129,25 @@ namespace DPA_Musicsheets.ViewModels
         {
             PopulateCommands(pressedKeys);
 
-            foreach(Icommand command in Commands)
+            foreach (Icommand command in Commands)
             {
                 command.Execute();
             }
+
+            Commands.Clear();
         }
 
         private void PopulateCommands(List<KeyEventArgs> pressedKeys)
         {
             Commands.Add(new ClefCommand(pressedKeys, LilypondText));
+            Commands.Add(new OpenCommand(musicController, pressedKeys));
+            Commands.Add(new SaveCommand(musicController, pressedKeys));
+            Commands.Add(new TempoCommand(pressedKeys, LilypondText));
+            Commands.Add(new TimeSig3Command(pressedKeys, LilypondText));
+            Commands.Add(new TimeSig4Command(pressedKeys, LilypondText));
+            Commands.Add(new TimeSig6Command(pressedKeys, LilypondText));
+            Commands.Add(new TimeSigCommand(pressedKeys, LilypondText));
+
         }
     }
 }

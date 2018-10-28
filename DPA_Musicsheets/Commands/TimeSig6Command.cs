@@ -1,31 +1,29 @@
-﻿using System;
+﻿using DPA_Musicsheets.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using DPA_Musicsheets.Interfaces;
+
 namespace DPA_Musicsheets.Commands
 {
-    class ClefCommand : Icommand
+    public class TimeSig6Command : Icommand
     {
         public List<KeyEventArgs> PressedKeys { get; }
         string text;
-
-        public ClefCommand(List<KeyEventArgs> pressedKeys, string text)
+        public TimeSig6Command(List<KeyEventArgs> pressedKeys, string text)
         {
-            this.PressedKeys = pressedKeys;
+            PressedKeys = pressedKeys;
             this.text = text;
         }
-
-
         public bool CanExecute()
         {
-            if (PressedKeys.Count > 2) return false;
+            if (PressedKeys.Count > 3) return false;
 
             if (PressedKeys[0].Key != Key.LeftAlt) return false;
-            if (PressedKeys[1].Key != Key.C) return false;
-
+            if (PressedKeys[1].Key != Key.T) return false;
+            if (PressedKeys[2].Key != Key.D6) return false;
             return true;
         }
 
@@ -33,7 +31,7 @@ namespace DPA_Musicsheets.Commands
         {
             if (!CanExecute()) return;
 
-            text += " \\clef treble";
+            text += "  \\time 6/8";
         }
     }
 }

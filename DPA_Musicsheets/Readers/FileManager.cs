@@ -24,7 +24,7 @@ namespace DPA_Musicsheet
         {
             savables = new Dictionary<string, ISavable>
             {
-                //{ ".pdf", new SaveToPDF() },
+                { ".pdf", new SaveToPDF() },
                 { ".ly", new SaveToLily() },
                 { ".mid", new SaveToMidi() }
             };
@@ -89,6 +89,26 @@ namespace DPA_Musicsheet
 
                 ISavable saver = savables[extension];
                 saver.Save(saveFileDialog.FileName, musicData);
+
+            }
+
+        }
+
+        public void SaveFile(Symbol musicData, string extension)
+        {
+
+            if (saveFileDialog.ShowDialog() == true)
+            {
+                // string extension = Path.GetExtension(saveFileDialog.FileName);
+                if (!savables.ContainsKey(extension))
+                {
+                    MessageBox.Show($"Extension {extension} is not supported.");
+                    return;
+                }
+
+                string filename = string.Format("{0}", DateTime.Now.ToLongTimeString());
+                ISavable saver = savables[extension];
+                saver.Save(filename, musicData);
 
             }
 
