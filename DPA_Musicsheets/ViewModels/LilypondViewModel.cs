@@ -107,17 +107,12 @@ namespace DPA_Musicsheets.ViewModels
                     {
                         _waitingForRender = false;
                         UndoCommand.RaiseCanExecuteChanged();
-                        
 
-
-                        
+                        musicController.musicData = converter.Convert(LilypondText);
                         LilypondText = editor.TextChanged(converter.Convert(LilypondText));
                         musicController.SetStaffs(converter.Convert(LilypondText));
                         musicController.SetMidiPlayer();
                         musicController.SetStaffs();
-
-
-
 
                         CreateMemento();
                         ShouldCreateMemento = true;
