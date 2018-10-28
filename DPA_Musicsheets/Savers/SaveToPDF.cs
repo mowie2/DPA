@@ -1,22 +1,46 @@
-﻿using DomainModel;
+﻿using ClassLibrary.Interfaces;
+using DomainModel;
 using DPA_Musicsheets.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Savers
 {
-    public class SaveToPDF// : ISavable
+    public class SaveToPDF : ISavable
     {
-        public void Save(string fileName, Symbol note)
+        private string extention;
+        private IConvertToExtention converter;
+
+        public SaveToPDF()
+        {
+            IEnumerable<Type> assemblies;
+            var type = typeof(IConvertToExtention);
+            var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            assemblies = Directory.GetFiles(spath, "*.dll")
+                .Select(dll => Assembly.LoadFile(dll))
+                .SelectMany(s => s.GetTypes())
+                .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
+
+            var converters = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToExtention)Activator.CreateInstance(c)).ToList();
+            converters = converters.Where(p => p.GetExtention().Equals(".ly")).ToList();
+            if (converters.Count>0)
+            {
+                converter = converters[0];
+            }
+            extention = ".pdf";
+        }
+
+        public void Save(string fileName, Symbol musicData)
         {
             string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
             string tmpFileName = $"{fileName}-tmp.ly";
-            //write(tmpFileName, musicData);
+            write(tmpFileName, musicData);
 
             string lilypondLocation = @"C:\Program Files (x86)\LilyPond\usr\bin\lilypond.exe";
             string sourceFolder = Path.GetDirectoryName(tmpFileName);
@@ -50,13 +74,18 @@ namespace DPA_Musicsheets.Savers
     
         private void write(string fileName, Symbol musicData)
         {
-            /*
+            
             using (StreamWriter outputFile = new StreamWriter(fileName))
             {
-               // outputFile.Write((string)musicData);
+                if (converter == null) return;
+                outputFile.Write(converter.Convert(musicData));
                 outputFile.Close();
             }
-            */
+        }
+
+        public string GetExtention()
+        {
+            return extention;
         }
     }
 }

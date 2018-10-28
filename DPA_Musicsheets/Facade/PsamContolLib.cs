@@ -58,11 +58,10 @@ namespace DPA_Musicsheets.Facade
             timeSignature = new DomainModel.TimeSignature();
             semitones = new Dictionary<Semitone.SEMITONE, int>
             {
-                { Semitone.SEMITONE.MAJOR, 1 },
-                { Semitone.SEMITONE.MINOR, -1 },
+                { Semitone.SEMITONE.MAJOR, -1 },
+                { Semitone.SEMITONE.MINOR, 1 },
                 { Semitone.SEMITONE.NORMAL, 0 }
             };
-
         }
 
         
@@ -103,7 +102,7 @@ namespace DPA_Musicsheets.Facade
                 return;
             }
 
-            PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch.ToUpper(), 0, 2 + cr.Octave, durriation[cr.Duration],
+            PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch.ToUpper(), semitones[cr.Semitone], 2 + cr.Octave, durriation[cr.Duration],
             NoteStemDirection.Up, NoteTieType.None,
             new List<NoteBeamType>() { NoteBeamType.Single });
 

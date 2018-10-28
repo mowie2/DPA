@@ -1,18 +1,42 @@
-﻿using DomainModel;
+﻿using ClassLibrary.Interfaces;
+using DomainModel;
+using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
+using System.Reflection;
 
 namespace LilypondAdapter
 {
     public class SaveToLily : ISavable
     {
-        public string extention { get; } = ".ly";
+        public string extention = ".ly";
+        private IConvertToExtention converter;
+
+        public SaveToLily()
+        {
+            IEnumerable<Type> assemblies;
+            var type = typeof(IConvertToExtention);
+            var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+            assemblies = Directory.GetFiles(spath, "*.dll")
+                .Select(dll => Assembly.LoadFile(dll))
+                .SelectMany(s => s.GetTypes())
+                .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
+
+            var converters = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToExtention)Activator.CreateInstance(c)).ToList();
+            converters = converters.Where(p => p.GetExtention().Equals(".ly")).ToList();
+            if (converters.Count > 0)
+            {
+                converter = converters[0];
+            }
+        }
+
         public void Save(string fileName, Symbol root)
         {
-            DomainToLily domainToLily = new DomainToLily();
-            
             using (StreamWriter outputFile = new StreamWriter(fileName))
             {
-                outputFile.Write(domainToLily.GetLilyText(root));
+                if (converter == null) return;
+                outputFile.Write(converter.Convert(root));
                 outputFile.Close();
             }       
         }

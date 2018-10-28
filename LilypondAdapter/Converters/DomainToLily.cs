@@ -1,11 +1,13 @@
-﻿using DomainModel;
+﻿using ClassLibrary.Interfaces;
+using DomainModel;
 using System;
 using System.Collections.Generic;
 
 namespace LilypondAdapter
 {
-    class DomainToLily
+    public class DomainToLily : IConvertToExtention
     {
+        private readonly string extention = ".ly";
         private Dictionary<Type, Delegate> writeLilyLookupTable;
         private Dictionary<Semitone.SEMITONE, string> pitchModifiers;
         private Dictionary<Clef.Key, string> clefs;
@@ -44,7 +46,7 @@ namespace LilypondAdapter
             };
         }
 
-        public string GetLilyText(Symbol root)
+        public object Convert(Symbol root)
         {
             Clear();
             if (root != null)
@@ -264,6 +266,11 @@ namespace LilypondAdapter
             returnString += WriteBarlines(note, (int)note.Duration, (int)note.Dotted);
             lilyString += returnString;
             return note;
+        }
+
+        public string GetExtention()
+        {
+            return extention;
         }
     }
 }

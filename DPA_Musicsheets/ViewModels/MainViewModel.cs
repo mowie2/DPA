@@ -2,6 +2,8 @@
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 using System.Windows.Input;
 
 namespace DPA_Musicsheets.ViewModels
@@ -33,14 +35,16 @@ namespace DPA_Musicsheets.ViewModels
             set { _currentState = value; RaisePropertyChanged(() => CurrentState); }
         }
 
-        private readonly MusicLoader _musicLoader;
         private MusicController musicController;
-        private readonly KeyBinding OpenCmdKeyBinding;
-        public MainViewModel(MusicLoader musicLoader, MusicController ms)
+        private LilypondViewModel lilypondViewModel;
+        private DateTime _lastChange;
+        List<KeyEventArgs> pressedKeys;
+        public MainViewModel(MusicController ms, LilypondViewModel lvm)
         {
-            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
-            _musicLoader = musicLoader;
+
+            pressedKeys = new List<KeyEventArgs>();
             musicController = ms;
+            lilypondViewModel = lvm;
             FileName = @"Files/Alle-eendjes-zwemmen-in-het-water.mid";
 
             //CurrentState = this.ed.CurrentState;
@@ -48,16 +52,12 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand OpenFileCommand => new RelayCommand(() =>
         {
-            //FileManager fr = new FileManager();
-            //FileName = fr.OpenFile();
-
-            musicController.OpenFile();
+            FileName = musicController.OpenFile();
         });
 
         public ICommand LoadCommand => new RelayCommand(() =>
-        {
-            //_musicLoader.OpenFile(FileName);
-            musicController.LoadFile();
+        {   
+            lilypondViewModel.LilypondText = musicController.LoadFile();
         });
 
         #region Focus and key commands, these can be used for implementing hotkeys
@@ -66,9 +66,11 @@ namespace DPA_Musicsheets.ViewModels
             Console.WriteLine("Maingrid Lost focus");
         });
 
+        
         public ICommand OnKeyDownCommand => new RelayCommand<KeyEventArgs>((e) =>
         {
             Console.WriteLine($"Key down: {e.Key}");
+            ShortCutes(e);
         });
 
         public ICommand OnKeyUpCommand => new RelayCommand(() =>
@@ -81,5 +83,24 @@ namespace DPA_Musicsheets.ViewModels
             ViewModelLocator.Cleanup();
         });
         #endregion Focus and key commands, these can be used for implementing hotkeys
+
+        private static int MILLISECONDS_BEFORE_CHANGE_HANDLED = 500;
+        private void ShortCutes(KeyEventArgs key)
+        {
+            _lastChange = DateTime.Now;
+
+            pressedKeys.Add(key);
+
+            
+            Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
+            {
+                if ((DateTime.Now - _lastChange).TotalMilliseconds >= MILLISECONDS_BEFORE_CHANGE_HANDLED)
+                {
+
+                    lilypondViewModel.InsertKeys(pressedKeys);
+                    pressedKeys.Clear();
+                }
+            }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
+        }
     }
 }

@@ -27,7 +27,7 @@ namespace LilypondAdapter
         {
             string file = ReadFile(filename);
             LilyToDomain ld = new LilyToDomain();
-            root = ld.getRoot(file);
+            root = ld.Convert(file);
             return root;
         }
 

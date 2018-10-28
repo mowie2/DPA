@@ -33,8 +33,6 @@ namespace DPA_Musicsheets.Managers
         private int _beatsPerBar;     // Aantal beatnotes per maat.
 
         public MainViewModel MainViewModel { get; set; }
-        public LilypondViewModel LilypondViewModel { get; set; }
-        public MidiPlayerViewModel MidiPlayerViewModel { get; set; }
         public StaffsViewModel StaffsViewModel { get; set; }
 
         /// <summary>
@@ -44,6 +42,7 @@ namespace DPA_Musicsheets.Managers
         /// TODO: Remove the calling of the outer viewmodel layer. We want to be able reuse this in an ASP.NET Core application for example.
         /// </summary>
         /// <param name="fileName"></param>
+        /*
         public void OpenFile(string fileName)
         {
             if (Path.GetExtension(fileName).EndsWith(".mid"))
@@ -75,5 +74,6 @@ namespace DPA_Musicsheets.Managers
 
             //LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
         }
+        */
     }
 }

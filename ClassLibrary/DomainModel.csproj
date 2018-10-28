@@ -45,6 +45,8 @@
     <Compile Include="Builder\NoteBuilder.cs" />
     <Compile Include="Clef.cs" />
     <Compile Include="Composite.cs" />
+    <Compile Include="Interfaces\IConvertToDomain.cs" />
+    <Compile Include="Interfaces\IConvertToExtention.cs" />
     <Compile Include="Interfaces\ISavable.cs" />
     <Compile Include="Interfaces\IReader.cs" />
     <Compile Include="MusicSymbol.cs" />

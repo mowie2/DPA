@@ -1,11 +1,19 @@
-﻿using DomainModel;
+﻿using ClassLibrary.Interfaces;
+using DomainModel;
 
 namespace LilypondAdapter
 {
-    class LilyToDomain
+    public class LilyToDomain : IConvertToDomain
     {
-        public Symbol getRoot(string lilyText)
+        private string extention;
+        public LilyToDomain()
         {
+            extention = ".ly";
+        }
+
+        public Symbol Convert(object text)
+        {
+            string lilyText = text as string;
             LilyTokenizer tokenizer = new LilyTokenizer();
             LilyParser parser = new LilyParser();
             string content = lilyText.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("}", " } ").Replace("{", " { ").Replace("  ", " ") + " ";
@@ -13,6 +21,11 @@ namespace LilypondAdapter
             parser.ReadLily(tokenizer.GetRootToken());
             Symbol root = parser.GetRootSymbol();
             return root;
+        }
+
+        public string GetExtention()
+        {
+            return extention;
         }
     }
 }
