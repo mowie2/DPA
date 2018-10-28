@@ -14,14 +14,9 @@ namespace DPA_Musicsheet
 {
     public class FileManager
     {
-        //private Dictionary<string, ISavable> savables;
-        //private readonly Dictionary<string, IReader> readers;
         private ConverterGetter converterGetter;
-
-        //private 
         private OpenFileDialog openFileDialog;
         private SaveFileDialog saveFileDialog;
-        //public string lilypondText;
 
 
         public FileManager()
@@ -33,22 +28,15 @@ namespace DPA_Musicsheet
             saveFileDialog = new SaveFileDialog() { Filter = converterGetter.GetSaveExtensionsFilter() };
         }
 
-        public void setSaveFileDialogExtensions()
-        {
-            //saveFileDialog = new SaveFileDialog() {  Filter = }
-        }
-
         internal Symbol LoadFile(string path)
         {
             string extension = Path.GetExtension(openFileDialog.FileName);
             IReader reader = converterGetter.GetReader(extension);
-            //IConvertToExtention converter = converterGetter.GetConvertToExtention(".ly");
 
-            if (reader != null /*&& converter != null*/)
+            if (reader != null)
             {
                 string fileName = openFileDialog.FileName;
                 Symbol root = reader.readFile(fileName);
-                //lilypondText = converter.Convert(root) as string;
                 return root;
             }
             return null;

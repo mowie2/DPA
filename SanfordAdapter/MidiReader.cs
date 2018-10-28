@@ -308,7 +308,6 @@ namespace SanfordAdapter
         private void setNotePitch(int midiKey)
         {
             int octave = (midiKey / 12) - 1;
-            //System.Diagnostics.Debug.Write(midiKey + " ");
             var x = pitches[midiKey % 12];
             var y = midiKey % 12;
             noteBuilder.SetPitch(pitches[y]);
@@ -339,7 +338,6 @@ namespace SanfordAdapter
             while (deltaTicks >= (smallestNote32 * Math.Pow(2, count+1)))
             {
                 count++;
-                //duration2 = ((double)deltaTicks - dotDuration) / (smallestNote32 * count);
             }
             int duration = (int)(32 / Math.Pow(2, count));
             double durationTick = division * (4.0 / duration);

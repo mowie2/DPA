@@ -23,18 +23,6 @@ namespace DPA_Musicsheets.Converters
                 .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
         }
 
-        /*
-        public object GetConverter(object i,string extention)
-        {
-            return null;
-            
-            var type = i.GetType();
-            var readers = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (c.GetType())Activator.CreateInstance(c)).ToList();
-            if (readers.count() > 0) return null;
-            return readers[0];
-        }
-        */
-
         public List<string> GetSupportOpenTypes()
         {
             var type = typeof(IReader);

@@ -28,10 +28,6 @@ namespace LilypondAdapter
             string file = ReadFile(filename);
             LilyToDomain ld = new LilyToDomain();
             root = ld.Convert(file);
-            //SaveToLily s = new SaveToLily();
-            //s.Save("test.ly", root);
-            
-            
             return root;
         }
 

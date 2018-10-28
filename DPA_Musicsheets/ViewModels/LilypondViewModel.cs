@@ -57,7 +57,6 @@ namespace DPA_Musicsheets.ViewModels
         
         private bool ShouldCreateMemento = true;
         private bool _waitingForRender = false;
-        //private LilyToDomain lilyToDomain;
 
         
 
@@ -71,7 +70,6 @@ namespace DPA_Musicsheets.ViewModels
             musicController = msc;
             careTaker = new CareTaker();
             Commands = new List<Icommand>();
-            //lilyToDomain = new LilyToDomain();
 
             ConverterGetter converterGetter = new ConverterGetter();
             converterToDomain = converterGetter.GetConvertToDomain(".ly");
@@ -89,7 +87,6 @@ namespace DPA_Musicsheets.ViewModels
         /// </summary>
         public ICommand TextChangedCommand => new RelayCommand<TextChangedEventArgs>((args) =>
         {
-            //setLilyText();
             // If we were typing, we need to do things.
             if (!_textChangedByLoad)
             {

@@ -21,7 +21,6 @@ namespace DPA_Musicsheets.ViewModels
             SimpleIoc.Default.Register<StaffsViewModel>();
             SimpleIoc.Default.Register<MidiPlayerViewModel>();
 
-            SimpleIoc.Default.Register<MusicLoader>();
             SimpleIoc.Default.Register<MusicController>();
             SimpleIoc.Default.Register<PsamContolLib>();
             SimpleIoc.Default.Register<Editor>();

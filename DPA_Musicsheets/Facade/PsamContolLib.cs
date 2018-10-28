@@ -35,10 +35,7 @@ namespace DPA_Musicsheets.Facade
             actions = new Dictionary<Type, Action>
             {
                 { typeof(DomainModel.Note), DoNote },
-                //{ typeof(ClassLibrary.BarLine), DoBarline },
                 { typeof(DomainModel.BarLine), DoRepeat },
-               // { typeof(ClassLibrary.TimeSignature), DoTimesig },
-               // {typeof(ClassLibrary.al) }
             };
 
 
@@ -77,8 +74,6 @@ namespace DPA_Musicsheets.Facade
             DoTimesig();
             while (currentNote != null)
             {
-                //DoClef();
-                //DoTimesig();
                 if (actions.ContainsKey(currentNote.GetType()))
                 {
                     actions[currentNote.GetType()]();
@@ -142,7 +137,6 @@ namespace DPA_Musicsheets.Facade
 
             symbols.Add(new PSAMControlLibrary.Clef(clefs[c.Clef.key], 2));
 
-            // return new PSAMControlLibrary.Clef(clefs[c.Clef.key], 2);
             this.clef.key = c.Clef.key;
 
         }
@@ -155,10 +149,8 @@ namespace DPA_Musicsheets.Facade
         private void DoBarline()
         {
             if (!ShouldDoBarline()) return;
-            // ClassLibrary.BarLine n = (ClassLibrary.BarLine)currentNote;
             Barline br = new Barline();
             br.RepeatSign = RepeatSignType.None;
-            //br.RepeatSign = reapeatType[n.Type];
             barlinecount = 0;
             symbols.Add(br);
         }
@@ -179,7 +171,6 @@ namespace DPA_Musicsheets.Facade
 
             Barline b = new Barline();
 
-            //b.RepeatSign = reapeatType[br.Type];
 
             if (br.Type == BarLine.TYPE.REPEAT)
             {
@@ -212,10 +203,6 @@ namespace DPA_Musicsheets.Facade
                         continue;
                     }
 
-                    //Barline endAlt = new Barline();
-                    //endAlt.RepeatSign = RepeatSignType.None;
-                    //endAlt.AlternateRepeatGroup = alt;
-                    //symbols.Add(endAlt);
                 }
                 return;
             }

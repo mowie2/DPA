@@ -55,19 +55,14 @@ namespace DPA_Musicsheets.Facade
             _sequencer.Continue();
         }
 
-        //private RelayCommand StopCommand;
-        //private readonly Action UpdateButtons;
 
-        public SanfordLib(/*RelayCommand stop, Action update*/)
+        public SanfordLib()
         {
             this._sequencer = new Sequencer();
             this._outputDevice = new OutputDevice(0);
 
             _sequencer.ChannelMessagePlayed += ChannelMessagePlayed;
             SequencerChannelMessagedPlayed(this.ChannelMessagePlayed);
-
-            //this.StopCommand = stop;
-            //this.UpdateButtons = update;
 
             ConverterGetter converterGetter = new ConverterGetter();
             converter = converterGetter.GetConvertToExtention(".mid");

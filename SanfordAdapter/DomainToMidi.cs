@@ -87,7 +87,6 @@ namespace SanfordAdapter
 
         private void setEndOfNote(float duration, int dotted, int midiPitch)
         {
-            //Pulse Length = (BPM * PPQN) / 60 = 120 *192 / 60
             currentTick += calculateNewTick(duration, dotted);
 
             sequence[1].Insert(currentTick, new ChannelMessage(ChannelCommand.NoteOn, 1, midiPitch, 0));
@@ -96,7 +95,6 @@ namespace SanfordAdapter
         private int calculateNewTick(float duration, int dotted)
         {
             float durationModifier = (float)((Math.Pow(2, dotted)) - 1) / (float)((Math.Pow(2, dotted))) + 1;
-            ////////////////////////////////////////////////////////
 
             double absoluteLength = 1.0 / (double)duration;
             absoluteLength += (absoluteLength / 2.0) * dotted;
@@ -176,7 +174,6 @@ namespace SanfordAdapter
             if (semitone == Semitone.SEMITONE.MAJOR)
                 midiKey--;
             midiKey += (octave-2) * 12;
-            //System.Diagnostics.Debug.Write((midiKey + 60) + " ");
             int test = midiKey + 60;
             if (test < 0)
                 return 0;

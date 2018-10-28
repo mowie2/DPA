@@ -32,7 +32,6 @@ namespace DPA_Musicsheets.Managers
         }
         public string TextChanged(Symbol symbol)
         {
-            //return "test"; 
             if (converter == null) return "";
             return converter.Convert(symbol) as string;
         }
