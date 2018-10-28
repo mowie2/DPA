@@ -1,4 +1,5 @@
 ﻿using ClassLibrary.Interfaces;
+using DomainModel;
 using DPA_Musicsheets.Commands;
 using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Managers;
@@ -20,7 +21,8 @@ namespace DPA_Musicsheets.ViewModels
     {
 
         private MusicController musicController;
-        private IConvertToDomain converter;
+        private IConvertToDomain converterToDomain;
+        private IConvertToExtention converterToExtention;
         private Editor editor;
         private string _text;
         private List<Icommand> Commands;
@@ -54,6 +56,9 @@ namespace DPA_Musicsheets.ViewModels
         private bool ShouldCreateMemento = false;
         private bool _waitingForRender = false;
         //private LilyToDomain lilyToDomain;
+
+        
+
         public LilypondViewModel(MusicController msc, Editor edit)
         {
 
@@ -70,35 +75,50 @@ namespace DPA_Musicsheets.ViewModels
 
 
             IEnumerable<Type> assemblies;
-            var type = typeof(IConvertToDomain);
             var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             assemblies = Directory.GetFiles(spath, "*.dll")
                 .Select(dll => Assembly.LoadFile(dll))
                 .SelectMany(s => s.GetTypes())
                 .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
 
-            var converters = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToDomain)Activator.CreateInstance(c)).ToList();
-            converters = converters.Where(p => p.GetExtention().Equals(".ly")).ToList();
+            var type = typeof(IConvertToDomain);
+            var convertersTo = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToDomain)Activator.CreateInstance(c)).ToList();
+            convertersTo = convertersTo.Where(p => p.GetExtention().Equals(".ly")).ToList();
 
-            if (converters.Count > 0)
+            if (convertersTo.Count > 0)
             {
-                converter = converters[0];
+                converterToDomain = convertersTo[0];
             }
 
+            type = typeof(IConvertToExtention);
+            var convertersFrom = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToExtention)Activator.CreateInstance(c)).ToList();
+            convertersFrom = convertersFrom.Where(p => p.GetExtention().Equals(".ly")).ToList();
+
+            if (convertersFrom.Count > 0)
+            {
+                converterToExtention = convertersFrom[0];
+            }
 
         }
+        /*
+        public void SetLilyText()
+        {
+            if (converterToExtention == null) return;
+            LilypondText = converterToExtention.Convert(musicController.musicData) as string;
+        }
+        */
         /// <summary>
         /// This occurs when the text in the textbox has changed. This can either be by loading or typing.
         /// </summary>
         public ICommand TextChangedCommand => new RelayCommand<TextChangedEventArgs>((args) =>
         {
-
+            //setLilyText();
             // If we were typing, we need to do things.
             if (!_textChangedByLoad)
             {
                 _waitingForRender = true;
                 _lastChange = DateTime.Now;
-
+                
 
 
                 Task.Delay(MILLISECONDS_BEFORE_CHANGE_HANDLED).ContinueWith((task) =>
@@ -108,11 +128,12 @@ namespace DPA_Musicsheets.ViewModels
                         _waitingForRender = false;
                         UndoCommand.RaiseCanExecuteChanged();
 
-                        musicController.musicData = converter.Convert(LilypondText);
-                        LilypondText = editor.TextChanged(converter.Convert(LilypondText));
-                        musicController.SetStaffs(converter.Convert(LilypondText));
-                        musicController.SetMidiPlayer();
+                        musicController.musicData = converterToDomain.Convert(LilypondText);
+                        LilypondText = editor.TextChanged(converterToDomain.Convert(LilypondText));
+                        musicController.SetStaffs(converterToDomain.Convert(LilypondText));
+                        musicController.SetMusicPlayer();
                         musicController.SetStaffs();
+                        //SetLilyText();
 
                         CreateMemento();
                         ShouldCreateMemento = true;
@@ -128,7 +149,6 @@ namespace DPA_Musicsheets.ViewModels
             {
                 DPA_Musicsheets.Memento.Memento memento = new DPA_Musicsheets.Memento.Memento(LilypondText);
                 careTaker.AddMemento(memento);
-
             }
         }
         #region Commands for buttons like Undo, Redo and SaveAs

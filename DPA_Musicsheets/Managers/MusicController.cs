@@ -51,7 +51,7 @@ namespace DPA_Musicsheets.Managers
             musicPlayer = new SanfordLib();
         }
 
-        public void SetMidiPlayer()
+        public void SetMusicPlayer()
         {
             musicPlayer.SetMusic(musicData);
         }
@@ -82,7 +82,7 @@ namespace DPA_Musicsheets.Managers
         {
             musicData = fileManager.LoadFile(path);
             lilyPondText = fileManager.lilypondText;
-            SetMidiPlayer();
+            SetMusicPlayer();
             SetStaffs();
             return lilyPondText;
         }
