@@ -2,16 +2,8 @@
 using DPA_Musicsheet;
 using DPA_Musicsheets.Facade;
 using DPA_Musicsheets.Interfaces;
-using DPA_Musicsheets.Savers;
 using DPA_Musicsheets.ViewModels;
 using GalaSoft.MvvmLight;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Reflection;
-using System.IO;
 using LilypondAdapter;
 
 namespace DPA_Musicsheets.Managers
@@ -90,7 +82,7 @@ namespace DPA_Musicsheets.Managers
             musicPlayer = new SanfordLib();
         }
 
-        public void SetMidiPlayer()
+        public void SetMusicPlayer()
         {
             musicPlayer.SetMusic(musicData);
         }
@@ -108,7 +100,7 @@ namespace DPA_Musicsheets.Managers
 
         public void SaveToPDF()
         {
-            //fileManager.SaveFile(musicData, ".pdf");
+            fileManager.SaveFile(musicData, ".pdf");
         }
 
         public string OpenFile()
@@ -121,7 +113,8 @@ namespace DPA_Musicsheets.Managers
         {
             musicData = fileManager.LoadFile(path);
             lilyPondText = fileManager.lilypondText;
-            SetMidiPlayer();
+            SetMusicPlayer();
+            //SetMidiPlayer();
             SetStaffs(musicData);
             return lilyPondText;
         }

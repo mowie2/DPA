@@ -124,6 +124,11 @@ namespace DPA_Musicsheets.Facade
 
         private bool TimeSigHasChanged(DomainModel.Note c)
         {
+
+            if(c.TimeSignature == null)
+            {
+                return false;
+            }
             return this.timeSignature.NumberOfBeats != c.TimeSignature.NumberOfBeats || this.timeSignature.TimeOfBeats != c.TimeSignature.TimeOfBeats;
         }
 

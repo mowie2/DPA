@@ -14,9 +14,10 @@ namespace DPA_Musicsheets.Commands
         private MusicController musicController;
         public List<KeyEventArgs> PressedKeys { get; }
 
-        public SaveToPDFCommand()
+        public SaveToPDFCommand(List<KeyEventArgs> pressedKeys, MusicController musicController)
         {
-
+            this.musicController = musicController;
+            this.PressedKeys = pressedKeys;
         }
         public bool CanExecute()
         {
@@ -24,7 +25,7 @@ namespace DPA_Musicsheets.Commands
 
             if (PressedKeys[0].Key != Key.LeftCtrl) return false;
             if (PressedKeys[1].Key != Key.S) return false;
-            if (PressedKeys[1].Key != Key.P) return false;
+            if (PressedKeys[2].Key != Key.P) return false;
 
             return true;
         }

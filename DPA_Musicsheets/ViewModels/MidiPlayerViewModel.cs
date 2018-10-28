@@ -1,6 +1,4 @@
-﻿using DPA_Musicsheets.Facade;
-using DPA_Musicsheets.Managers;
-using DPA_Musicsheets.Savers;
+﻿using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.CommandWpf;
 
@@ -12,7 +10,7 @@ namespace DPA_Musicsheets.ViewModels
     /// </summary>
     public class MidiPlayerViewModel : ViewModelBase
     {
-        public SanfordLib slb;
+        //public SanfordLib slb;
         private MusicController musicController;
         //private OutputDevice _outputDevice;
         private bool _running;
@@ -50,8 +48,6 @@ namespace DPA_Musicsheets.ViewModels
             
             // Wanneer de sequence klaar is moeten we alles closen en stoppen.
             musicController.musicPlayer.SquencePlayCompleted(_running);
-
-            
         }
 
         private void UpdateButtons()
@@ -85,14 +81,14 @@ namespace DPA_Musicsheets.ViewModels
             _running = false;
             musicController.musicPlayer.Stop();
             musicController.musicPlayer.Rewind();
-            //UpdateButtons();
+            UpdateButtons();
         }, () => _running);
 
         public RelayCommand PauseCommand => new RelayCommand(() =>
         {
             _running = false;
             musicController.musicPlayer.Stop();
-            //UpdateButtons();
+            UpdateButtons();
         }, () => _running);
 
         #endregion buttons for play, stop, pause

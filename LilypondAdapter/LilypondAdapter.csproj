@@ -50,6 +50,7 @@
     <Compile Include="Models\LilyTokenizer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SaveToLily.cs" />
+    <Compile Include="SaveToPDF.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\ClassLibrary\DomainModel.csproj">

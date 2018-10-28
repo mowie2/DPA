@@ -10,7 +10,7 @@ using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Savers
+namespace LilypondAdapter
 {
     public class SaveToPDF : ISavable
     {
