@@ -1,12 +1,10 @@
-﻿using ClassLibrary;
-using DPA_Musicsheets.Builders;
+﻿using DomainModel;
 using DPA_Musicsheets.Interfaces;
-using DPA_Musicsheets.Savers;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
 
-namespace DPA_Musicsheets.Managers
+namespace SanfordAdapter
 {
     public class MidiReader : IReader
     {
@@ -19,12 +17,15 @@ namespace DPA_Musicsheets.Managers
         private int lastAbsoluteTicks;
         private string midiText;
 
+        private string extention;
+
         private readonly Dictionary<int, string> pitches;
         List<int> SemitonValues;
 
 
         public MidiReader()
         {
+            extention = ".mid";
             noteBuilder = new NoteBuilder();
             openNotes = new Dictionary<int, Tuple<MidiEvent, Note>>();
             pitches = new Dictionary<int, string>()
@@ -62,8 +63,6 @@ namespace DPA_Musicsheets.Managers
             Sequence midiSequence = new Sequence();
             midiSequence.Load(fileName);
             processFile(midiSequence);
-            SaveToLily s = new SaveToLily();
-            s.Save("test.ly",firstNote);
             return firstNote;
         }
 
@@ -381,7 +380,7 @@ namespace DPA_Musicsheets.Managers
             byte[] tempoBytes = metaMessage.GetBytes();
             int tempo = (tempoBytes[0] & 0xff) << 16 | (tempoBytes[1] & 0xff) << 8 | (tempoBytes[2] & 0xff);
             var _bpm = 60000000 / tempo;
-            noteBuilder.setTempo(new Tempo()
+            noteBuilder.SetTempo(new Tempo()
             {
                 bpm = _bpm
             });
@@ -390,6 +389,11 @@ namespace DPA_Musicsheets.Managers
         public string GetMusicText()
         {
             return midiText;
+        }
+
+        public string GetExtention()
+        {
+            return extention;
         }
     }
 }

@@ -1,15 +1,7 @@
-﻿using ClassLibrary;
+﻿using DomainModel;
 using DPA_Musicsheets.Interfaces;
-using DPA_Musicsheets.Models;
-using DPA_Musicsheets.Savers;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
-namespace DPA_Musicsheets.Readers
+namespace LilypondAdapter
 {
     public class LillyPondReader : IReader
     {
@@ -17,8 +9,11 @@ namespace DPA_Musicsheets.Readers
         private LilyTokenizer tokenizer; 
         private Symbol root;
         private string liliePondText;
+        private string extention;
+
         public LillyPondReader()
         {
+            extention = ".ly";
             parser = new LilyParser();
             tokenizer = new LilyTokenizer();
         }
@@ -31,14 +26,8 @@ namespace DPA_Musicsheets.Readers
         public Symbol readFile(string filename)
         {
             string file = ReadFile(filename);
-            string content = file.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  "," ")+" ";
-            tokenizer.ReadLily(content);
-            parser.ReadLily(tokenizer.GetRootToken());
-            root = parser.GetRootSymbol();
-            //SaveToMidi d = new SaveToMidi();
-            //d.Save("newtest.mid", root);
-            SaveToLily s = new SaveToLily();
-            s.Save("tfewflwlj.ly",root);
+            LilyToDomain ld = new LilyToDomain();
+            root = ld.getRoot(file);
             return root;
         }
 
@@ -47,6 +36,11 @@ namespace DPA_Musicsheets.Readers
         {
             liliePondText = System.IO.File.ReadAllText(filePath);
             return liliePondText;
+        }
+
+        public string GetExtention()
+        {
+            return extention;
         }
     }
 }

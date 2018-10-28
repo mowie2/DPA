@@ -1,4 +1,4 @@
-﻿using ClassLibrary;
+﻿using DomainModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +7,10 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Interfaces
 {
-    interface IReader
+    public interface IReader
     {
         Symbol readFile(string filename);
         string GetMusicText();
+        string GetExtention();
     }
 }

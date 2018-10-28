@@ -1,4 +1,4 @@
-﻿using ClassLibrary;
+﻿using DomainModel;
 using PSAMControlLibrary;
 using System;
 using System.Collections.Generic;
@@ -10,13 +10,13 @@ namespace DPA_Musicsheets.Facade
         private List<MusicalSymbol> symbols;
 
         private Symbol currentNote;
-        private readonly ClassLibrary.TimeSignature timeSignature;
-        private readonly ClassLibrary.Clef clef;
+        private readonly DomainModel.TimeSignature timeSignature;
+        private readonly DomainModel.Clef clef;
         private float barlinecount = 0;
 
         private Dictionary<Type, Action> actions;
-        private readonly Dictionary<ClassLibrary.Clef.Key, ClefType> clefs;
-        private readonly Dictionary<ClassLibrary.BarLine.TYPE, RepeatSignType> reapeatType;
+        private readonly Dictionary<DomainModel.Clef.Key, ClefType> clefs;
+        private readonly Dictionary<DomainModel.BarLine.TYPE, RepeatSignType> reapeatType;
         private readonly Dictionary<float, MusicalSymbolDuration> durriation;
         private Dictionary<Semitone.SEMITONE, int> semitones;
         public PsamContolLib()
@@ -34,27 +34,28 @@ namespace DPA_Musicsheets.Facade
             };
             actions = new Dictionary<Type, Action>
             {
-                { typeof(ClassLibrary.Note), DoNote },
+                { typeof(DomainModel.Note), DoNote },
                 //{ typeof(ClassLibrary.BarLine), DoBarline },
-                { typeof(ClassLibrary.BarLine), DoRepeat },
+                { typeof(DomainModel.BarLine), DoRepeat },
                // { typeof(ClassLibrary.TimeSignature), DoTimesig },
                // {typeof(ClassLibrary.al) }
             };
 
-            clefs = new Dictionary<ClassLibrary.Clef.Key, ClefType>
+
+            clefs = new Dictionary<DomainModel.Clef.Key, ClefType>
             {
-                { ClassLibrary.Clef.Key.C, ClefType.CClef },
-                { ClassLibrary.Clef.Key.F, ClefType.FClef },
-                { ClassLibrary.Clef.Key.G, ClefType.GClef }
+                { DomainModel.Clef.Key.C, ClefType.CClef },
+                { DomainModel.Clef.Key.F, ClefType.FClef },
+                { DomainModel.Clef.Key.G, ClefType.GClef }
             };
-            clef = new ClassLibrary.Clef();
+            clef = new DomainModel.Clef();
             reapeatType = new Dictionary<BarLine.TYPE, RepeatSignType>
             {
-                { ClassLibrary.BarLine.TYPE.NORMAL, RepeatSignType.None },
-                { ClassLibrary.BarLine.TYPE.START, RepeatSignType.Forward },
-                { ClassLibrary.BarLine.TYPE.REPEAT, RepeatSignType.Backward }
+                { DomainModel.BarLine.TYPE.NORMAL, RepeatSignType.None },
+                { DomainModel.BarLine.TYPE.START, RepeatSignType.Forward },
+                { DomainModel.BarLine.TYPE.REPEAT, RepeatSignType.Backward }
             };
-            timeSignature = new ClassLibrary.TimeSignature();
+            timeSignature = new DomainModel.TimeSignature();
             semitones = new Dictionary<Semitone.SEMITONE, int>
             {
                 { Semitone.SEMITONE.MAJOR, 1 },
@@ -64,8 +65,13 @@ namespace DPA_Musicsheets.Facade
 
         }
 
+        
         public IList<MusicalSymbol> GetStaffsFromTokens(Symbol rootNote)
         {
+            if (rootNote == null) return new List<MusicalSymbol>();
+            clef.key = DomainModel.Clef.Key.NOTSET;
+            timeSignature.NumberOfBeats = 0;
+            timeSignature.TimeOfBeats = 0;
             symbols = new List<MusicalSymbol>();
             currentNote = rootNote;
             DoClef();
@@ -87,7 +93,7 @@ namespace DPA_Musicsheets.Facade
 
         private void DoNote()
         {
-            ClassLibrary.Note cr = (ClassLibrary.Note)currentNote;
+            DomainModel.Note cr = (DomainModel.Note)currentNote;
 
             if(cr.Pitch == "")
             {
@@ -101,17 +107,15 @@ namespace DPA_Musicsheets.Facade
             NoteStemDirection.Up, NoteTieType.None,
             new List<NoteBeamType>() { NoteBeamType.Single });
 
-
             float count = 1 / cr.Duration;
             float dur = (float)((Math.Pow(2, cr.Dotted) - 1) / Math.Pow(2, cr.Dotted)) + 1;
             barlinecount += (count * dur);
             symbols.Add(n);
         }
-
         private void DoTimesig()
         {
-            if (currentNote.GetType() != typeof(ClassLibrary.Note)) return;
-            ClassLibrary.Note c = (ClassLibrary.Note)currentNote;
+            if (currentNote.GetType() != typeof(DomainModel.Note)) return;
+            DomainModel.Note c = (DomainModel.Note)currentNote;
 
             if (!TimeSigHasChanged(c)) return;
             this.timeSignature.TimeOfBeats = c.TimeSignature.TimeOfBeats;
@@ -119,15 +123,15 @@ namespace DPA_Musicsheets.Facade
             symbols.Add(new PSAMControlLibrary.TimeSignature(TimeSignatureType.Numbers, (uint)c.TimeSignature.NumberOfBeats, (uint)c.TimeSignature.TimeOfBeats));
         }
 
-        private bool TimeSigHasChanged(ClassLibrary.Note c)
+        private bool TimeSigHasChanged(DomainModel.Note c)
         {
             return this.timeSignature.NumberOfBeats != c.TimeSignature.NumberOfBeats || this.timeSignature.TimeOfBeats != c.TimeSignature.TimeOfBeats;
         }
 
         private void DoClef()
         {
-            if (currentNote.GetType() != typeof(ClassLibrary.Note)) return;
-            ClassLibrary.Note c = (ClassLibrary.Note)currentNote;
+            if (currentNote.GetType() != typeof(DomainModel.Note)) return;
+            DomainModel.Note c = (DomainModel.Note)currentNote;
 
             if (!ClefHasChanged(c)) return;
 
@@ -137,7 +141,7 @@ namespace DPA_Musicsheets.Facade
             this.clef.key = c.Clef.key;
 
         }
-        private bool ClefHasChanged(ClassLibrary.Note c)
+        private bool ClefHasChanged(DomainModel.Note c)
         {
             if (c.Clef == null) return false;
             return c.Clef.key != this.clef.key;
@@ -166,7 +170,7 @@ namespace DPA_Musicsheets.Facade
 
         public void DoRepeat()
         {
-            ClassLibrary.BarLine br = (ClassLibrary.BarLine)currentNote;
+            DomainModel.BarLine br = (DomainModel.BarLine)currentNote;
 
             Barline b = new Barline();
 
@@ -184,7 +188,7 @@ namespace DPA_Musicsheets.Facade
                     Symbol temp = br.Alternatives[i];
                     while (temp != null)
                     {
-                        ClassLibrary.Note cr = (ClassLibrary.Note)temp;
+                        DomainModel.Note cr = (DomainModel.Note)temp;
                         PSAMControlLibrary.Note n = new PSAMControlLibrary.Note(cr.Pitch.ToUpper(), 0, 2 + cr.Octave, durriation[cr.Duration],
                         NoteStemDirection.Up, NoteTieType.None,
                         new List<NoteBeamType>() { NoteBeamType.Single });

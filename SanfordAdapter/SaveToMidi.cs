@@ -1,10 +1,10 @@
-﻿using ClassLibrary;
+﻿using DomainModel;
 using DPA_Musicsheets.Interfaces;
 using Sanford.Multimedia.Midi;
 using System;
 using System.Collections.Generic;
 
-namespace DPA_Musicsheets.Savers
+namespace SanfordAdapter
 {
     public class SaveToMidi : ISavable
     {
@@ -15,7 +15,7 @@ namespace DPA_Musicsheets.Savers
         private BarLine activeBarline;
         private int alternativeCount;
         Sequence sequence;
-
+        public string extention { get; } = ".mid";
 
         public SaveToMidi()
         {
@@ -33,7 +33,7 @@ namespace DPA_Musicsheets.Savers
                 item.Insert(currentTick, MetaMessage.EndOfTrackMessage);
             }
 
-            sequence.Save("testfile.mid");
+            sequence.Save(fileName);
         }
 
         private void readSymbolTillNull(Symbol symbol)
@@ -175,6 +175,11 @@ namespace DPA_Musicsheets.Savers
             if (test > 127)
                 return 0;
             return midiKey+60;
+        }
+
+        public string GetExtention()
+        {
+            return extention;
         }
     }
 }
