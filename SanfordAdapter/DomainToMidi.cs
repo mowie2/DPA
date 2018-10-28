@@ -57,11 +57,14 @@ namespace SanfordAdapter
             }
             else
                 alternativeCount++;
-            if (alternativeCount > barLine.Alternatives.Count - 1)
+            if (alternativeCount > barLine.Alternatives.Count -1)
                 return;
 
             readSymbolTillNull(barLine.Alternatives[alternativeCount]);
-            readSymbolTillNull(barLine.Buddy.nextSymbol);
+
+            if (alternativeCount > barLine.Alternatives.Count - 2)
+                return;
+                readSymbolTillNull(barLine.Buddy.nextSymbol);
         }
 
         public void addNote(Note note)
@@ -137,16 +140,21 @@ namespace SanfordAdapter
                 currentTimeSignature = timeSignature;
 
             TimeSignatureBuilder timeSignatureBuilder = new TimeSignatureBuilder();
-            timeSignatureBuilder.Numerator = (byte)currentTimeSignature.TimeOfBeats;
-            if (currentTimeSignature.NumberOfBeats == 9)
+            timeSignatureBuilder.Numerator = (byte)currentTimeSignature.NumberOfBeats;
+            if (IsPowerOfTwo(currentTimeSignature.TimeOfBeats))
                 timeSignatureBuilder.Denominator = 8;
             else
-                timeSignatureBuilder.Denominator = (byte)currentTimeSignature.NumberOfBeats;
+                timeSignatureBuilder.Denominator = (byte)currentTimeSignature.TimeOfBeats;
             timeSignatureBuilder.ClocksPerMetronomeClick = 24;
             timeSignatureBuilder.ThirtySecondNotesPerQuarterNote = 8;
             timeSignatureBuilder.Build();
 
             sequence[0].Insert(currentTick, timeSignatureBuilder.Result);
+        }
+
+        bool IsPowerOfTwo(int x)
+        {
+            return (x & (x - 1)) != 0;
         }
 
         private int calculatePitch(string pitch, int octave, Clef clef, Semitone.SEMITONE semitone)
