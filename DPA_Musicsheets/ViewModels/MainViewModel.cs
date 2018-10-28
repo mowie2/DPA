@@ -1,16 +1,7 @@
-﻿using DPA_Musicsheet;
-using DPA_Musicsheets.Managers;
+﻿using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
-using Microsoft.Win32;
-using PSAMWPFControlLibrary;
 using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 
 namespace DPA_Musicsheets.ViewModels
@@ -42,24 +33,31 @@ namespace DPA_Musicsheets.ViewModels
             set { _currentState = value; RaisePropertyChanged(() => CurrentState); }
         }
 
-        private MusicLoader _musicLoader;
-
-        public MainViewModel(MusicLoader musicLoader)
+        private MusicController musicController;
+        private LilypondViewModel lilypondViewModel;
+        
+        public MainViewModel(MusicController ms, LilypondViewModel lvm)
         {
-            // TODO: Can we use some sort of eventing system so the managers layer doesn't have to know the viewmodel layer?
-            _musicLoader = musicLoader;
+
+            musicController = ms;
+            lilypondViewModel = lvm;
             FileName = @"Files/Alle-eendjes-zwemmen-in-het-water.mid";
+
+            //CurrentState = this.ed.CurrentState;
         }
 
         public ICommand OpenFileCommand => new RelayCommand(() =>
         {
-            FileManager fr = new FileManager();
-            FileName = fr.OpenFile();
+            //FileManager fr = new FileManager();
+            //FileName = fr.OpenFile();
+
+            musicController.OpenFile();
         });
 
         public ICommand LoadCommand => new RelayCommand(() =>
         {
-            _musicLoader.OpenFile(FileName);
+             
+            lilypondViewModel.LilypondText = musicController.LoadFile();
         });
 
         #region Focus and key commands, these can be used for implementing hotkeys

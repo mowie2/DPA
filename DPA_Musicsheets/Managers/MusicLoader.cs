@@ -36,8 +36,6 @@ namespace DPA_Musicsheets.Managers
         private int _beatsPerBar;     // Aantal beatnotes per maat.
 
         public MainViewModel MainViewModel { get; set; }
-        public LilypondViewModel LilypondViewModel { get; set; }
-        public MidiPlayerViewModel MidiPlayerViewModel { get; set; }
         public StaffsViewModel StaffsViewModel { get; set; }
 
         /// <summary>
@@ -46,58 +44,12 @@ namespace DPA_Musicsheets.Managers
         /// TODO: Remove the knowledge of filetypes. What if we want to support MusicXML later?
         /// TODO: Remove the calling of the outer viewmodel layer. We want to be able reuse this in an ASP.NET Core application for example.
         /// </summary>
-        /// <param name="fileName"></param>
-        public void OpenFile(string fileName)
-        {
-            if (Path.GetExtension(fileName).EndsWith(".mid"))
-            {
-                MidiPlayerViewModel.slb.CreateSequence(fileName);
-
-                // MidiPlayerViewModel.slb.MidiSequence = MidiSequence;
-                this.LilypondText = LoadMidiIntoLilypond(MidiPlayerViewModel.slb.MidiSequence);
-                this.LilypondViewModel.LilypondTextLoaded(this.LilypondText);
-            }
-            else if (Path.GetExtension(fileName).EndsWith(".ly"))
-            {
-                StringBuilder sb = new StringBuilder();
-                foreach (var line in File.ReadAllLines(fileName))
-                {
-                    sb.AppendLine(line);
-                }
-                
-                this.LilypondText = sb.ToString();
-                this.LilypondViewModel.LilypondTextLoaded(this.LilypondText);
-            }
-            else
-            {
-                throw new NotSupportedException($"File extension {Path.GetExtension(fileName)} is not supported.");
-            }
-            MidiReader reader = new MidiReader();
-            
-            ClassLibrary.Note firstnote = reader.readFile(fileName);
-            Savers.SaveToMidi save = new Savers.SaveToMidi();
-            save.Save("testfile", firstnote);
-            //LoadLilypondIntoWpfStaffsAndMidi(LilypondText);
-        }
-
-        /// <summary>
+   
         /// This creates WPF staffs and MIDI from Lilypond.
         /// TODO: Remove the dependencies from one language to another. If we want to replace the WPF library with another for example, we have to rewrite all logic.
         /// TODO: Create our own domain classes to be independent of external libraries/languages.
         /// </summary>
         /// <param name="content"></param>
-        public void LoadLilypondIntoWpfStaffsAndMidi(string content)
-        {
-            LilypondText = content;
-            content = content.Trim().ToLower().Replace("\r\n", " ").Replace("\n", " ").Replace("  ", " ");
-            LinkedList<LilypondToken> tokens = GetTokensFromLilypond(content);
-            WPFStaffs.Clear();
-
-            WPFStaffs.AddRange(GetStaffsFromTokens(tokens));
-            this.StaffsViewModel.SetStaffs(this.WPFStaffs);
-
-            MidiPlayerViewModel.slb.MidiSequence = GetSequenceFromWPFStaffs(); 
-        }
 
         #region Midi loading (loads midi to lilypond)
 
@@ -474,7 +426,7 @@ namespace DPA_Musicsheets.Managers
             metaTrack.Insert(absoluteTicks, MetaMessage.EndOfTrackMessage);
             return sequence;
         }
-
+        /*
         internal void SaveToPDF(string fileName)
         {
             string withoutExtension = Path.GetFileNameWithoutExtension(fileName);
@@ -500,14 +452,14 @@ namespace DPA_Musicsheets.Managers
 
             process.Start();
             while (!process.HasExited) { /* Wait for exit */
-                }
+            /*    }
                 if (sourceFolder != targetFolder || sourceFileName != targetFileName)
             {
                 File.Move(sourceFolder + "\\" + sourceFileName + ".pdf", targetFolder + "\\" + targetFileName + ".pdf");
                 File.Delete(tmpFileName);
             }
-        }
-
+        }*/
+        /*
         internal void SaveToLilypond(string fileName)
         {
             using (StreamWriter outputFile = new StreamWriter(fileName))
@@ -516,6 +468,7 @@ namespace DPA_Musicsheets.Managers
                 outputFile.Close();
             }
         }
+        */
         #endregion Saving to files
     }
 }

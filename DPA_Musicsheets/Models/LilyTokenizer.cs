@@ -18,7 +18,7 @@ namespace DPA_Musicsheets.Models
             lookupTable = new Dictionary<string, LilypondTokenKind>
             {
                 [@"^\\relative$"] = LilypondTokenKind.Relative,
-                [@"^c([,'])*$"] = LilypondTokenKind.RelativeValue,
+                [@"^c([,']*)$"] = LilypondTokenKind.RelativeValue,
                 [@"^([a-g])([eis]*)([,']*)(\d+)([.]*)$"] = LilypondTokenKind.Note,
                 [@"^r(\d+)([.]*)$"] = LilypondTokenKind.Rest,
                 //Bar,
@@ -35,6 +35,12 @@ namespace DPA_Musicsheets.Models
                 [@"^{$"] = LilypondTokenKind.SectionStart,
                 [@"^}$"] = LilypondTokenKind.SectionEnd 
             };
+        }
+
+        private void Clear()
+        {
+            rootToken = null;
+            prefToken = null;
         }
 
         public void ReadLily(string text)
@@ -68,7 +74,7 @@ namespace DPA_Musicsheets.Models
             }
         }
 
-        public void SetNextToken(LilypondToken nextToken)
+        private void SetNextToken(LilypondToken nextToken)
         {
             if (rootToken == null)
             {
@@ -83,7 +89,9 @@ namespace DPA_Musicsheets.Models
 
         public LilypondToken GetRootToken()
         {
-            return rootToken;
+            LilypondToken t = rootToken;
+            rootToken = null;
+            return t;
         }
     }
 }

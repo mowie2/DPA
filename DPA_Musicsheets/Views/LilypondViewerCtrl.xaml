@@ -23,11 +23,11 @@
             VerticalAlignment="Stretch" Text="{Binding LilypondText, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Padding="5"
             Grid.Row="1" Grid.Column="1">
             <i:Interaction.Triggers>
-                <i:EventTrigger EventName="SelectionChanged" >
+                <!--<i:EventTrigger EventName="SelectionChanged" >
                     <command:EventToCommand Command="{Binding SelectionChangedCommand}" PassEventArgsToCommand="True"  />
-                </i:EventTrigger>
+                </i:EventTrigger>-->
                 <i:EventTrigger EventName="TextChanged" >
-                    <command:EventToCommand Command="{Binding TextChangedCommand}" PassEventArgsToCommand="True"  />
+                    <command:EventToCommand Command="{Binding TextChangedCommand, UpdateSourceTrigger=PropertyChanged}" PassEventArgsToCommand="True"  />
                 </i:EventTrigger>
             </i:Interaction.Triggers>
         </TextBox>
