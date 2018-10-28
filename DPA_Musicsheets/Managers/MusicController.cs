@@ -18,7 +18,7 @@ namespace DPA_Musicsheets.Managers
         FileManager fileManager;
         //public MidiPlayerViewModel midiPlayerView;
         private string _lilyPondText;
-        public IMidiPlayer midiPlayer;
+        public IMusicPlayer musicPlayer;
 
         public string lilyPondText
         {
@@ -46,7 +46,7 @@ namespace DPA_Musicsheets.Managers
             staffsViewModel = staffs;
             editor = edit;
 
-            midiPlayer = new SanfordLib();
+            musicPlayer = new SanfordLib();
             //path = "C:\\Users\\mo\\Desktop\\School\\DPA\\DPA_Musicsheets\\Files\\Herhaling_metAlternatief.ly";
             //musicData = fileManager.LoadFile(path);
             //Test();
@@ -137,13 +137,13 @@ namespace DPA_Musicsheets.Managers
 
         public void SetMidiPlayer()
         {
-            midiPlayer.SetMidisequence(musicData);
+            musicPlayer.SetMusic(musicData);
         }
 
         public void Play()
         {
             //midiPlayer.SetMidisequence(musicData);
-            midiPlayer.ContinueSequence();
+            musicPlayer.Continue();
         }
 
         public void Save()

@@ -7,13 +7,13 @@ using System.Threading.Tasks;
 
 namespace DPA_Musicsheets.Interfaces
 {
-    public interface IMidiPlayer
+    public interface IMusicPlayer
     {
-        void SetMidisequence(Symbol symbol);
-        bool CheckSequence();
-        void SetSequncerPosition(int position);
-        void SequencerStop();
-        void ContinueSequence();
+        void SetMusic(Symbol symbol);
+        bool Check();
+        void Rewind();
+        void Stop();
+        void Continue();
         void SquencePlayCompleted(bool running);
         void Cleanup();
     }

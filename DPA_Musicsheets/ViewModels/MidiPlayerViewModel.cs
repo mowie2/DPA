@@ -50,7 +50,7 @@ namespace DPA_Musicsheets.ViewModels
             //musicController.midiPlayer.SequencerChannelMessagedPlayed(slb.ChannelMessagePlayed);
             
             // Wanneer de sequence klaar is moeten we alles closen en stoppen.
-            //slb.SquencePlayCompleted(_running);
+            musicController.musicPlayer.SquencePlayCompleted(_running);
 
             
         }
@@ -71,32 +71,29 @@ namespace DPA_Musicsheets.ViewModels
         #region buttons for play, stop, pause
         public RelayCommand PlayCommand => new RelayCommand(() =>
         {
-            musicController.midiPlayer.SquencePlayCompleted(_running);
+            musicController.musicPlayer.SquencePlayCompleted(_running);
             if (!_running)
             {
                 _running = true;
                 musicController.Play();
                 //slb.ContinueSequence();
-                //UpdateButtons();
-                musicController.midiPlayer.SquencePlayCompleted(_running);
+                UpdateButtons();
             }
-        }, () => !_running && musicController.midiPlayer.CheckSequence() == true);
+        }, () => !_running && musicController.musicPlayer.Check() == true);
 
         public RelayCommand StopCommand => new RelayCommand(() =>
         {
             _running = false;
-            musicController.midiPlayer.SequencerStop();
-            musicController.midiPlayer.SetSequncerPosition(0);
+            musicController.musicPlayer.Stop();
+            musicController.musicPlayer.Rewind();
             //UpdateButtons();
-            musicController.midiPlayer.SquencePlayCompleted(_running);
         }, () => _running);
 
         public RelayCommand PauseCommand => new RelayCommand(() =>
         {
             _running = false;
-            musicController.midiPlayer.SequencerStop();
+            musicController.musicPlayer.Stop();
             //UpdateButtons();
-            musicController.midiPlayer.SquencePlayCompleted(_running);
         }, () => _running);
 
         #endregion buttons for play, stop, pause
@@ -106,7 +103,7 @@ namespace DPA_Musicsheets.ViewModels
         /// </summary>
         public override void Cleanup()
         {
-            musicController.midiPlayer.Cleanup();
+            musicController.musicPlayer.Cleanup();
             base.Cleanup();
         }
     }

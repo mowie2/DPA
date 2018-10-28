@@ -8,7 +8,7 @@ using System;
 
 namespace DPA_Musicsheets.Facade
 {
-    public class SanfordLib: IMidiPlayer
+    public class SanfordLib: IMusicPlayer
     {
         public OutputDevice _outputDevice { get; set; }
         private DomainToMidi domainToMidi;
@@ -24,35 +24,40 @@ namespace DPA_Musicsheets.Facade
             }
         }
 
-        public void SetMidisequence(Symbol symbol)
+        public void Rewind()
         {
-            SequencerStop();
             SetSequncerPosition(0);
+        }
+
+        public void SetMusic(Symbol symbol)
+        {
+            Stop();
+            Rewind();
             MidiSequence = domainToMidi.GetMidiSequence(symbol);
         }
 
-        public bool CheckSequence()
+        public bool Check()
         {
             return _sequencer.Sequence != null;
         }
 
-        public void SetSequncerPosition(int position)
+        private void SetSequncerPosition(int position)
         {
             _sequencer.Position = position;
         }
 
-        public void SequencerStop()
+        public void Stop()
         {
             _sequencer.Stop();
         }
 
-        public void ContinueSequence()
+        public void Continue()
         {
             _sequencer.Continue();
         }
 
-        private RelayCommand StopCommand;
-        private readonly Action UpdateButtons;
+        //private RelayCommand StopCommand;
+        //private readonly Action UpdateButtons;
 
         public SanfordLib(/*RelayCommand stop, Action update*/)
         {
