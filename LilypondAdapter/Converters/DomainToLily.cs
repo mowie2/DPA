@@ -87,9 +87,10 @@ namespace LilypondAdapter
 
         private int RelativeOctaveModifier(string pitch)
         {
-            int returnOctave = 0 + prefRelativeOctaveModifier;
+            int returnOctave = 0;
             if (!prefPitch.Equals("") && !pitch.Equals(""))
             {
+                returnOctave += prefRelativeOctaveModifier;
                 int distance = notesOrder.IndexOf(pitch) - notesOrder.IndexOf(prefPitch);
                 if (distance > 3)
                 {
@@ -99,8 +100,8 @@ namespace LilypondAdapter
                 {
                     returnOctave -= 1;
                 }
+                prefPitch = pitch;
             }
-            prefPitch = pitch;
             prefRelativeOctaveModifier = returnOctave;
             return returnOctave;
         }
