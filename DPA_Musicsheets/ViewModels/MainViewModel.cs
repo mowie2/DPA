@@ -3,6 +3,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
@@ -84,9 +85,22 @@ namespace DPA_Musicsheets.ViewModels
             Console.WriteLine("Key Up");
         });
 
-        public ICommand OnWindowClosingCommand => new RelayCommand(() =>
+        public ICommand OnWindowClosingCommand => new RelayCommand<CancelEventArgs>((args) =>
         {
-            ViewModelLocator.Cleanup();
+            // TODO: als het bestand net is ingeladen werkt dit niet zo goed
+            if (lilypondViewModel.UnSavedChanges())
+            {
+                if(MessageBox.Show("There are unsaved changes, quit anyway?", "Confirm", MessageBoxButton.YesNo) == MessageBoxResult.Yes)
+                {
+                    args.Cancel = false;
+                    ViewModelLocator.Cleanup();
+                   
+                } else
+                {
+                    args.Cancel = true;
+                }
+            }
+           
         });
         #endregion Focus and key commands, these can be used for implementing hotkeys
 

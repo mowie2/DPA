@@ -27,6 +27,7 @@ namespace DPA_Musicsheets.ViewModels
         private Editor editor;
         private string _text;
         private List<Icommand> Commands;
+        private bool changedFiles = false;
 
         private DPA_Musicsheets.Memento.CareTaker careTaker;
         /// <summary>
@@ -113,6 +114,7 @@ namespace DPA_Musicsheets.ViewModels
 
                         CreateMemento();
                         ShouldCreateMemento = true;
+                        changedFiles = true;
                     }
                 }, TaskScheduler.FromCurrentSynchronizationContext()); // Request from main thread.
             }
@@ -145,6 +147,7 @@ namespace DPA_Musicsheets.ViewModels
 
         public ICommand SaveAsCommand => new RelayCommand(() =>
         {
+            changedFiles = false;
             musicController.Save();
         });
         #endregion Commands for buttons like Undo, Redo and SaveAs
@@ -173,6 +176,11 @@ namespace DPA_Musicsheets.ViewModels
             Commands.Add(new TimeSig6Command(pressedKeys, LilypondText));
             Commands.Add(new TimeSigCommand(pressedKeys, LilypondText));
 
+        }
+
+        public bool UnSavedChanges()
+        {
+            return changedFiles;
         }
     }
 }
