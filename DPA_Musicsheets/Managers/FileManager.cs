@@ -1,5 +1,6 @@
 ﻿using ClassLibrary.Interfaces;
 using DomainModel;
+using DPA_Musicsheets.Converters;
 using DPA_Musicsheets.Interfaces;
 using Microsoft.Win32;
 using System;
@@ -15,9 +16,7 @@ namespace DPA_Musicsheet
     {
         //private Dictionary<string, ISavable> savables;
         //private readonly Dictionary<string, IReader> readers;
-        private readonly List<IReader> readers;
-        private readonly List<ISavable> savables;
-        private readonly List<IConvertToExtention> converters;
+        private ConverterGetter converterGetter;
 
         //private 
         private OpenFileDialog openFileDialog;
@@ -27,37 +26,8 @@ namespace DPA_Musicsheet
 
         public FileManager()
         {
-            
-            IEnumerable<Type> assemblies;
-            var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            assemblies = Directory.GetFiles(spath, "*.dll")
-                .Select(dll => Assembly.LoadFile(dll))
-                .SelectMany(s => s.GetTypes())
-                .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
 
-            var type = typeof(IReader);
-            readers = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IReader)Activator.CreateInstance(c)).ToList();
-
-            type = typeof(ISavable);
-            savables = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (ISavable)Activator.CreateInstance(c)).ToList();
-
-            type = typeof(IConvertToExtention);
-            converters = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToExtention)Activator.CreateInstance(c)).ToList();
-
-
-            //savables = new Dictionary<string, ISavable>
-            //{
-            //{ ".pdf", new SaveToPDF() },
-            //{ ".ly", new SaveToLily() },
-            //{ ".mid", new SaveToMidi() }
-            //};
-
-            //readers = new Dictionary<string, IReader>()
-            //{
-            //{".mid", new MidiReader() },
-            //{".ly", new LillyPondReader() }
-            //};
-
+            converterGetter = new ConverterGetter();
             openFileDialog = new OpenFileDialog() { Filter = "Midi or LilyPond files (*.mid *.ly)|*.mid;*.ly" };
             saveFileDialog = new SaveFileDialog() { Filter = "Midi|*.mid|Lilypond|*.ly|PDF|*.pdf" };
         }
@@ -65,16 +35,14 @@ namespace DPA_Musicsheet
         internal Symbol LoadFile(string path)
         {
             string extension = Path.GetExtension(openFileDialog.FileName);
+            IReader reader = converterGetter.GetReader(extension);
+            IConvertToExtention converter = converterGetter.GetConvertToExtention(".ly");
 
-            List<IReader> readerWithExtention = readers.Where(p => p.GetExtention().Equals(extension)).ToList();
-            List<IConvertToExtention> convertersWithExtention = converters.Where(p => p.GetExtention().Equals(".ly")).ToList();
-
-            if (readerWithExtention.Count() >0 && convertersWithExtention.Count() >0)
+            if (reader != null && converter != null)
             {
-                IReader reader = readerWithExtention[0];
                 string fileName = openFileDialog.FileName;
                 Symbol root = reader.readFile(fileName);
-                lilypondText = convertersWithExtention[0].Convert(root) as string;
+                lilypondText = converter.Convert(root) as string;
                 return root;
             }
             return null;
@@ -82,7 +50,6 @@ namespace DPA_Musicsheet
 
         public string OpenFile()
         {
-
             try
             {
                 if (openFileDialog.ShowDialog() == true)
@@ -109,15 +76,13 @@ namespace DPA_Musicsheet
             {
                 string extension = Path.GetExtension(saveFileDialog.FileName);
 
-                List<ISavable> saverWithExtention = savables.Where(p => p.GetExtention().Equals(extension)).ToList();
+                ISavable saver = converterGetter.GetSaver(extension);
 
-                if (saverWithExtention.Count() == 0)
+                if (saver == null)
                 {
                     MessageBox.Show($"Extension {extension} is not supported.");
                     return;
                 }
-
-                ISavable saver = saverWithExtention[0];
                 saver.Save(saveFileDialog.FileName, musicData);
             }
 
@@ -126,22 +91,21 @@ namespace DPA_Musicsheet
         internal void SaveFile(Symbol musicData, string extension)
         {
 
-            List<ISavable> saverWithExtention = savables.Where(p => p.GetExtention().Equals(extension)).ToList();
+            ISavable saver = converterGetter.GetSaver(extension);
 
-            if (saverWithExtention.Count() == 0)
+            if (saver == null)
             {
                 MessageBox.Show($"Extension {extension} is not supported.");
                 return;
             }
 
-            ISavable saver = saverWithExtention[0];
             string path = System.IO.Path.GetDirectoryName(Assembly.GetEntryAssembly().Location);
 
             string newpath = Path.GetFullPath(Path.Combine(path, @"..\..\"));
             string Filename = newpath + "/Files/autogenerated_pdf_" + DateTime.Now.Ticks.ToString();
 
             saver.Save(Filename, musicData);
-            
+
         }
     }
 }

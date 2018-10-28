@@ -112,6 +112,7 @@
     <Compile Include="Commands\TimeSig4Command.cs" />
     <Compile Include="Commands\TimeSig6Command.cs" />
     <Compile Include="Commands\TimeSigCommand.cs" />
+    <Compile Include="Converters\ConverterGetter.cs" />
     <Compile Include="Facade\PsamContolLib.cs" />
     <Compile Include="Facade\SanfordLib.cs" />
     <Compile Include="Interfaces\Icommand.cs" />

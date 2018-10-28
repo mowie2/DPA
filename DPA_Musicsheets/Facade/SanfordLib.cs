@@ -1,6 +1,7 @@
 ﻿using ClassLibrary;
 using ClassLibrary.Interfaces;
 using DomainModel;
+using DPA_Musicsheets.Converters;
 using DPA_Musicsheets.Interfaces;
 using DPA_Musicsheets.Managers;
 using GalaSoft.MvvmLight.CommandWpf;
@@ -65,25 +66,11 @@ namespace DPA_Musicsheets.Facade
             _sequencer.ChannelMessagePlayed += ChannelMessagePlayed;
             SequencerChannelMessagedPlayed(this.ChannelMessagePlayed);
 
-
-
             //this.StopCommand = stop;
             //this.UpdateButtons = update;
 
-            IEnumerable<Type> assemblies;
-            var type = typeof(IConvertToExtention);
-            var spath = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
-            assemblies = Directory.GetFiles(spath, "*.dll")
-                .Select(dll => Assembly.LoadFile(dll))
-                .SelectMany(s => s.GetTypes())
-                .Where(p => p.IsClass && p.IsPublic && !p.IsAbstract);
-
-            var converters = assemblies.Where(p => type.IsAssignableFrom(p)).Select(c => (IConvertToExtention)Activator.CreateInstance(c)).ToList();
-            converters = converters.Where(p => p.GetExtention().Equals(".mid")).ToList();
-            if (converters.Count > 0)
-            {
-                converter = converters[0];
-            }
+            ConverterGetter converterGetter = new ConverterGetter();
+            converter = converterGetter.GetConvertToExtention(".mid");
         }
 
         public void Cleanup()
